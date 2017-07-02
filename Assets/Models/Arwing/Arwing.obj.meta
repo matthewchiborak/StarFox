@@ -1,0 +1,224 @@
+fileFormatVersion: 2
+guid: cddade84d02bc934f98ee66aced84bff
+timeCreated: 1498951412
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: 1_pl0000_10_Glass
+    100002: 1_pl0000_1_Body
+    100004: 1_pl0000_2_Body
+    100006: 1_pl0000_3_Body
+    100008: 1_pl0000_4_Fox
+    100010: 1_pl0000_5_Falco
+    100012: 1_pl0000_6_Peppy
+    100014: 1_pl0000_7_Slippy
+    100016: 1_pl0000_8_Logos
+    100018: 1_pl0000_9_Damage_01
+    100020: //RootNode
+    100022: Bone1
+    100024: Bone10
+    100026: Bone11
+    100028: Bone12
+    100030: Bone13
+    100032: Bone14
+    100034: Bone15
+    100036: Bone16
+    100038: Bone17
+    100040: Bone18
+    100042: Bone19
+    100044: Bone2
+    100046: Bone3
+    100048: Bone4
+    100050: Bone5
+    100052: Bone6
+    100054: Bone7
+    100056: Bone8
+    100058: Bone9
+    400000: 1_pl0000_10_Glass
+    400002: 1_pl0000_1_Body
+    400004: 1_pl0000_2_Body
+    400006: 1_pl0000_3_Body
+    400008: 1_pl0000_4_Fox
+    400010: 1_pl0000_5_Falco
+    400012: 1_pl0000_6_Peppy
+    400014: 1_pl0000_7_Slippy
+    400016: 1_pl0000_8_Logos
+    400018: 1_pl0000_9_Damage_01
+    400020: //RootNode
+    400022: Bone1
+    400024: Bone10
+    400026: Bone11
+    400028: Bone12
+    400030: Bone13
+    400032: Bone14
+    400034: Bone15
+    400036: Bone16
+    400038: Bone17
+    400040: Bone18
+    400042: Bone19
+    400044: Bone2
+    400046: Bone3
+    400048: Bone4
+    400050: Bone5
+    400052: Bone6
+    400054: Bone7
+    400056: Bone8
+    400058: Bone9
+    2300000: 1_pl0000_10_Glass
+    2300002: 1_pl0000_1_Body
+    2300004: 1_pl0000_2_Body
+    2300006: 1_pl0000_3_Body
+    2300008: 1_pl0000_4_Fox
+    2300010: 1_pl0000_5_Falco
+    2300012: 1_pl0000_6_Peppy
+    2300014: 1_pl0000_7_Slippy
+    2300016: 1_pl0000_8_Logos
+    2300018: 1_pl0000_9_Damage_01
+    2300020: Bone1
+    2300022: Bone10
+    2300024: Bone11
+    2300026: Bone12
+    2300028: Bone13
+    2300030: Bone14
+    2300032: Bone15
+    2300034: Bone16
+    2300036: Bone17
+    2300038: Bone18
+    2300040: Bone19
+    2300042: Bone2
+    2300044: Bone3
+    2300046: Bone4
+    2300048: Bone5
+    2300050: Bone6
+    2300052: Bone7
+    2300054: Bone8
+    2300056: Bone9
+    3300000: 1_pl0000_10_Glass
+    3300002: 1_pl0000_1_Body
+    3300004: 1_pl0000_2_Body
+    3300006: 1_pl0000_3_Body
+    3300008: 1_pl0000_4_Fox
+    3300010: 1_pl0000_5_Falco
+    3300012: 1_pl0000_6_Peppy
+    3300014: 1_pl0000_7_Slippy
+    3300016: 1_pl0000_8_Logos
+    3300018: 1_pl0000_9_Damage_01
+    3300020: Bone1
+    3300022: Bone10
+    3300024: Bone11
+    3300026: Bone12
+    3300028: Bone13
+    3300030: Bone14
+    3300032: Bone15
+    3300034: Bone16
+    3300036: Bone17
+    3300038: Bone18
+    3300040: Bone19
+    3300042: Bone2
+    3300044: Bone3
+    3300046: Bone4
+    3300048: Bone5
+    3300050: Bone6
+    3300052: Bone7
+    3300054: Bone8
+    3300056: Bone9
+    4300000: 1_pl0000_10_Glass
+    4300002: 1_pl0000_1_Body
+    4300004: 1_pl0000_2_Body
+    4300006: 1_pl0000_3_Body
+    4300008: 1_pl0000_4_Fox
+    4300010: 1_pl0000_5_Falco
+    4300012: 1_pl0000_6_Peppy
+    4300014: 1_pl0000_7_Slippy
+    4300016: 1_pl0000_8_Logos
+    4300018: 1_pl0000_9_Damage_01
+    4300020: Bone1
+    4300022: Bone10
+    4300024: Bone11
+    4300026: Bone12
+    4300028: Bone13
+    4300030: Bone14
+    4300032: Bone15
+    4300034: Bone16
+    4300036: Bone17
+    4300038: Bone18
+    4300040: Bone19
+    4300042: Bone2
+    4300044: Bone3
+    4300046: Bone4
+    4300048: Bone5
+    4300050: Bone6
+    4300052: Bone7
+    4300054: Bone8
+    4300056: Bone9
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
