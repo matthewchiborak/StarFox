@@ -36,6 +36,19 @@ public class PlayerControllerScript : MonoBehaviour {
     public Transform shotSpawn1;
     public Transform shotSpawn2;
 
+    //Barrel roll functionality
+    private bool rollingL;
+    private bool tappingL;
+    private float lastTapL;
+    private float tapTime;
+    private bool rollingR;
+    private bool tappingR;
+    private float lastTapR;
+
+    private float durationOfRoll;
+    private float startRollTime;
+    public ParticleSystem rollTrails;
+
     // Use this for initialization
     void Start ()
     {
@@ -60,8 +73,18 @@ public class PlayerControllerScript : MonoBehaviour {
         currentBankAngle = 0;
         startBankTimeTaken = false;
         timeForBank = 0.25f;
+
+        rollingL = false;
+        tappingL = false;
+        lastTapL = Time.time;
+        tapTime = 0.25f;
+        rollingR = false;
+        tappingR = false;
+        lastTapR = Time.time;
+        durationOfRoll = 0.5f;
+        startRollTime = 0;
     }
-	
+
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
     //Done before physics calculations
     void FixedUpdate()
@@ -74,26 +97,93 @@ public class PlayerControllerScript : MonoBehaviour {
         //movement = new Vector3(moveHorizontal, moveVertical, 0);
         rb.velocity = new Vector3(moveHorizontal * currentSpeed, moveVertical * verticalSpeed, 0);
 
-        //Banking
-        if (Input.GetKey(KeyCode.Q) ^ Input.GetKey(KeyCode.E))
+        //Barrel roll functionallity
+        if (Input.GetKeyDown(KeyCode.Q) && !rollingL && !rollingR)
         {
-            isBanking = true;
+            if (!tappingL)
+            {
+                tappingL = true;
+                lastTapL = Time.time;
+            }
+            else
+            {
+                //Start barrel roll to the left
+                rollingL = true;
+                startRollTime = Time.time;
+                rollTrails.Play();
+            }
         }
-        else
+        //Time out the key press if pressed
+        if (tappingL && Time.time - lastTapL > tapTime)
         {
-            isBanking = false;
+            tappingL = false;
         }
-        setIsBanking();
+        //Right direction barrel roll
+        if (Input.GetKeyDown(KeyCode.E) && !rollingL && !rollingR)
+        {
+            if (!tappingR)
+            {
+                tappingR = true;
+                lastTapR = Time.time;
+            }
+            else
+            {
+                //Start barrel roll to the right
+                rollingR = true;
+                startRollTime = Time.time;
+                rollTrails.Play();
+            }
+        }
+        //Time out the key press if pressed
+        if (tappingR && Time.time - lastTapR > tapTime)
+        {
+            tappingR = false;
+        }
 
-        //Rotation the z-axis based on the banking
-        if(isBanking)
+        //Banking
+        if (!rollingL && !rollingR)
         {
-            //transform.rotation = Quaternion.Lerp(bankNeutral, bankingAngle, Time.time * bankRotationSpeed);
-            currentBankAngle = Mathf.Lerp(0, bankingAngle, (Time.time - startBankTime) / timeForBank);
+            if (Input.GetKey(KeyCode.Q) ^ Input.GetKey(KeyCode.E))
+            {
+                isBanking = true;
+            }
+            else
+            {
+                isBanking = false;
+            }
+            setIsBanking();
+
+            //Rotation the z-axis based on the banking
+            if (isBanking)
+            {
+                //transform.rotation = Quaternion.Lerp(bankNeutral, bankingAngle, Time.time * bankRotationSpeed);
+                currentBankAngle = Mathf.Lerp(0, bankingAngle, (Time.time - startBankTime) / timeForBank);
+            }
+            else
+            {
+                currentBankAngle = Mathf.Lerp(bankingAngle, 0, (Time.time - startBankTime) / timeForBank);
+            }
         }
-        else
+
+        //If barrel rolling, set the banking angle to the current point in the barrel roll
+        if (rollingL || rollingR)
         {
-            currentBankAngle = Mathf.Lerp(bankingAngle, 0, (Time.time - startBankTime) / timeForBank);
+            if(rollingL)
+            {
+                currentBankAngle = Mathf.Lerp(0, 360, (Time.time - startRollTime) / durationOfRoll);
+            }
+            else if(rollingR)
+            {
+                currentBankAngle = Mathf.Lerp(0, -360, (Time.time - startRollTime) / durationOfRoll);
+            }
+
+            if((Time.time - startRollTime) > durationOfRoll)
+            {
+                currentBankAngle = 0;
+                rollingL = false;
+                rollingR = false;
+                rollTrails.Stop();
+            }
         }
        
         rotation = new Vector3
@@ -134,6 +224,7 @@ public class PlayerControllerScript : MonoBehaviour {
             if((Input.GetKey(KeyCode.Q)))
             {
                 bankingAngle = 90;
+               
             }
             else if((Input.GetKey(KeyCode.E)))
             {
