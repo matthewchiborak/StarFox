@@ -30,7 +30,12 @@ public class PlayerControllerScript : MonoBehaviour {
     private bool startBankTimeTaken;
     private float startBankTime;
     private float timeForBank;
-    
+
+    //Laser shot functionality
+    public GameObject laserShot;
+    public Transform shotSpawn1;
+    public Transform shotSpawn2;
+
     // Use this for initialization
     void Start ()
     {
@@ -58,6 +63,7 @@ public class PlayerControllerScript : MonoBehaviour {
     }
 	
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
+    //Done before physics calculations
     void FixedUpdate()
     {
         //Get user input and move the player if the game is still in progess
@@ -104,7 +110,9 @@ public class PlayerControllerScript : MonoBehaviour {
         //Check if the player is firing
         if (Input.GetButtonDown("Fire1"))
         {
-            Debug.Log("Pew pew");
+            //Create the shot
+            Instantiate(laserShot, shotSpawn1.position, rb.rotation);
+            Instantiate(laserShot, shotSpawn2.position, rb.rotation);
         }
     }
 
