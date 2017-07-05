@@ -49,6 +49,13 @@ public class PlayerControllerScript : MonoBehaviour {
     private float startRollTime;
     public ParticleSystem rollTrails;
 
+    //Boost and break functionality
+    public ParticleSystem exhaustTrailL;
+    public ParticleSystem exhaustTrailR;
+    private float normalExhaustLifeTime;
+    private float boostExhaustLifeTime;
+    private float breakExhaustLifeTime;
+
     // Use this for initialization
     void Start ()
     {
@@ -83,7 +90,11 @@ public class PlayerControllerScript : MonoBehaviour {
         lastTapR = Time.time;
         durationOfRoll = 0.5f;
         startRollTime = 0;
-    }
+
+        normalExhaustLifeTime = 0.15f;
+        boostExhaustLifeTime = 0.3f;
+        breakExhaustLifeTime = 0.05f;
+}
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
     //Done before physics calculations
@@ -193,8 +204,28 @@ public class PlayerControllerScript : MonoBehaviour {
             currentBankAngle
         );
         rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
-        
-        
+
+        //Breaking and boosting
+        //TODO Check if have enough meter to do so
+        //Maybe should lerp to the new life time and speeds
+        //Boost
+        if (Input.GetKey(KeyCode.R))
+        {
+            exhaustTrailL.startLifetime = boostExhaustLifeTime;
+            exhaustTrailR.startLifetime = boostExhaustLifeTime;
+        }
+        //Break
+        else if(Input.GetKey(KeyCode.F))
+        {
+            exhaustTrailL.startLifetime = breakExhaustLifeTime;
+            exhaustTrailR.startLifetime = breakExhaustLifeTime;
+        }
+        else //Normal
+        {
+            exhaustTrailL.startLifetime = normalExhaustLifeTime;
+            exhaustTrailR.startLifetime = normalExhaustLifeTime;
+        }
+
         //Reset speed if 
 
         //Check if the player is firing
