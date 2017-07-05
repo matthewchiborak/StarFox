@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PlayerControllerScript : MonoBehaviour {
 
+    //Access the UI control script to access/update game variable
+    public UIController _UIController;
+
     private Transform transform;
     private Rigidbody rb;
     private Vector3 movement;
@@ -56,6 +59,17 @@ public class PlayerControllerScript : MonoBehaviour {
     private float boostExhaustLifeTime;
     private float breakExhaustLifeTime;
 
+    //Variables reflecting UI elements
+    private int numBombs;
+    private float maxHealth;
+    private float currentHealth;
+
+    private float maxBoost;
+    private float currentBoost;
+    private float boostRate;
+    private float timeSinceLastBoost;
+    private float timeForBoostRecoverStart;
+
     // Use this for initialization
     void Start ()
     {
@@ -94,7 +108,16 @@ public class PlayerControllerScript : MonoBehaviour {
         normalExhaustLifeTime = 0.15f;
         boostExhaustLifeTime = 0.3f;
         breakExhaustLifeTime = 0.05f;
-}
+        
+        numBombs = 3;
+        maxHealth = 100;
+        currentHealth = maxHealth;
+        maxBoost = 100;
+        currentBoost = 0;
+        boostRate = 20; //20 points per second?
+        timeSinceLastBoost = 0;
+        timeForBoostRecoverStart = 0.5f;
+    }
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
     //Done before physics calculations
@@ -208,25 +231,51 @@ public class PlayerControllerScript : MonoBehaviour {
         //Breaking and boosting
         //TODO Check if have enough meter to do so
         //Maybe should lerp to the new life time and speeds
+        //ALSO TODO ACTUALLY ADjUST THE SPEED WHENEVER YOU DECIDE TO ACTUALLY IMPLEMENT THAT
+
         //Boost
-        if (Input.GetKey(KeyCode.R))
+        if (Input.GetKey(KeyCode.R) && (currentBoost < maxBoost))
         {
+            currentBoost += (boostRate * Time.deltaTime);
+            if (currentBoost > maxBoost)
+            {
+                currentBoost = maxBoost;
+            }
+
+            timeSinceLastBoost = Time.time;
+
             exhaustTrailL.startLifetime = boostExhaustLifeTime;
             exhaustTrailR.startLifetime = boostExhaustLifeTime;
         }
         //Break
-        else if(Input.GetKey(KeyCode.F))
+        else if(Input.GetKey(KeyCode.F) && (currentBoost < maxBoost))
         {
+            currentBoost += (boostRate * Time.deltaTime);
+            if (currentBoost > maxBoost)
+            {
+                currentBoost = maxBoost;
+            }
+
+            timeSinceLastBoost = Time.time;
+
             exhaustTrailL.startLifetime = breakExhaustLifeTime;
             exhaustTrailR.startLifetime = breakExhaustLifeTime;
         }
         else //Normal
         {
+            if (Time.time - timeSinceLastBoost > timeForBoostRecoverStart)
+            {
+                currentBoost -= (boostRate * Time.deltaTime);
+                if (currentBoost < 0)
+                {
+                    currentBoost = 0;
+                }
+            }
+
             exhaustTrailL.startLifetime = normalExhaustLifeTime;
             exhaustTrailR.startLifetime = normalExhaustLifeTime;
         }
-
-        //Reset speed if 
+        
 
         //Check if the player is firing
         if (Input.GetButtonDown("Fire1"))
@@ -235,6 +284,9 @@ public class PlayerControllerScript : MonoBehaviour {
             Instantiate(laserShot, shotSpawn1.position, rb.rotation);
             Instantiate(laserShot, shotSpawn2.position, rb.rotation);
         }
+
+        //Finally update the UI
+        _UIController.updateUI(numBombs, currentHealth, currentBoost);
     }
 
     //Cause the arwing to bank to the left or right
