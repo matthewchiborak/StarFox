@@ -70,11 +70,14 @@ public class PlayerControllerScript : MonoBehaviour {
     private bool boostRecovering;
 
     //Forward movement
-    bool atBoss;
-    float normalVelocity;
-    float boostVelocity;
-    float breakVelocity;
-    float currentForwardVelocity;
+    private bool atBoss;
+    private float normalVelocity;
+    private float boostVelocity;
+    private float breakVelocity;
+    private float currentForwardVelocity;
+
+    //Camera offset
+    public float cameraOffset;
 
     // Use this for initialization
     void Start ()
@@ -139,7 +142,24 @@ public class PlayerControllerScript : MonoBehaviour {
         moveHorizontal = Input.GetAxis("Horizontal");
         moveVertical = -1 * Input.GetAxis("Vertical");
 
-        //movement = new Vector3(moveHorizontal, moveVertical, 0);
+        //Force the player to stay in the game area
+        if(transform.position.x < (cameraOffset))
+        {
+            transform.position = new Vector3(cameraOffset, transform.position.y, transform.position.z);
+        }
+        if (transform.position.x > (-1 * cameraOffset))
+        {
+            transform.position = new Vector3(-1 * cameraOffset, transform.position.y, transform.position.z);
+        }
+        if (transform.position.y < (cameraOffset/2))
+        {
+            transform.position = new Vector3(transform.position.x, cameraOffset/2, transform.position.z);
+        }
+        if (transform.position.y > (cameraOffset / -2))
+        {
+            transform.position = new Vector3(transform.position.x, cameraOffset / -2, transform.position.z);
+        }
+
         rb.velocity = new Vector3(moveHorizontal * currentSpeed, moveVertical * verticalSpeed, currentForwardVelocity);
 
         //Barrel roll functionallity
@@ -314,7 +334,7 @@ public class PlayerControllerScript : MonoBehaviour {
             }
             else
             {
-                currentSpeed = bankSpeed - speed;
+                currentSpeed = speed;
             }
 
             if((Input.GetKey(KeyCode.Q)))
