@@ -69,6 +69,13 @@ public class PlayerControllerScript : MonoBehaviour {
     private float boostRate;
     private bool boostRecovering;
 
+    //Forward movement
+    bool atBoss;
+    float normalVelocity;
+    float boostVelocity;
+    float breakVelocity;
+    float currentForwardVelocity;
+
     // Use this for initialization
     void Start ()
     {
@@ -115,6 +122,12 @@ public class PlayerControllerScript : MonoBehaviour {
         currentBoost = 0;
         boostRate = 40; //points per second?
         boostRecovering = false;
+
+        atBoss = false;
+        normalVelocity = 5;
+        boostVelocity = 10f;
+        breakVelocity = 1f;
+        currentForwardVelocity = normalVelocity;
     }
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
@@ -127,7 +140,7 @@ public class PlayerControllerScript : MonoBehaviour {
         moveVertical = -1 * Input.GetAxis("Vertical");
 
         //movement = new Vector3(moveHorizontal, moveVertical, 0);
-        rb.velocity = new Vector3(moveHorizontal * currentSpeed, moveVertical * verticalSpeed, 0);
+        rb.velocity = new Vector3(moveHorizontal * currentSpeed, moveVertical * verticalSpeed, currentForwardVelocity);
 
         //Barrel roll functionallity
         if (Input.GetKeyDown(KeyCode.Q) && !rollingL && !rollingR)
@@ -242,6 +255,8 @@ public class PlayerControllerScript : MonoBehaviour {
             
             exhaustTrailL.startLifetime = boostExhaustLifeTime;
             exhaustTrailR.startLifetime = boostExhaustLifeTime;
+
+            currentForwardVelocity = boostVelocity;
         }
         //Break
         else if(Input.GetKey(KeyCode.F) && (currentBoost < maxBoost) && !boostRecovering)
@@ -254,6 +269,8 @@ public class PlayerControllerScript : MonoBehaviour {
 
             exhaustTrailL.startLifetime = breakExhaustLifeTime;
             exhaustTrailR.startLifetime = breakExhaustLifeTime;
+
+            currentForwardVelocity = breakVelocity;
         }
         else //Normal
         {
@@ -268,6 +285,8 @@ public class PlayerControllerScript : MonoBehaviour {
             
             exhaustTrailL.startLifetime = normalExhaustLifeTime;
             exhaustTrailR.startLifetime = normalExhaustLifeTime;
+
+            currentForwardVelocity = normalVelocity;
         }
         
 
