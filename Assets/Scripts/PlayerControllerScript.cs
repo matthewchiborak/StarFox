@@ -67,8 +67,7 @@ public class PlayerControllerScript : MonoBehaviour {
     private float maxBoost;
     private float currentBoost;
     private float boostRate;
-    private float timeSinceLastBoost;
-    private float timeForBoostRecoverStart;
+    private bool boostRecovering;
 
     // Use this for initialization
     void Start ()
@@ -114,9 +113,8 @@ public class PlayerControllerScript : MonoBehaviour {
         currentHealth = maxHealth;
         maxBoost = 100;
         currentBoost = 0;
-        boostRate = 20; //20 points per second?
-        timeSinceLastBoost = 0;
-        timeForBoostRecoverStart = 0.5f;
+        boostRate = 40; //points per second?
+        boostRecovering = false;
     }
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
@@ -234,44 +232,40 @@ public class PlayerControllerScript : MonoBehaviour {
         //ALSO TODO ACTUALLY ADjUST THE SPEED WHENEVER YOU DECIDE TO ACTUALLY IMPLEMENT THAT
 
         //Boost
-        if (Input.GetKey(KeyCode.R) && (currentBoost < maxBoost))
+        if (Input.GetKey(KeyCode.R) && (currentBoost < maxBoost) && !boostRecovering)
         {
             currentBoost += (boostRate * Time.deltaTime);
             if (currentBoost > maxBoost)
             {
                 currentBoost = maxBoost;
             }
-
-            timeSinceLastBoost = Time.time;
-
+            
             exhaustTrailL.startLifetime = boostExhaustLifeTime;
             exhaustTrailR.startLifetime = boostExhaustLifeTime;
         }
         //Break
-        else if(Input.GetKey(KeyCode.F) && (currentBoost < maxBoost))
+        else if(Input.GetKey(KeyCode.F) && (currentBoost < maxBoost) && !boostRecovering)
         {
             currentBoost += (boostRate * Time.deltaTime);
             if (currentBoost > maxBoost)
             {
                 currentBoost = maxBoost;
             }
-
-            timeSinceLastBoost = Time.time;
 
             exhaustTrailL.startLifetime = breakExhaustLifeTime;
             exhaustTrailR.startLifetime = breakExhaustLifeTime;
         }
         else //Normal
         {
-            if (Time.time - timeSinceLastBoost > timeForBoostRecoverStart)
-            {
-                currentBoost -= (boostRate * Time.deltaTime);
-                if (currentBoost < 0)
-                {
-                    currentBoost = 0;
-                }
-            }
+            boostRecovering = true;
 
+            currentBoost -= (boostRate * Time.deltaTime);
+            if (currentBoost <= 0)
+            {
+                currentBoost = 0;
+                boostRecovering = false;
+            }
+            
             exhaustTrailL.startLifetime = normalExhaustLifeTime;
             exhaustTrailR.startLifetime = normalExhaustLifeTime;
         }
@@ -286,7 +280,7 @@ public class PlayerControllerScript : MonoBehaviour {
         }
 
         //Finally update the UI
-        _UIController.updateUI(numBombs, currentHealth, currentBoost);
+        _UIController.updateUI(numBombs, currentHealth/maxHealth, currentBoost/maxBoost);
     }
 
     //Cause the arwing to bank to the left or right

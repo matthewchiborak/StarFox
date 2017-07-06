@@ -6,12 +6,6 @@ using UnityEngine.UI;
 public class UIController : MonoBehaviour {
 
     private int hits;
-    private int numBombs;
-    private float maxHealth;
-    private float currentHealth;
-
-    private float maxBoost;
-    private float currentBoost;
 
     public Text hitCountUI;
     public Image[] bombs;
@@ -24,31 +18,10 @@ public class UIController : MonoBehaviour {
 	void Start ()
     {
         hits = 0;
-        numBombs = 3;
-        maxHealth = 100;
-        currentHealth = maxHealth;
-        maxBoost = 100;
-        currentBoost = 0;
-
-        updateUI();
 	}
-
-    void Update()
-    {
-        updateUI();
-    }
-
-    public void updateUI(int numBombs, float currentHealth, float currentBoost)
-    {
-        this.numBombs = numBombs;
-        this.currentHealth = currentHealth;
-        this.currentBoost = currentBoost;
-
-        updateUI();
-    }
-	
+    
     //Updates the UI in case of a change
-    public void updateUI()
+    public void updateUI(int numBombs, float currentHealthPercentage, float currentBoostPercentage)
     {
         //Hit count
         if(hits >= 100)
@@ -65,10 +38,10 @@ public class UIController : MonoBehaviour {
         }
 
         //Health bar
-        healthBarImage.transform.localScale = new Vector3(currentHealth / maxHealth, 1, 1);
+        healthBarImage.transform.localScale = new Vector3(currentHealthPercentage, 1, 1);
 
         //Boost bar
-        boostBarImage.transform.localScale = new Vector3(currentBoost / maxBoost, 1, 1);
+        boostBarImage.transform.localScale = new Vector3(currentBoostPercentage, 1, 1);
 
         //Bombs
         if (numBombs > 6)
