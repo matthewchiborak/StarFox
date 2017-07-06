@@ -60,6 +60,7 @@ public class PlayerControllerScript : MonoBehaviour {
     private float breakExhaustLifeTime;
 
     //Variables reflecting UI elements
+    private int maxBombs;
     private int numBombs;
     private float maxHealth;
     private float currentHealth;
@@ -78,6 +79,11 @@ public class PlayerControllerScript : MonoBehaviour {
 
     //Camera offset
     public float cameraOffset;
+
+    //Bomb functionality
+    public GameObject bombShot;
+    public Transform bombSpawn;
+    private GameObject currentBomb;
 
     // Use this for initialization
     void Start ()
@@ -117,7 +123,8 @@ public class PlayerControllerScript : MonoBehaviour {
         normalExhaustLifeTime = 0.15f;
         boostExhaustLifeTime = 0.3f;
         breakExhaustLifeTime = 0.05f;
-        
+
+        maxBombs = 9;
         numBombs = 3;
         maxHealth = 100;
         currentHealth = maxHealth;
@@ -131,6 +138,8 @@ public class PlayerControllerScript : MonoBehaviour {
         boostVelocity = 10f;
         breakVelocity = 1f;
         currentForwardVelocity = normalVelocity;
+
+        currentBomb = null;
     }
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
@@ -317,6 +326,20 @@ public class PlayerControllerScript : MonoBehaviour {
             Instantiate(laserShot, shotSpawn1.position, rb.rotation);
             Instantiate(laserShot, shotSpawn2.position, rb.rotation);
         }
+        //Check if firing a bomb
+        if (Input.GetButtonDown("Fire2"))
+        {
+            //Create the shot
+            if(numBombs > 0 && currentBomb == null)
+            {
+                currentBomb = Instantiate(bombShot, bombSpawn.position, rb.rotation);
+                numBombs--;
+            }
+            else if(currentBomb != null)
+            {
+                currentBomb.GetComponent<BombShotControlScript>().explode();
+            }
+        }
 
         //Finally update the UI
         _UIController.updateUI(numBombs, currentHealth/maxHealth, currentBoost/maxBoost);
@@ -383,5 +406,19 @@ public class PlayerControllerScript : MonoBehaviour {
         }
 
         tilt = maxRotX / currentSpeed;
+    }
+
+    //Handle Collsions
+    void OnTriggerEnter(Collider other)
+    {
+        //Collide with bombs
+        if (other.gameObject.CompareTag("BombPickup"))
+        {
+            if(numBombs < 9)
+            {
+                numBombs++;
+                Destroy(other.gameObject);
+            }
+        }
     }
 }
