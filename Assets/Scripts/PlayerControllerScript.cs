@@ -58,6 +58,9 @@ public class PlayerControllerScript : MonoBehaviour {
     private float normalExhaustLifeTime;
     private float boostExhaustLifeTime;
     private float breakExhaustLifeTime;
+    public AudioSource boostSource;
+    public AudioSource breakSource;
+    private bool boostTriggered;
 
     //Variables reflecting UI elements
     private int maxBombs;
@@ -84,6 +87,7 @@ public class PlayerControllerScript : MonoBehaviour {
     public GameObject bombShot;
     public Transform bombSpawn;
     private GameObject currentBomb;
+    public AudioSource pickupSound;
 
     //Somersault
     private bool isSomerSaulting;
@@ -127,6 +131,7 @@ public class PlayerControllerScript : MonoBehaviour {
         normalExhaustLifeTime = 0.15f;
         boostExhaustLifeTime = 0.3f;
         breakExhaustLifeTime = 0.05f;
+        boostTriggered = false;
 
         maxBombs = 9;
         numBombs = 3;
@@ -162,6 +167,7 @@ public class PlayerControllerScript : MonoBehaviour {
         {
             isSomerSaulting = true;
             currentForwardVelocity = 0;
+            boostSource.Play();
         }
 
         //Force the player to stay in the game area
@@ -342,6 +348,12 @@ public class PlayerControllerScript : MonoBehaviour {
             {
                 currentBoost = maxBoost;
             }
+
+            if(!boostTriggered)
+            {
+                boostTriggered = true;
+                boostSource.Play();
+            }
             
             exhaustTrailL.startLifetime = boostExhaustLifeTime;
             exhaustTrailR.startLifetime = boostExhaustLifeTime;
@@ -355,6 +367,12 @@ public class PlayerControllerScript : MonoBehaviour {
             if (currentBoost > maxBoost)
             {
                 currentBoost = maxBoost;
+            }
+
+            if (!boostTriggered)
+            {
+                boostTriggered = true;
+                breakSource.Play();
             }
 
             exhaustTrailL.startLifetime = breakExhaustLifeTime;
@@ -371,6 +389,9 @@ public class PlayerControllerScript : MonoBehaviour {
             {
                 currentBoost = 0;
                 boostRecovering = false;
+                boostTriggered = false;
+                boostSource.Stop();
+                breakSource.Stop();
             }
             
             exhaustTrailL.startLifetime = normalExhaustLifeTime;
@@ -460,10 +481,12 @@ public class PlayerControllerScript : MonoBehaviour {
         //Collide with bombs
         if (other.gameObject.CompareTag("BombPickup"))
         {
-            if(numBombs < 9)
+            pickupSound.Play();
+            Destroy(other.gameObject);
+
+            if (numBombs < 9)
             {
                 numBombs++;
-                Destroy(other.gameObject);
             }
         }
     }
