@@ -85,6 +85,10 @@ public class PlayerControllerScript : MonoBehaviour {
     public Transform bombSpawn;
     private GameObject currentBomb;
 
+    //Somersault
+    private bool isSomerSaulting;
+    private float somerSaultVelocity;
+
     // Use this for initialization
     void Start ()
     {
@@ -140,6 +144,8 @@ public class PlayerControllerScript : MonoBehaviour {
         currentForwardVelocity = normalVelocity;
 
         currentBomb = null;
+        isSomerSaulting = false;
+        somerSaultVelocity = 35;
     }
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
@@ -151,8 +157,15 @@ public class PlayerControllerScript : MonoBehaviour {
         moveHorizontal = Input.GetAxis("Horizontal");
         moveVertical = -1 * Input.GetAxis("Vertical");
 
+        //Check if the player wants to perform a somersault
+        if (Input.GetKey(KeyCode.R) && (currentBoost == 0) && !boostRecovering && !isSomerSaulting && !rollingL && !rollingR && moveVertical > 0)
+        {
+            isSomerSaulting = true;
+            currentForwardVelocity = 0;
+        }
+
         //Force the player to stay in the game area
-        if(transform.position.x < (cameraOffset))
+        if (transform.position.x < (cameraOffset))
         {
             transform.position = new Vector3(cameraOffset, transform.position.y, transform.position.z);
         }
@@ -160,19 +173,49 @@ public class PlayerControllerScript : MonoBehaviour {
         {
             transform.position = new Vector3(-1 * cameraOffset, transform.position.y, transform.position.z);
         }
-        if (transform.position.y < (cameraOffset/2))
+        if (transform.position.y < (cameraOffset / 2))
         {
-            transform.position = new Vector3(transform.position.x, cameraOffset/2, transform.position.z);
+            transform.position = new Vector3(transform.position.x, cameraOffset / 2, transform.position.z);
         }
-        if (transform.position.y > (cameraOffset / -2))
+        if (transform.position.y > (cameraOffset / -2) && !isSomerSaulting) //If somersaulting allow go out of bounds
         {
             transform.position = new Vector3(transform.position.x, cameraOffset / -2, transform.position.z);
         }
 
-        rb.velocity = new Vector3(moveHorizontal * currentSpeed, moveVertical * verticalSpeed, currentForwardVelocity);
+        //Movement when somersaulting will be different
+        if(!isSomerSaulting)
+        {
+            rb.velocity = new Vector3(moveHorizontal * currentSpeed, moveVertical * verticalSpeed, currentForwardVelocity);
+        }
+
+        //If performing a somersault advance the somersault
+        if(isSomerSaulting)
+        {
+            //Rotate the arwing accordingly
+            float angle = Mathf.Lerp(0, -360, currentBoost / maxBoost);
+            
+            transform.eulerAngles = new Vector3(angle, 0, 0);
+            rb.velocity = new Vector3(transform.forward.x * somerSaultVelocity + moveHorizontal * currentSpeed, transform.forward.y * somerSaultVelocity, transform.forward.z * somerSaultVelocity);
+            //Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX)
+            //rotation = new Vector3
+            //(
+            //    rb.rotation.x,
+            //    Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX) + rb.rotation.y,
+            //    rb.rotation.z
+            //);
+            //rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+
+            currentBoost += (boostRate * Time.deltaTime);
+            if (currentBoost > maxBoost)
+            {
+                currentBoost = maxBoost;
+                isSomerSaulting = false;
+                currentForwardVelocity = normalVelocity;
+            }
+        }
 
         //Barrel roll functionallity
-        if (Input.GetKeyDown(KeyCode.Q) && !rollingL && !rollingR)
+        if (Input.GetKeyDown(KeyCode.Q) && !rollingL && !rollingR && !isSomerSaulting)
         {
             if (!tappingL)
             {
@@ -193,7 +236,7 @@ public class PlayerControllerScript : MonoBehaviour {
             tappingL = false;
         }
         //Right direction barrel roll
-        if (Input.GetKeyDown(KeyCode.E) && !rollingL && !rollingR)
+        if (Input.GetKeyDown(KeyCode.E) && !rollingL && !rollingR && !isSomerSaulting)
         {
             if (!tappingR)
             {
@@ -215,7 +258,7 @@ public class PlayerControllerScript : MonoBehaviour {
         }
 
         //Banking
-        if (!rollingL && !rollingR)
+        if ((!rollingL && !rollingR) && !isSomerSaulting)
         {
             if (Input.GetKey(KeyCode.Q) ^ Input.GetKey(KeyCode.E))
             {
@@ -230,7 +273,6 @@ public class PlayerControllerScript : MonoBehaviour {
             //Rotation the z-axis based on the banking
             if (isBanking)
             {
-                //transform.rotation = Quaternion.Lerp(bankNeutral, bankingAngle, Time.time * bankRotationSpeed);
                 currentBankAngle = Mathf.Lerp(0, bankingAngle, (Time.time - startBankTime) / timeForBank);
             }
             else
@@ -240,15 +282,31 @@ public class PlayerControllerScript : MonoBehaviour {
         }
 
         //If barrel rolling, set the banking angle to the current point in the barrel roll
-        if (rollingL || rollingR)
+        if ((rollingL || rollingR) && !isSomerSaulting)
         {
             if(rollingL)
             {
                 currentBankAngle = Mathf.Lerp(0, 360, (Time.time - startRollTime) / durationOfRoll);
+                if(moveHorizontal < 0)
+                {
+                    currentSpeed = bankSpeed;
+                }
+                else
+                {
+                    currentSpeed = speed;
+                }
             }
             else if(rollingR)
             {
                 currentBankAngle = Mathf.Lerp(0, -360, (Time.time - startRollTime) / durationOfRoll);
+                if (moveHorizontal > 0)
+                {
+                    currentSpeed = bankSpeed;
+                }
+                else
+                {
+                    currentSpeed = speed;
+                }
             }
 
             if((Time.time - startRollTime) > durationOfRoll)
@@ -259,14 +317,17 @@ public class PlayerControllerScript : MonoBehaviour {
                 rollTrails.Stop();
             }
         }
-       
-        rotation = new Vector3
-        (
-            Mathf.Clamp(rb.velocity.y * -tilt, minRotX, maxRotX),
-            Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX),
-            currentBankAngle
-        );
-        rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+
+        if (!isSomerSaulting)
+        {
+            rotation = new Vector3
+            (
+                Mathf.Clamp(rb.velocity.y * -tilt, minRotX, maxRotX),
+                Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX),
+                currentBankAngle
+            );
+            rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+        }
 
         //Breaking and boosting
         //TODO Check if have enough meter to do so
@@ -274,7 +335,7 @@ public class PlayerControllerScript : MonoBehaviour {
         //ALSO TODO ACTUALLY ADjUST THE SPEED WHENEVER YOU DECIDE TO ACTUALLY IMPLEMENT THAT
 
         //Boost
-        if (Input.GetKey(KeyCode.R) && (currentBoost < maxBoost) && !boostRecovering)
+        if (Input.GetKey(KeyCode.R) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting)
         {
             currentBoost += (boostRate * Time.deltaTime);
             if (currentBoost > maxBoost)
@@ -288,7 +349,7 @@ public class PlayerControllerScript : MonoBehaviour {
             currentForwardVelocity = boostVelocity;
         }
         //Break
-        else if(Input.GetKey(KeyCode.F) && (currentBoost < maxBoost) && !boostRecovering)
+        else if(Input.GetKey(KeyCode.F) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting)
         {
             currentBoost += (boostRate * Time.deltaTime);
             if (currentBoost > maxBoost)
@@ -301,7 +362,7 @@ public class PlayerControllerScript : MonoBehaviour {
 
             currentForwardVelocity = breakVelocity;
         }
-        else //Normal
+        else if(!isSomerSaulting)//Normal
         {
             boostRecovering = true;
 
@@ -376,16 +437,6 @@ public class PlayerControllerScript : MonoBehaviour {
                 startBankTimeTaken = true;
             }
 
-            //bankNeutral = Quaternion.Euler(transform.rotation.x, transform.rotation.y, 0);
-            //if((Input.GetKey(KeyCode.Q)))
-            //{
-            //    bankingAngle = Quaternion.Euler(transform.rotation.x, transform.rotation.y, -90);
-            //}
-            //else
-            //{
-            //    bankingAngle = Quaternion.Euler(transform.rotation.x, transform.rotation.y, 90);
-            //}
-            //transform.rotation = Quaternion.Lerp(bankNeutral, bankingAngle, Time.time * bankRotationSpeed);
         }
         else
         {
@@ -398,11 +449,6 @@ public class PlayerControllerScript : MonoBehaviour {
                 startBankTimeTaken = false;
             }
             
-
-            //Reseting banking
-            //bankNeutral = Quaternion.Euler(transform.rotation.x, transform.rotation.y, 0);
-            //bankingAngle = Quaternion.Euler(transform.rotation.x, transform.rotation.y, bankingAngle.z);
-            //transform.rotation = Quaternion.Lerp(bankingAngle, bankNeutral, Time.time * bankRotationSpeed);
         }
 
         tilt = maxRotX / currentSpeed;
@@ -420,5 +466,10 @@ public class PlayerControllerScript : MonoBehaviour {
                 Destroy(other.gameObject);
             }
         }
+    }
+
+    public bool getIsSomerSaulting()
+    {
+        return isSomerSaulting;
     }
 }

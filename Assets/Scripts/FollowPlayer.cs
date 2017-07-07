@@ -6,17 +6,25 @@ public class FollowPlayer : MonoBehaviour {
 
     public Transform transformToFollow;
     private Transform cameraTransform;
+    private PlayerControllerScript playerScript;
 
-    public float zOffset;
+    private float zOffset;
 
     void Start()
     {
         cameraTransform = GetComponent<Transform>();
+        cameraTransform.localPosition = new Vector3(0, 0, transformToFollow.localPosition.z + zOffset);
+        playerScript = transformToFollow.GetComponentInParent<PlayerControllerScript>();
+        zOffset = playerScript.cameraOffset;
     }
 
     // Update is called once per frame
     void Update ()
     {
-        cameraTransform.localPosition = new Vector3(0, 0, transformToFollow.localPosition.z + zOffset);
+        //Never go backwards
+        if (!playerScript.getIsSomerSaulting())
+        {
+            cameraTransform.localPosition = new Vector3(0, 0, transformToFollow.localPosition.z + zOffset);
+        }
 	}
 }
