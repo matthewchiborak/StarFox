@@ -75,4 +75,9 @@ public class UIController : MonoBehaviour {
         }
        
     }
+
+    public void increaseHits(int hitsToAdd)
+    {
+        hits += hitsToAdd;
+    }
 }

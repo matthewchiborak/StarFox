@@ -36,8 +36,8 @@ public class PlayerControllerScript : MonoBehaviour {
 
     //Laser shot functionality
     public GameObject laserShot;
-    public Transform shotSpawn1;
-    public Transform shotSpawn2;
+    public Transform shotSpawn;
+    //public Transform shotSpawn2;
 
     //Barrel roll functionality
     private bool rollingL;
@@ -405,8 +405,7 @@ public class PlayerControllerScript : MonoBehaviour {
         if (Input.GetButtonDown("Fire1"))
         {
             //Create the shot
-            Instantiate(laserShot, shotSpawn1.position, rb.rotation);
-            Instantiate(laserShot, shotSpawn2.position, rb.rotation);
+            Instantiate(laserShot, shotSpawn.position, rb.rotation);
         }
         //Check if firing a bomb
         if (Input.GetButtonDown("Fire2"))
