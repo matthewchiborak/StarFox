@@ -67,6 +67,7 @@ public class PlayerControllerScript : MonoBehaviour {
     private int numBombs;
     private float maxHealth;
     private float currentHealth;
+    public AudioSource hitSource;
 
     private float maxBoost;
     private float currentBoost;
@@ -92,6 +93,15 @@ public class PlayerControllerScript : MonoBehaviour {
     //Somersault
     private bool isSomerSaulting;
     private float somerSaultVelocity;
+
+    //Hit effect
+    private float durationOfDamageFlash;
+    private float currentTimeOfDamageFlash;
+    private float timeBetweenFlashes;
+    private bool flashOn;
+    private float currentTimeBetweenFlashes;
+
+    public Renderer[] rend;
 
     // Use this for initialization
     void Start ()
@@ -151,6 +161,13 @@ public class PlayerControllerScript : MonoBehaviour {
         currentBomb = null;
         isSomerSaulting = false;
         somerSaultVelocity = 35;
+
+        durationOfDamageFlash = 1;
+        currentTimeOfDamageFlash = 0;
+        timeBetweenFlashes = 0.05f;
+        currentTimeBetweenFlashes = 0;
+
+        flashOn = false;
     }
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
@@ -490,8 +507,57 @@ public class PlayerControllerScript : MonoBehaviour {
         }
     }
 
+    void Update()
+    {
+        if (Time.time - currentTimeOfDamageFlash < durationOfDamageFlash)
+        {
+            if (Time.time - currentTimeBetweenFlashes > timeBetweenFlashes)
+            {
+                currentTimeBetweenFlashes = Time.time;
+
+                if (flashOn)
+                {
+                    flashOn = false;
+                    for(int i = 0; i < rend.Length; i++)
+                    {
+                        rend[i].material.SetFloat("_FlashTintBool", 0);
+                    }
+                }
+                else
+                {
+                    flashOn = true;
+                    for (int i = 0; i < rend.Length; i++)
+                    {
+                        rend[i].material.SetFloat("_FlashTintBool", 1);
+                    }
+                }
+            }
+        }
+        else if(flashOn)
+        {
+            flashOn = false;
+            for (int i = 0; i < rend.Length; i++)
+            {
+                rend[i].material.SetFloat("_FlashTintBool", 0);
+            }
+        }
+    }
+
     public bool getIsSomerSaulting()
     {
         return isSomerSaulting;
+    }
+
+    public void damagePlayer(float damage)
+    {
+        currentHealth -= damage;
+        hitSource.Play();
+
+        currentTimeOfDamageFlash = Time.time;
+
+        if (currentHealth <= 0)
+        {
+            Debug.Log("Game over");
+        }
     }
 }

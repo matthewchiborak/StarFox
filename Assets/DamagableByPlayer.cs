@@ -17,13 +17,55 @@ public class DamagableByPlayer : MonoBehaviour {
 
     public GameObject enemyExplosion;
 
-	// Use this for initialization
-	void Start ()
+    private float durationOfDamageFlash;
+    private float currentTimeOfDamageFlash;
+    private float timeBetweenFlashes;
+    private bool flashOn;
+    private float currentTimeBetweenFlashes;
+
+    public Renderer rend;
+
+    // Use this for initialization
+    void Start ()
     {
         laserDamage = 20;
         bombDamage = 100;
         currentHealth = maxHealth;
-	}
+
+        durationOfDamageFlash = 1;
+        currentTimeOfDamageFlash = 0;
+        timeBetweenFlashes = 0.05f;
+        currentTimeBetweenFlashes = 0;
+
+        flashOn = false;
+    }
+
+    void Update()
+    {
+        if (Time.time - currentTimeOfDamageFlash < durationOfDamageFlash)
+        {
+            if (Time.time - currentTimeBetweenFlashes > timeBetweenFlashes)
+            {
+                currentTimeBetweenFlashes = Time.time;
+
+                if (flashOn)
+                {
+                    flashOn = false;
+                    rend.material.SetFloat("_FlashTintBool", 0);
+                }
+                else
+                {
+                    flashOn = true;
+                    rend.material.SetFloat("_FlashTintBool", 1);
+                }
+            }
+        }
+        else if (flashOn)
+        {
+            flashOn = false;
+            rend.material.SetFloat("_FlashTintBool", 0);
+        }
+    }
 
     void OnTriggerEnter(Collider other)
     {
@@ -32,6 +74,7 @@ public class DamagableByPlayer : MonoBehaviour {
         {
             currentHealth -= bombDamage;
             hitSource.Play();
+            currentTimeOfDamageFlash = Time.time;
 
             if (currentHealth <= 0)
             {
@@ -45,6 +88,7 @@ public class DamagableByPlayer : MonoBehaviour {
             currentHealth -= laserDamage;
             hitSource.Play();
             Destroy(other.gameObject);
+            currentTimeOfDamageFlash = Time.time;
 
             if (currentHealth <= 0)
             {
