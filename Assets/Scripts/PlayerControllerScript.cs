@@ -163,9 +163,9 @@ public class PlayerControllerScript : MonoBehaviour {
         somerSaultVelocity = 35;
 
         durationOfDamageFlash = 1;
-        currentTimeOfDamageFlash = 0;
+        currentTimeOfDamageFlash = Time.time - durationOfDamageFlash;
         timeBetweenFlashes = 0.05f;
-        currentTimeBetweenFlashes = 0;
+        currentTimeBetweenFlashes = Time.time - timeBetweenFlashes;
 
         flashOn = false;
     }

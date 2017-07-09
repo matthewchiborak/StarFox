@@ -24,6 +24,7 @@ public class DamagableByPlayer : MonoBehaviour {
     private float currentTimeBetweenFlashes;
 
     public Renderer rend;
+    public Material transparentMaterial;
 
     // Use this for initialization
     void Start ()
@@ -33,9 +34,9 @@ public class DamagableByPlayer : MonoBehaviour {
         currentHealth = maxHealth;
 
         durationOfDamageFlash = 1;
-        currentTimeOfDamageFlash = 0;
+        currentTimeOfDamageFlash = Time.time - durationOfDamageFlash;
         timeBetweenFlashes = 0.05f;
-        currentTimeBetweenFlashes = 0;
+        currentTimeBetweenFlashes = Time.time - timeBetweenFlashes;
 
         flashOn = false;
     }
@@ -65,6 +66,11 @@ public class DamagableByPlayer : MonoBehaviour {
             flashOn = false;
             rend.material.SetFloat("_FlashTintBool", 0);
         }
+    }
+
+    public void BecomeTransparent()
+    {
+        rend.material = transparentMaterial;
     }
 
     void OnTriggerEnter(Collider other)
