@@ -24,7 +24,8 @@ public class DamagableByPlayer : MonoBehaviour {
     private float currentTimeBetweenFlashes;
 
     public Renderer rend;
-    public Material transparentMaterial;
+    //public Material defaultMaterial;
+    //public Material transparentMaterial;
 
     // Use this for initialization
     void Start ()
@@ -68,10 +69,17 @@ public class DamagableByPlayer : MonoBehaviour {
         }
     }
 
-    public void BecomeTransparent()
-    {
-        rend.material = transparentMaterial;
-    }
+    //public void switchTransparent(bool becomeTransparent)
+    //{
+    //    if (becomeTransparent)
+    //    {
+    //        rend.material = transparentMaterial;
+    //    }
+    //    else
+    //    {
+    //        rend.material = defaultMaterial;
+    //    }
+    //}
 
     void OnTriggerEnter(Collider other)
     {
