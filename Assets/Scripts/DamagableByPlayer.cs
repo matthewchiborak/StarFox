@@ -6,6 +6,7 @@ public class DamagableByPlayer : MonoBehaviour {
 
     private float laserDamage;
     private float bombDamage;
+    private float chargeShotDamage;
 
     public UIController _UIController;
 
@@ -32,6 +33,7 @@ public class DamagableByPlayer : MonoBehaviour {
     {
         laserDamage = 20;
         bombDamage = 100;
+        chargeShotDamage = 75;
         currentHealth = maxHealth;
 
         durationOfDamageFlash = 1;
@@ -100,6 +102,20 @@ public class DamagableByPlayer : MonoBehaviour {
         else if (other.gameObject.CompareTag("PlayerShot"))
         {
             currentHealth -= laserDamage;
+            hitSource.Play();
+            Destroy(other.gameObject);
+            currentTimeOfDamageFlash = Time.time;
+
+            if (currentHealth <= 0)
+            {
+                _UIController.increaseHits(hits);
+                Instantiate(enemyExplosion, transform.position, transform.rotation);
+                Destroy(gameObject);
+            }
+        }
+        else if (other.gameObject.CompareTag("ChargeShot"))
+        {
+            currentHealth -= chargeShotDamage;
             hitSource.Play();
             Destroy(other.gameObject);
             currentTimeOfDamageFlash = Time.time;

@@ -103,6 +103,13 @@ public class PlayerControllerScript : MonoBehaviour {
 
     public Renderer[] rend;
 
+    //Charge shot
+    private float fireTimePressed;
+    private float durationNeededForCharge;
+    public GameObject chargeShot;
+    private GameObject _ChargeShot;
+    public Transform chargeShotSpawn;
+
     // Use this for initialization
     void Start ()
     {
@@ -168,6 +175,9 @@ public class PlayerControllerScript : MonoBehaviour {
         currentTimeBetweenFlashes = Time.time - timeBetweenFlashes;
 
         flashOn = false;
+        
+        fireTimePressed = Time.time;
+        durationNeededForCharge = 1.5f;
     }
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
@@ -423,7 +433,34 @@ public class PlayerControllerScript : MonoBehaviour {
         {
             //Create the shot
             Instantiate(laserShot, shotSpawn.position, rb.rotation);
+
+            //TODO the quick hold tripple shot
+
+            //Charge Shot
+            fireTimePressed = Time.time;
+            //Create the charge shot
+            _ChargeShot = Instantiate(chargeShot, chargeShotSpawn.position, rb.rotation);
+            _ChargeShot.GetComponent<ChargeShotControllerScript>().player = gameObject;
+            _ChargeShot.GetComponent<ChargeShotControllerScript>().chargeShotSpawn = bombSpawn;
         }
+        //Check if release a charge shot if held long enough
+        if(Input.GetButtonUp("Fire1"))
+        {
+            if (_ChargeShot != null)
+            {
+                //If enough time passed, active the charge shot and release it
+                if (Time.time - fireTimePressed > durationNeededForCharge)
+                {
+                    _ChargeShot.GetComponent<ChargeShotControllerScript>().fire();
+                }
+                //If not, destroy it
+                else
+                {
+                    //Destroy(_ChargeShot);
+                }
+            }
+        }
+
         //Check if firing a bomb
         if (Input.GetButtonDown("Fire2"))
         {
@@ -559,5 +596,10 @@ public class PlayerControllerScript : MonoBehaviour {
         {
             Debug.Log("Game over");
         }
+    }
+
+    public float getPercentageDurationForChargeShot()
+    {
+        return (Time.time - fireTimePressed) / durationNeededForCharge;
     }
 }
