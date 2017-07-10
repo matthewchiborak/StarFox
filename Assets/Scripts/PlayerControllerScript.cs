@@ -226,8 +226,9 @@ public class PlayerControllerScript : MonoBehaviour {
         {
             //Rotate the arwing accordingly
             float angle = Mathf.Lerp(0, -360, currentBoost / maxBoost);
-            
-            transform.eulerAngles = new Vector3(angle, 0, 0);
+
+            //transform.eulerAngles = new Vector3(angle, 0, 0);
+            transform.eulerAngles = new Vector3(angle, 0, currentBankAngle);
             rb.velocity = new Vector3(transform.forward.x * somerSaultVelocity + moveHorizontal * currentSpeed, transform.forward.y * somerSaultVelocity, transform.forward.z * somerSaultVelocity);
             //Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX)
             //rotation = new Vector3
@@ -291,7 +292,7 @@ public class PlayerControllerScript : MonoBehaviour {
         }
 
         //Banking
-        if ((!rollingL && !rollingR) && !isSomerSaulting)
+        if ((!rollingL && !rollingR))// && !isSomerSaulting)
         {
             if (Input.GetKey(KeyCode.Q) ^ Input.GetKey(KeyCode.E))
             {
@@ -360,6 +361,10 @@ public class PlayerControllerScript : MonoBehaviour {
                 currentBankAngle
             );
             rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+        }
+        else
+        {
+           // rb.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, currentBankAngle);
         }
 
         //Breaking and boosting

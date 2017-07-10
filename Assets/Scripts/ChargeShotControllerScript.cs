@@ -35,7 +35,7 @@ public class ChargeShotControllerScript : MonoBehaviour {
             chargeShotEffect.startSize = Mathf.Lerp(0, 6, player.GetComponent<PlayerControllerScript>().getPercentageDurationForChargeShot());
             chargeLight.intensity = Mathf.Lerp(0, 40, player.GetComponent<PlayerControllerScript>().getPercentageDurationForChargeShot());
 
-            chargeSource.volume = Mathf.Lerp(0, 32, player.GetComponent<PlayerControllerScript>().getPercentageDurationForChargeShot());
+            chargeSource.volume = Mathf.Lerp(0, 8, player.GetComponent<PlayerControllerScript>().getPercentageDurationForChargeShot());
             chargeSource.pitch = Mathf.Lerp(0, 1, player.GetComponent<PlayerControllerScript>().getPercentageDurationForChargeShot());
 
             transform.position = chargeShotSpawn.position;
