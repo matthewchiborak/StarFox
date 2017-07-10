@@ -43,10 +43,10 @@ public class GameManagerScript : MonoBehaviour {
                     // enemies[i].GetComponent<DamagableByPlayer>().rend.material.shader = Shader.Find("Transparent/Diffuse");
                     enemies[i].GetComponent<BecomeTransparent>().switchTransparent(true);
                 }
-                else
-                {
-                    enemies[i].GetComponent<BecomeTransparent>().switchTransparent(false);
-                }
+                //else
+                //{
+                //    enemies[i].GetComponent<BecomeTransparent>().switchTransparent(false);
+                //}
             }
         }
     }

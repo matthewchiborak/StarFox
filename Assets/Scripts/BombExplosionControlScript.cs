@@ -15,7 +15,7 @@ public class BombExplosionControlScript : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        durationOfActiveHitBox = 2;
+        durationOfActiveHitBox = 2.5f;
         timeOfExplosion = Time.time;
         maxLightIntensity = 100;
     }
@@ -26,6 +26,10 @@ public class BombExplosionControlScript : MonoBehaviour {
 		if(Time.time - timeOfExplosion > durationOfActiveHitBox)
         {
             hitbox.enabled = false;
+        }
+        else
+        {
+            hitbox.radius = Mathf.Lerp(0, 30f, (Time.time - timeOfExplosion) / durationOfActiveHitBox);
         }
 
         explosionLight.intensity = Mathf.Lerp(maxLightIntensity,0, (Time.time - timeOfExplosion) / (durationOfActiveHitBox * 2));

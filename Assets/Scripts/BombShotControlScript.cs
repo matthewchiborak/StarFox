@@ -5,11 +5,24 @@ using UnityEngine;
 public class BombShotControlScript : MonoBehaviour {
 
     public GameObject explosion;
+    private bool exploded;
+
+    void Start()
+    {
+        exploded = false;
+    }
 
 	public void explode()
     {
-        Instantiate(explosion, GetComponent<Transform>().position, GetComponent<Transform>().rotation);
+        if(exploded)
+        {
+            return;
+        }
+
+        exploded = true;
+
         Destroy(gameObject);
+        Instantiate(explosion, GetComponent<Transform>().position, GetComponent<Transform>().rotation);
     }
 
     //Handle Collsions
@@ -17,8 +30,9 @@ public class BombShotControlScript : MonoBehaviour {
     {
         //Collide with bombs
         //TODO change to go off when hit enemies or level geometry
-        if (!other.gameObject.CompareTag("Player") 
-            && !other.gameObject.CompareTag("PlayerShot"))
+        //if (!other.gameObject.CompareTag("Player") 
+        //    && !other.gameObject.CompareTag("PlayerShot"))
+        if(other.gameObject.CompareTag("Enemy") || other.gameObject.CompareTag("Untagged"))
         {
             explode();
         }
