@@ -20,11 +20,14 @@ public class PlayerControllerScript : MonoBehaviour {
     private float bankSpeed;
     private float currentSpeed;
     private float tilt;
+    private float zTiltTurnFactor;
 
     private float minRotX;
     private float minRotY;
     private float maxRotX;
     private float maxRotY;
+    private float maxRotZ;
+    private float minRotZ;
 
     private float bankRotationSpeed;
     private float bankingAngle;
@@ -120,6 +123,8 @@ public class PlayerControllerScript : MonoBehaviour {
         minRotY = -45;
         maxRotX = 45;
         maxRotY = 45;
+        maxRotZ = 90;
+        minRotZ = -90;
 
         speed = 20;
         bankSpeed = 30;
@@ -128,6 +133,7 @@ public class PlayerControllerScript : MonoBehaviour {
         verticalSpeed = speed;
 
         tilt = maxRotX / speed;
+        zTiltTurnFactor = 0.5f;
 
         bankRotationSpeed = 0.1f;
         isBanking = false;
@@ -227,8 +233,9 @@ public class PlayerControllerScript : MonoBehaviour {
             //Rotate the arwing accordingly
             float angle = Mathf.Lerp(0, -360, currentBoost / maxBoost);
 
-            //transform.eulerAngles = new Vector3(angle, 0, 0);
-            transform.eulerAngles = new Vector3(angle, 0, currentBankAngle);
+            //transform.eulerAngles = new Vector3(angle, 0, 0); //HERE Mathf.Clamp(currentBankAngle + rb.velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ)
+            //transform.eulerAngles = new Vector3(angle, 0, currentBankAngle);
+            transform.eulerAngles = new Vector3(angle, 0, Mathf.Clamp(currentBankAngle + rb.velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ));
             rb.velocity = new Vector3(transform.forward.x * somerSaultVelocity + moveHorizontal * currentSpeed, transform.forward.y * somerSaultVelocity, transform.forward.z * somerSaultVelocity);
             //Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX)
             //rotation = new Vector3
@@ -358,7 +365,7 @@ public class PlayerControllerScript : MonoBehaviour {
             (
                 Mathf.Clamp(rb.velocity.y * -tilt, minRotX, maxRotX),
                 Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX),
-                currentBankAngle
+                Mathf.Clamp(currentBankAngle + rb.velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ)
             );
             rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
         }
