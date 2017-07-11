@@ -112,6 +112,8 @@ public class PlayerControllerScript : MonoBehaviour {
     public GameObject chargeShot;
     private GameObject _ChargeShot;
     public Transform chargeShotSpawn;
+    public AudioSource lockonSource;
+    public GameObject lockonCursor;
 
     // Use this for initialization
     void Start ()
@@ -487,6 +489,36 @@ public class PlayerControllerScript : MonoBehaviour {
                 currentBomb.GetComponent<BombShotControlScript>().explode();
             }
         }
+
+        //Check if has a charge shot
+        if (_ChargeShot != null)
+        {
+            if(_ChargeShot.GetComponent<ChargeShotControllerScript>().homingTarget == null)
+            { 
+                //Check if charge shot is ready
+                if (Time.time - fireTimePressed > durationNeededForCharge)
+                {
+                    //Check if the direction the player is aiming collides with an enemy
+                    RaycastHit hit;
+
+                    if (Physics.Raycast(bombSpawn.position, transform.forward.normalized, out hit))//, 6 * col.radius))
+                    {
+                        if (hit.collider.gameObject.CompareTag("Enemy"))
+                        {
+                            //If does collide, mark that enemy has the lock on target and give that target to the charge shot so if released, will home in on that enemy
+                            _ChargeShot.GetComponent<ChargeShotControllerScript>().homingTarget = hit.collider.gameObject;
+
+                            //Also play a sound effect
+                            lockonSource.Play();
+
+                            //Move the secondary cursor to the emeny
+                            hit.collider.gameObject.GetComponent<DamagableByPlayer>().changeLockOnStatus(true);
+                        }
+                    }
+                }
+            }
+        }
+        
 
         //Finally update the UI
         _UIController.updateUI(numBombs, currentHealth/maxHealth, currentBoost/maxBoost);

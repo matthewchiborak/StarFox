@@ -10,10 +10,13 @@ public class GameManagerScript : MonoBehaviour {
 
     public GameObject[] bombPickups;
 
+    private float distanceBehindPlayerToRemove;
+
     // Use this for initialization
-    void Start () {
-		
-	}
+    void Start ()
+    {
+        distanceBehindPlayerToRemove = 25;
+    }
 	
 	// Update is called once per frame
 	void Update ()
@@ -30,6 +33,11 @@ public class GameManagerScript : MonoBehaviour {
                 {
                     bombPickups[i].GetComponent<BecomeTransparent>().switchTransparent(false);
                 }
+
+                if (bombPickups[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
+                {
+                    Destroy(bombPickups[i]);
+                }
             }
         }
 
@@ -42,6 +50,11 @@ public class GameManagerScript : MonoBehaviour {
                     // Destroy(enemies[i]);
                     // enemies[i].GetComponent<DamagableByPlayer>().rend.material.shader = Shader.Find("Transparent/Diffuse");
                     enemies[i].GetComponent<BecomeTransparent>().switchTransparent(true);
+                }
+
+                if (enemies[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
+                {
+                    Destroy(enemies[i]);
                 }
                 //else
                 //{

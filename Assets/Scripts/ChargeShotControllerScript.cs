@@ -16,6 +16,8 @@ public class ChargeShotControllerScript : MonoBehaviour {
     public AudioSource fireSource;
     public AudioSource chargeSource;
 
+    public GameObject homingTarget;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -24,6 +26,7 @@ public class ChargeShotControllerScript : MonoBehaviour {
         hitbox.enabled = false;
         lifeTime = 2;
         timeOfFire = Time.time;
+        homingTarget = null;
 	}
 	
 	// Update is called once per frame
@@ -56,6 +59,11 @@ public class ChargeShotControllerScript : MonoBehaviour {
             {
                 Destroy(gameObject);
             }
+
+            if(homingTarget != null)
+            {
+                GetComponent<Rigidbody>().velocity = (homingTarget.transform.position - transform.position).normalized * speed;
+            }
         }
 	}
 
@@ -67,5 +75,8 @@ public class ChargeShotControllerScript : MonoBehaviour {
         timeOfFire = Time.time;
         chargeSource.Stop();
         fireSource.Play();
+
+        if(homingTarget != null)
+            homingTarget.GetComponent<DamagableByPlayer>().changeLockOnStatus(false);
     }
 }

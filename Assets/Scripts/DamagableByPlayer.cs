@@ -28,6 +28,9 @@ public class DamagableByPlayer : MonoBehaviour {
     //public Material defaultMaterial;
     //public Material transparentMaterial;
 
+    //Lock on functionality
+    public GameObject lockonCursor;
+
     // Use this for initialization
     void Start ()
     {
@@ -82,6 +85,11 @@ public class DamagableByPlayer : MonoBehaviour {
     //        rend.material = defaultMaterial;
     //    }
     //}
+
+    public void changeLockOnStatus(bool status)
+    {
+        lockonCursor.SetActive(status);
+    }
 
     void OnTriggerEnter(Collider other)
     {
