@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class DamagableByPlayer : MonoBehaviour {
 
-    private float laserDamage;
+    //private float laserDamage;
     private float bombDamage;
-    private float chargeShotDamage;
+    //private float chargeShotDamage;
 
     public UIController _UIController;
 
@@ -34,9 +34,9 @@ public class DamagableByPlayer : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
-        laserDamage = 20;
+        //laserDamage = 20;
         bombDamage = 100;
-        chargeShotDamage = 75;
+        //chargeShotDamage = 75;
         currentHealth = maxHealth;
 
         durationOfDamageFlash = 1;
@@ -107,9 +107,9 @@ public class DamagableByPlayer : MonoBehaviour {
                 Destroy(gameObject);
             }
         }
-        else if (other.gameObject.CompareTag("PlayerShot"))
+        else if (other.gameObject.CompareTag("PlayerShot") || other.gameObject.CompareTag("ChargeShot"))
         {
-            currentHealth -= laserDamage;
+            currentHealth -= other.gameObject.GetComponent<LaserInformation>().damage;
             hitSource.Play();
             Destroy(other.gameObject);
             currentTimeOfDamageFlash = Time.time;
@@ -121,19 +121,19 @@ public class DamagableByPlayer : MonoBehaviour {
                 Destroy(gameObject);
             }
         }
-        else if (other.gameObject.CompareTag("ChargeShot"))
-        {
-            currentHealth -= chargeShotDamage;
-            hitSource.Play();
-            Destroy(other.gameObject);
-            currentTimeOfDamageFlash = Time.time;
+        //else if (other.gameObject.CompareTag("ChargeShot"))
+        //{
+        //    currentHealth -= other.gameObject.GetComponent<LaserInformation>().damage;
+        //    hitSource.Play();
+        //    Destroy(other.gameObject);
+        //    currentTimeOfDamageFlash = Time.time;
 
-            if (currentHealth <= 0)
-            {
-                _UIController.increaseHits(hits);
-                Instantiate(enemyExplosion, transform.position, transform.rotation);
-                Destroy(gameObject);
-            }
-        }
+        //    if (currentHealth <= 0)
+        //    {
+        //        _UIController.increaseHits(hits);
+        //        Instantiate(enemyExplosion, transform.position, transform.rotation);
+        //        Destroy(gameObject);
+        //    }
+        //}
     }
 }

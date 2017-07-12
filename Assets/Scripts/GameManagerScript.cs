@@ -10,11 +10,18 @@ public class GameManagerScript : MonoBehaviour {
 
     public GameObject[] bombPickups;
 
+    public GameObject[] laserPickups;
+
+    //Prefab references for the laser pickups to switch to the other laser pickups
+    bool greenLasersActive;
+    public GameObject blueLasers;
+
     private float distanceBehindPlayerToRemove;
 
     // Use this for initialization
     void Start ()
     {
+        greenLasersActive = true;
         distanceBehindPlayerToRemove = 25;
     }
 	
@@ -40,6 +47,47 @@ public class GameManagerScript : MonoBehaviour {
                 }
             }
         }
+
+        for (int i = 0; i < laserPickups.Length; i++)
+        {
+            if (laserPickups[i] != null)
+            {
+                //Switch to blue lasers if have twin laser already
+                if(greenLasersActive)
+                {
+                    if(player.GetComponent<PlayerControllerScript>().getCurrentLaser() > 0)
+                    {
+                        Vector3 pos = laserPickups[i].transform.position;
+                        Quaternion rot = laserPickups[i].transform.rotation;
+                        Destroy(laserPickups[i]);
+                        laserPickups[i] = Instantiate(blueLasers, pos, rot);
+                    }
+                }
+
+                if (laserPickups[i].transform.position.z < player.transform.position.z)
+                {
+                    laserPickups[i].GetComponent<BecomeTransparent>().switchTransparent(true);
+                }
+                else
+                {
+                    laserPickups[i].GetComponent<BecomeTransparent>().switchTransparent(false);
+                }
+
+                if (laserPickups[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
+                {
+                    Destroy(laserPickups[i]);
+                }
+            }
+        }
+        //If all the green lasers were swapped, disalbe it to prevent further changes
+        if (greenLasersActive)
+        {
+            if (player.GetComponent<PlayerControllerScript>().getCurrentLaser() > 0)
+            {
+                greenLasersActive = false;
+            }
+        }
+
 
         for (int i = 0; i < enemies.Length; i++)
         {

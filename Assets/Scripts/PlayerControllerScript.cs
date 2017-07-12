@@ -40,6 +40,9 @@ public class PlayerControllerScript : MonoBehaviour {
     //Laser shot functionality
     public GameObject laserShot;
     public Transform shotSpawn;
+    public GameObject twinShot;
+    public GameObject hyperShot;
+    public int currentLaserMode;
     //public Transform shotSpawn2;
 
     //Barrel roll functionality
@@ -110,6 +113,8 @@ public class PlayerControllerScript : MonoBehaviour {
     private float fireTimePressed;
     private float durationNeededForCharge;
     public GameObject chargeShot;
+    public GameObject twinChargeShot;
+    public GameObject hyperChargeShot;
     private GameObject _ChargeShot;
     public Transform chargeShotSpawn;
     public AudioSource lockonSource;
@@ -120,6 +125,8 @@ public class PlayerControllerScript : MonoBehaviour {
     {
         transform = GetComponent<Transform>();
         rb = GetComponent<Rigidbody>();
+
+        currentLaserMode = 0;
 
         minRotX = -45;
         minRotY = -45;
@@ -363,13 +370,26 @@ public class PlayerControllerScript : MonoBehaviour {
 
         if (!isSomerSaulting)
         {
-            rotation = new Vector3
-            (
+            if(rollingL || rollingR)
+            {
+                rotation = new Vector3
+                (
+                Mathf.Clamp(rb.velocity.y * -tilt, minRotX, maxRotX),
+                Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX),
+                currentBankAngle
+            );
+                rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+            }
+            else
+            {
+                rotation = new Vector3
+                (
                 Mathf.Clamp(rb.velocity.y * -tilt, minRotX, maxRotX),
                 Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX),
                 Mathf.Clamp(currentBankAngle + rb.velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ)
             );
-            rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+                rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+            }
         }
         else
         {
@@ -446,14 +466,37 @@ public class PlayerControllerScript : MonoBehaviour {
         if (Input.GetButtonDown("Fire1"))
         {
             //Create the shot
-            Instantiate(laserShot, shotSpawn.position, rb.rotation);
+            if (currentLaserMode == 0)
+            {
+                Instantiate(laserShot, shotSpawn.position, rb.rotation);
+            }
+            else if(currentLaserMode == 1)
+            {
+                Instantiate(twinShot, shotSpawn.position, rb.rotation);
+            }
+            else if(currentLaserMode == 2)
+            {
+                Instantiate(hyperShot, shotSpawn.position, rb.rotation);
+            }
 
             //TODO the quick hold tripple shot
 
             //Charge Shot
             fireTimePressed = Time.time;
             //Create the charge shot
-            _ChargeShot = Instantiate(chargeShot, chargeShotSpawn.position, rb.rotation);
+            if (currentLaserMode == 0)
+            {
+                _ChargeShot = Instantiate(chargeShot, chargeShotSpawn.position, rb.rotation);
+            }
+            else if (currentLaserMode == 1)
+            {
+                _ChargeShot = Instantiate(twinChargeShot, chargeShotSpawn.position, rb.rotation);
+            }
+            else if (currentLaserMode == 2)
+            {
+                _ChargeShot = Instantiate(hyperChargeShot, chargeShotSpawn.position, rb.rotation);
+            }
+            //_ChargeShot = Instantiate(chargeShot, chargeShotSpawn.position, rb.rotation);
             _ChargeShot.GetComponent<ChargeShotControllerScript>().player = gameObject;
             _ChargeShot.GetComponent<ChargeShotControllerScript>().chargeShotSpawn = bombSpawn;
         }
@@ -586,6 +629,16 @@ public class PlayerControllerScript : MonoBehaviour {
                 numBombs++;
             }
         }
+
+        if (other.gameObject.CompareTag("LaserPickup"))
+        {
+            if(currentLaserMode < 2)
+            {
+                currentLaserMode++;
+            }
+            pickupSound.Play();
+            Destroy(other.gameObject);
+        }
     }
 
     void Update()
@@ -645,5 +698,10 @@ public class PlayerControllerScript : MonoBehaviour {
     public float getPercentageDurationForChargeShot()
     {
         return (Time.time - fireTimePressed) / durationNeededForCharge;
+    }
+
+    public float getCurrentLaser()
+    {
+        return currentLaserMode;
     }
 }
