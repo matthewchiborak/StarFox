@@ -5,12 +5,18 @@ using UnityEngine;
 public class GameManagerScript : MonoBehaviour {
 
     public GameObject player;
+    
+
+    public GameObject[] enemiesPrefabs;
 
     public GameObject[] enemies;
 
     public GameObject[] bombPickups;
 
     public GameObject[] laserPickups;
+
+    public GameObject[] silverRings;
+    public GameObject[] goldRings;
 
     //Prefab references for the laser pickups to switch to the other laser pickups
     bool greenLasersActive;
@@ -44,6 +50,46 @@ public class GameManagerScript : MonoBehaviour {
                 if (bombPickups[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
                 {
                     Destroy(bombPickups[i]);
+                }
+            }
+        }
+
+        for (int i = 0; i < silverRings.Length; i++)
+        {
+            if (silverRings[i] != null)
+            {
+                if (silverRings[i].transform.position.z < player.transform.position.z)
+                {
+                    silverRings[i].GetComponent<BecomeTransparent>().switchTransparent(true);
+                }
+                else
+                {
+                    silverRings[i].GetComponent<BecomeTransparent>().switchTransparent(false);
+                }
+
+                if (silverRings[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
+                {
+                    Destroy(silverRings[i]);
+                }
+            }
+        }
+
+        for (int i = 0; i < goldRings.Length; i++)
+        {
+            if (goldRings[i] != null)
+            {
+                if (goldRings[i].transform.position.z < player.transform.position.z)
+                {
+                    goldRings[i].GetComponent<BecomeTransparent>().switchTransparent(true);
+                }
+                else
+                {
+                    goldRings[i].GetComponent<BecomeTransparent>().switchTransparent(false);
+                }
+
+                if (goldRings[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
+                {
+                    Destroy(goldRings[i]);
                 }
             }
         }

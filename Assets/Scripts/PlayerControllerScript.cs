@@ -120,6 +120,10 @@ public class PlayerControllerScript : MonoBehaviour {
     public AudioSource lockonSource;
     public GameObject lockonCursor;
 
+    //Ring functionallity
+    private float silverRingRecoverAmount;
+    private int numGoldRings;
+
     // Use this for initialization
     void Start ()
     {
@@ -193,6 +197,9 @@ public class PlayerControllerScript : MonoBehaviour {
         
         fireTimePressed = Time.time;
         durationNeededForCharge = 1.5f;
+
+        silverRingRecoverAmount = 50;
+        numGoldRings = 0;
     }
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
@@ -564,7 +571,7 @@ public class PlayerControllerScript : MonoBehaviour {
         
 
         //Finally update the UI
-        _UIController.updateUI(numBombs, currentHealth/maxHealth, currentBoost/maxBoost);
+        _UIController.updateUI(numBombs, currentHealth/maxHealth, currentBoost/maxBoost, numGoldRings);
     }
 
     //Cause the arwing to bank to the left or right
@@ -635,6 +642,33 @@ public class PlayerControllerScript : MonoBehaviour {
             if(currentLaserMode < 2)
             {
                 currentLaserMode++;
+            }
+            pickupSound.Play();
+            Destroy(other.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("SilverRing"))
+        {
+            currentHealth += silverRingRecoverAmount;
+
+            if(currentHealth > maxHealth)
+            {
+                currentHealth = maxHealth;
+            }
+            pickupSound.Play();
+            Destroy(other.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("GoldRing"))
+        {
+            numGoldRings++;
+
+            if (numGoldRings >= 3)
+            {
+                numGoldRings = 0;
+                _UIController.GetComponent<UIController>().doubleLifeBar();
+                maxHealth = maxHealth * 2;
+                currentHealth = currentHealth * 2;
             }
             pickupSound.Play();
             Destroy(other.gameObject);
