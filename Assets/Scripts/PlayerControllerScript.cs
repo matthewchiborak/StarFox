@@ -122,7 +122,13 @@ public class PlayerControllerScript : MonoBehaviour {
 
     //Ring functionallity
     private float silverRingRecoverAmount;
+    private float goldRingRecoverAmount;
     private int numGoldRings;
+    public GameObject goldRingAround;
+    public GameObject silverRingAround;
+    private float timeRingGoldAppear;
+    private float timeRingSilverAppear;
+    private float durationOfRingOnScreen;
 
     // Use this for initialization
     void Start ()
@@ -199,8 +205,12 @@ public class PlayerControllerScript : MonoBehaviour {
         durationNeededForCharge = 1.5f;
 
         silverRingRecoverAmount = 50;
+        goldRingRecoverAmount = 100;
         numGoldRings = 0;
-    }
+        durationOfRingOnScreen = 1;
+        timeRingGoldAppear = Time.time - durationOfRingOnScreen;
+        timeRingSilverAppear = Time.time - durationOfRingOnScreen;
+}
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
     //Done before physics calculations
@@ -569,6 +579,33 @@ public class PlayerControllerScript : MonoBehaviour {
             }
         }
         
+        //Update the visual effect for the rings being collected
+        if(Time.time - timeRingGoldAppear < durationOfRingOnScreen)
+        {
+            if(Time.time - timeRingGoldAppear < durationOfRingOnScreen / 2)
+            {
+                float scale = Mathf.Lerp(0, 1, (Time.time - timeRingGoldAppear) / (durationOfRingOnScreen / 2));
+                goldRingAround.transform.localScale = new Vector3(scale, scale, scale);
+            }
+            else
+            {
+                float scale = Mathf.Lerp(1, 0, (Time.time - timeRingGoldAppear - (durationOfRingOnScreen / 2)) / (durationOfRingOnScreen / 2));
+                goldRingAround.transform.localScale = new Vector3(scale, scale, scale);
+            }
+        }
+        if (Time.time - timeRingSilverAppear < durationOfRingOnScreen)
+        {
+            if (Time.time - timeRingSilverAppear < durationOfRingOnScreen / 2)
+            {
+                float scale = Mathf.Lerp(0, 1, (Time.time - timeRingSilverAppear) / (durationOfRingOnScreen / 2));
+                silverRingAround.transform.localScale = new Vector3(scale, scale, scale);
+            }
+            else
+            {
+                float scale = Mathf.Lerp(1, 0, (Time.time - timeRingSilverAppear - (durationOfRingOnScreen / 2)) / (durationOfRingOnScreen / 2));
+                silverRingAround.transform.localScale = new Vector3(scale, scale, scale);
+            }
+        }
 
         //Finally update the UI
         _UIController.updateUI(numBombs, currentHealth/maxHealth, currentBoost/maxBoost, numGoldRings);
@@ -655,6 +692,7 @@ public class PlayerControllerScript : MonoBehaviour {
             {
                 currentHealth = maxHealth;
             }
+            timeRingSilverAppear = Time.time;
             pickupSound.Play();
             Destroy(other.gameObject);
         }
@@ -662,6 +700,13 @@ public class PlayerControllerScript : MonoBehaviour {
         if (other.gameObject.CompareTag("GoldRing"))
         {
             numGoldRings++;
+            currentHealth += goldRingRecoverAmount;
+            if (currentHealth > maxHealth)
+            {
+                currentHealth = maxHealth;
+            }
+            
+            timeRingGoldAppear = Time.time;
 
             if (numGoldRings >= 3)
             {
