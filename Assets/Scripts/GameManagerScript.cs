@@ -2,21 +2,42 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class UnitInfo
+{
+    public int type;
+    public int zCordReq;
+    public Vector3 spawnLocation;
+    public bool damagableByPlayer;
+    //TODO behaviour
+    public bool spawned;
+
+    public UnitInfo()
+    {
+        spawned = false;
+        damagableByPlayer = false;
+    }
+}
+
 public class GameManagerScript : MonoBehaviour {
 
+    public TextAsset levelInfo;
+
     public GameObject player;
+    public UIController _UIcontroller;
     
+    public GameObject[] prefabs;
+    public GameObject[] actives;
 
-    public GameObject[] enemiesPrefabs;
+    private UnitInfo[] _unitInfo;
 
-    public GameObject[] enemies;
+    //public GameObject[] enemies;
 
-    public GameObject[] bombPickups;
+    //public GameObject[] bombPickups;
 
-    public GameObject[] laserPickups;
+    //public GameObject[] laserPickups;
 
-    public GameObject[] silverRings;
-    public GameObject[] goldRings;
+    //public GameObject[] silverRings;
+    //public GameObject[] goldRings;
 
     //Prefab references for the laser pickups to switch to the other laser pickups
     bool greenLasersActive;
@@ -29,102 +50,68 @@ public class GameManagerScript : MonoBehaviour {
     {
         greenLasersActive = true;
         distanceBehindPlayerToRemove = 25;
+        loadLevel();
     }
+
+    
 	
 	// Update is called once per frame
 	void Update ()
     {
-        for(int i = 0; i < bombPickups.Length; i++)
+        checkIfNeedToRemove();
+        checkIfNeedActivate();
+    }
+
+    private void checkIfNeedActivate()
+    {
+        for(int i = 0; i < _unitInfo.Length; i++)
         {
-            if (bombPickups[i] != null)
+            if(!_unitInfo[i].spawned)
             {
-                if (bombPickups[i].transform.position.z < player.transform.position.z)
+                if(player.transform.position.z > _unitInfo[i].zCordReq)//_unitInfo[i].zCordReq)
                 {
-                    bombPickups[i].GetComponent<BecomeTransparent>().switchTransparent(true);
-                }
-                else
-                {
-                    bombPickups[i].GetComponent<BecomeTransparent>().switchTransparent(false);
-                }
+                    //Spawn the enemy
+                    actives[i] = Instantiate(prefabs[_unitInfo[i].type], _unitInfo[i].spawnLocation, new Quaternion(0, 0, 0, 1));
+                    _unitInfo[i].spawned = true;
 
-                if (bombPickups[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
-                {
-                    Destroy(bombPickups[i]);
-                }
-            }
-        }
-
-        for (int i = 0; i < silverRings.Length; i++)
-        {
-            if (silverRings[i] != null)
-            {
-                if (silverRings[i].transform.position.z < player.transform.position.z)
-                {
-                    silverRings[i].GetComponent<BecomeTransparent>().switchTransparent(true);
-                }
-                else
-                {
-                    silverRings[i].GetComponent<BecomeTransparent>().switchTransparent(false);
-                }
-
-                if (silverRings[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
-                {
-                    Destroy(silverRings[i]);
-                }
-            }
-        }
-
-        for (int i = 0; i < goldRings.Length; i++)
-        {
-            if (goldRings[i] != null)
-            {
-                if (goldRings[i].transform.position.z < player.transform.position.z)
-                {
-                    goldRings[i].GetComponent<BecomeTransparent>().switchTransparent(true);
-                }
-                else
-                {
-                    goldRings[i].GetComponent<BecomeTransparent>().switchTransparent(false);
-                }
-
-                if (goldRings[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
-                {
-                    Destroy(goldRings[i]);
-                }
-            }
-        }
-
-        for (int i = 0; i < laserPickups.Length; i++)
-        {
-            if (laserPickups[i] != null)
-            {
-                //Switch to blue lasers if have twin laser already
-                if(greenLasersActive)
-                {
-                    if(player.GetComponent<PlayerControllerScript>().getCurrentLaser() > 0)
+                    if (_unitInfo[i].damagableByPlayer)
                     {
-                        Vector3 pos = laserPickups[i].transform.position;
-                        Quaternion rot = laserPickups[i].transform.rotation;
-                        Destroy(laserPickups[i]);
-                        laserPickups[i] = Instantiate(blueLasers, pos, rot);
+                        actives[i].GetComponent<DamagableByPlayer>()._UIController = _UIcontroller;
                     }
                 }
-
-                if (laserPickups[i].transform.position.z < player.transform.position.z)
-                {
-                    laserPickups[i].GetComponent<BecomeTransparent>().switchTransparent(true);
-                }
-                else
-                {
-                    laserPickups[i].GetComponent<BecomeTransparent>().switchTransparent(false);
-                }
-
-                if (laserPickups[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
-                {
-                    Destroy(laserPickups[i]);
-                }
             }
         }
+    }
+
+    private void loadLevel()
+    {
+        string fs = levelInfo.text;
+        string[] fLines = fs.Split('\n');//Regex.Split(fs, "\n|\r|\r\n");
+
+        _unitInfo = new UnitInfo[fLines.Length];
+        actives = new GameObject[fLines.Length];
+
+        for (int i = 0; i < fLines.Length; i++)
+        {
+            string valueLine = fLines[i];
+            string[] values = valueLine.Split(',');//, ";"); // your splitter here
+            
+            _unitInfo[i] = new UnitInfo();
+            _unitInfo[i].type = int.Parse(values[0]);
+            _unitInfo[i].zCordReq = int.Parse(values[1]);
+            _unitInfo[i].spawnLocation.x = int.Parse(values[2]);
+            _unitInfo[i].spawnLocation.y = int.Parse(values[3]);
+            _unitInfo[i].spawnLocation.z = int.Parse(values[4]);
+
+            if(int.Parse(values[5]) == 1)
+            {
+                _unitInfo[i].damagableByPlayer = true;
+            }
+        }
+    }
+
+    private void checkIfNeedToRemove()
+    {
         //If all the green lasers were swapped, disalbe it to prevent further changes
         if (greenLasersActive)
         {
@@ -134,27 +121,154 @@ public class GameManagerScript : MonoBehaviour {
             }
         }
 
-
-        for (int i = 0; i < enemies.Length; i++)
+        for (int i = 0; i < actives.Length; i++)
         {
-            if (enemies[i] != null)
+            if (actives[i] != null)
             {
-                if (enemies[i].transform.position.z < player.transform.position.z)
+                //Switch to blue lasers if have twin laser already
+                if (actives[i].CompareTag("LaserPickup"))
                 {
-                    // Destroy(enemies[i]);
-                    // enemies[i].GetComponent<DamagableByPlayer>().rend.material.shader = Shader.Find("Transparent/Diffuse");
-                    enemies[i].GetComponent<BecomeTransparent>().switchTransparent(true);
+                    if (greenLasersActive)
+                    {
+                        if (player.GetComponent<PlayerControllerScript>().getCurrentLaser() > 0)
+                        {
+                            Vector3 pos = actives[i].transform.position;
+                            Quaternion rot = actives[i].transform.rotation;
+                            Destroy(actives[i]);
+                            actives[i] = Instantiate(blueLasers, pos, rot);
+                        }
+                    }
                 }
 
-                if (enemies[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
+                if (actives[i].transform.position.z < player.transform.position.z)
                 {
-                    Destroy(enemies[i]);
+                    actives[i].GetComponent<BecomeTransparent>().switchTransparent(true);
                 }
-                //else
-                //{
-                //    enemies[i].GetComponent<BecomeTransparent>().switchTransparent(false);
-                //}
+                else
+                {
+                    actives[i].GetComponent<BecomeTransparent>().switchTransparent(false);
+                }
+
+                if (actives[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
+                {
+                    Destroy(actives[i]);
+                }
             }
         }
+
+        //for (int i = 0; i < bombPickups.Length; i++)
+        //{
+        //    if (bombPickups[i] != null)
+        //    {
+        //        if (bombPickups[i].transform.position.z < player.transform.position.z)
+        //        {
+        //            bombPickups[i].GetComponent<BecomeTransparent>().switchTransparent(true);
+        //        }
+        //        else
+        //        {
+        //            bombPickups[i].GetComponent<BecomeTransparent>().switchTransparent(false);
+        //        }
+
+        //        if (bombPickups[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
+        //        {
+        //            Destroy(bombPickups[i]);
+        //        }
+        //    }
+        //}
+
+        //for (int i = 0; i < silverRings.Length; i++)
+        //{
+        //    if (silverRings[i] != null)
+        //    {
+        //        if (silverRings[i].transform.position.z < player.transform.position.z)
+        //        {
+        //            silverRings[i].GetComponent<BecomeTransparent>().switchTransparent(true);
+        //        }
+        //        else
+        //        {
+        //            silverRings[i].GetComponent<BecomeTransparent>().switchTransparent(false);
+        //        }
+
+        //        if (silverRings[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
+        //        {
+        //            Destroy(silverRings[i]);
+        //        }
+        //    }
+        //}
+
+        //for (int i = 0; i < goldRings.Length; i++)
+        //{
+        //    if (goldRings[i] != null)
+        //    {
+        //        if (goldRings[i].transform.position.z < player.transform.position.z)
+        //        {
+        //            goldRings[i].GetComponent<BecomeTransparent>().switchTransparent(true);
+        //        }
+        //        else
+        //        {
+        //            goldRings[i].GetComponent<BecomeTransparent>().switchTransparent(false);
+        //        }
+
+        //        if (goldRings[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
+        //        {
+        //            Destroy(goldRings[i]);
+        //        }
+        //    }
+        //}
+
+        //for (int i = 0; i < laserPickups.Length; i++)
+        //{
+        //    if (laserPickups[i] != null)
+        //    {
+        //        //Switch to blue lasers if have twin laser already
+        //        if (greenLasersActive)
+        //        {
+        //            if (player.GetComponent<PlayerControllerScript>().getCurrentLaser() > 0)
+        //            {
+        //                Vector3 pos = laserPickups[i].transform.position;
+        //                Quaternion rot = laserPickups[i].transform.rotation;
+        //                Destroy(laserPickups[i]);
+        //                laserPickups[i] = Instantiate(blueLasers, pos, rot);
+        //            }
+        //        }
+
+        //        if (laserPickups[i].transform.position.z < player.transform.position.z)
+        //        {
+        //            laserPickups[i].GetComponent<BecomeTransparent>().switchTransparent(true);
+        //        }
+        //        else
+        //        {
+        //            laserPickups[i].GetComponent<BecomeTransparent>().switchTransparent(false);
+        //        }
+
+        //        if (laserPickups[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
+        //        {
+        //            Destroy(laserPickups[i]);
+        //        }
+        //    }
+        //}
+
+        //for (int i = 0; i < enemies.Length; i++)
+        //{
+        //    if (enemies[i] != null)
+        //    {
+        //        if (enemies[i].transform.position.z < player.transform.position.z)
+        //        {
+        //            // Destroy(enemies[i]);
+        //            // enemies[i].GetComponent<DamagableByPlayer>().rend.material.shader = Shader.Find("Transparent/Diffuse");
+        //            enemies[i].GetComponent<BecomeTransparent>().switchTransparent(true);
+        //        }
+
+        //        if (enemies[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
+        //        {
+        //            Destroy(enemies[i]);
+        //        }
+        //        //else
+        //        //{
+        //        //    enemies[i].GetComponent<BecomeTransparent>().switchTransparent(false);
+        //        //}
+        //    }
+        //}
     }
+
 }
