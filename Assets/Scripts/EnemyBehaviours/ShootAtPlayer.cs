@@ -24,11 +24,13 @@ public class ShootAtPlayer : MonoBehaviour {
 		if(Time.time - timeOfLastShot > timeBetweenShots)
         {
             //Fire a shot at the position of the player
-            Quaternion newAngle = new Quaternion(0, 0, 0, 1);
+            //Quaternion newAngle = new Quaternion(Mathf.Atan2(player.transform.position.x - transform.position.x, player.transform.position.z - transform.position.z), Mathf.Atan2(player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z), 0, 1);
+            Quaternion newAngle = Quaternion.Euler(Mathf.Atan2(player.transform.position.x - transform.position.x, player.transform.position.z + 85 - transform.position.z), Mathf.Atan2(player.transform.position.y - transform.position.y, player.transform.position.z + 85 - transform.position.z), 0);
             GameObject newShot = Instantiate(enemyShot, transform.position, newAngle);
-
-            newShot.GetComponent<CollisionWithThisHurtsPlayer>().damage = damage;
-            newShot.GetComponent<Rigidbody>().velocity = transform.forward.normalized * -shotSpeed;
+            
+            Vector3 direction = new Vector3(player.transform.position.x - transform.position.x, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z).normalized;
+            newShot.GetComponent<Rigidbody>().velocity = direction * shotSpeed;
+                //transform.forward.normalized * -shotSpeed;
 
             timeOfLastShot = Time.time;
         }

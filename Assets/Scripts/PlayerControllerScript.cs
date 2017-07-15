@@ -130,6 +130,9 @@ public class PlayerControllerScript : MonoBehaviour {
     private float timeRingSilverAppear;
     private float durationOfRingOnScreen;
 
+    //Shot deflecting
+    public AudioSource deflectionSource;
+
     // Use this for initialization
     void Start ()
     {
@@ -716,6 +719,22 @@ public class PlayerControllerScript : MonoBehaviour {
                 currentHealth = currentHealth * 2;
             }
             pickupSound.Play();
+            Destroy(other.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("EnemyShot"))
+        {
+            //Rolling negate damage
+            if(!rollingL && !rollingR)
+            {
+                damagePlayer(other.gameObject.GetComponent<LaserInformation>().damage);
+            }
+            else
+            {
+                //Deflect the shot
+                deflectionSource.Play();
+            }
+
             Destroy(other.gameObject);
         }
     }
