@@ -546,6 +546,15 @@ public class PlayerControllerScript : MonoBehaviour {
             {
                 currentBomb = Instantiate(bombShot, bombSpawn.position, rb.rotation);
                 numBombs--;
+
+                if(_ChargeShot != null)
+                {
+                    if(_ChargeShot.GetComponent<ChargeShotControllerScript>().homingTarget != null)
+                    {
+                        currentBomb.GetComponent<BombShotControlScript>().homingTarget = _ChargeShot.GetComponent<ChargeShotControllerScript>().homingTarget;
+                    }
+                }
+                
             }
             else if(currentBomb != null)
             {
@@ -789,6 +798,7 @@ public class PlayerControllerScript : MonoBehaviour {
 
         if (currentHealth <= 0)
         {
+            currentHealth = 0;
             Debug.Log("Game over");
         }
     }

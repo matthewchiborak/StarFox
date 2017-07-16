@@ -6,10 +6,18 @@ public class BombShotControlScript : MonoBehaviour {
 
     public GameObject explosion;
     private bool exploded;
+    public float speed;
+    private Rigidbody rb;
+
+    public GameObject homingTarget;
 
     void Start()
     {
         exploded = false;
+        //homingTarget = null;
+        rb = GetComponent<Rigidbody>();
+        //rb.velocity = transform.forward * speed;
+        Debug.Log("Test2");
     }
 
 	public void explode()
@@ -23,6 +31,20 @@ public class BombShotControlScript : MonoBehaviour {
 
         Destroy(gameObject);
         Instantiate(explosion, GetComponent<Transform>().position, GetComponent<Transform>().rotation);
+    }
+
+    void Update ()
+    {
+        Debug.Log("Test1");
+
+        if (homingTarget != null)
+        {
+            GetComponent<Rigidbody>().velocity = (homingTarget.transform.position - GetComponent<Transform>().position).normalized * speed;
+        }
+        else
+        {
+            GetComponent<Rigidbody>().velocity = GetComponent<Transform>().forward * speed;
+        }
     }
 
     //Handle Collsions
