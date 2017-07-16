@@ -802,4 +802,9 @@ public class PlayerControllerScript : MonoBehaviour {
     {
         return currentLaserMode;
     }
+
+    public float getCurrentSpeed()
+    {
+        return currentSpeed;
+    }
 }

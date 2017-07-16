@@ -13,6 +13,8 @@ public class ShootAtPlayer : MonoBehaviour {
     public float timeBetweenShots;
     private float timeOfLastShot;
 
+    private float shotLead;
+
     void Start()
     {
         timeOfLastShot = Time.time - timeBetweenShots;
@@ -25,7 +27,10 @@ public class ShootAtPlayer : MonoBehaviour {
         {
             //Fire a shot at the position of the player
             //Quaternion newAngle = new Quaternion(Mathf.Atan2(player.transform.position.x - transform.position.x, player.transform.position.z - transform.position.z), Mathf.Atan2(player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z), 0, 1);
-            Quaternion newAngle = Quaternion.Euler(Mathf.Atan2(player.transform.position.x - transform.position.x, player.transform.position.z + 85 - transform.position.z), Mathf.Atan2(player.transform.position.y - transform.position.y, player.transform.position.z + 85 - transform.position.z), 0);
+            shotLead = (player.transform.position.z - transform.position.z) / (shotSpeed + player.GetComponent<PlayerControllerScript>().getCurrentSpeed());
+            shotLead = shotSpeed * shotLead;
+
+            Quaternion newAngle = Quaternion.Euler(Mathf.Atan2(player.transform.position.x - transform.position.x, player.transform.position.z + shotLead - transform.position.z), Mathf.Atan2(player.transform.position.y - transform.position.y, player.transform.position.z + shotLead - transform.position.z), 0);
             GameObject newShot = Instantiate(enemyShot, transform.position, newAngle);
             
             Vector3 direction = new Vector3(player.transform.position.x - transform.position.x, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z).normalized;

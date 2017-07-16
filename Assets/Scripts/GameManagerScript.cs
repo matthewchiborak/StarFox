@@ -50,7 +50,7 @@ public class GameManagerScript : MonoBehaviour {
     {
         greenLasersActive = true;
         distanceBehindPlayerToRemove = 25;
-        loadLevel();
+        //loadLevel();
     }
 
     
@@ -59,7 +59,7 @@ public class GameManagerScript : MonoBehaviour {
 	void Update ()
     {
         checkIfNeedToRemove();
-        checkIfNeedActivate();
+        //checkIfNeedActivate();
     }
 
     private void checkIfNeedActivate()
