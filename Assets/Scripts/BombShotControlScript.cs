@@ -17,7 +17,6 @@ public class BombShotControlScript : MonoBehaviour {
         //homingTarget = null;
         rb = GetComponent<Rigidbody>();
         //rb.velocity = transform.forward * speed;
-        Debug.Log("Test2");
     }
 
 	public void explode()
@@ -35,8 +34,6 @@ public class BombShotControlScript : MonoBehaviour {
 
     void Update ()
     {
-        Debug.Log("Test1");
-
         if (homingTarget != null)
         {
             GetComponent<Rigidbody>().velocity = (homingTarget.transform.position - GetComponent<Transform>().position).normalized * speed;

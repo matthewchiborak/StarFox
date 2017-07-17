@@ -60,6 +60,30 @@ public class GameManagerScript : MonoBehaviour {
     {
         checkIfNeedToRemove();
         //checkIfNeedActivate();
+        checkIfNeedActiveEnemyWithPath();
+    }
+
+    private void checkIfNeedActiveEnemyWithPath()
+    {
+        for (int i = 0; i < actives.Length; i++)
+        {
+            if (actives[i] != null)
+            {
+                if (actives[i].CompareTag("Enemy"))
+                {
+                    if (actives[i].GetComponent<FollowPath>() != null)
+                    {
+                        if (!actives[i].GetComponent<FollowPath>().checkIfIsActive())
+                        {
+                            if (player.transform.position.z > actives[i].GetComponent<FollowPath>().zCordToActiveAt)
+                            {
+                                actives[i].GetComponent<FollowPath>().activateEnemy();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void checkIfNeedActivate()
