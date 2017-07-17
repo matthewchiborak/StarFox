@@ -49,7 +49,7 @@ public class GameManagerScript : MonoBehaviour {
     void Start ()
     {
         greenLasersActive = true;
-        distanceBehindPlayerToRemove = 25;
+        distanceBehindPlayerToRemove = 50;
         //loadLevel();
     }
 
@@ -63,6 +63,28 @@ public class GameManagerScript : MonoBehaviour {
         checkIfNeedActiveEnemyWithPath();
     }
 
+    //private void checkIfNeedActiveEnemyWithPath()
+    //{
+    //    for (int i = 0; i < actives.Length; i++)
+    //    {
+    //        if (actives[i] != null)
+    //        {
+    //            if (actives[i].CompareTag("Enemy"))
+    //            {
+    //                if (actives[i].GetComponent<FollowPath>() != null)
+    //                {
+    //                    if (!actives[i].GetComponent<FollowPath>().checkIfIsActive())
+    //                    {
+    //                        if (player.transform.position.z > actives[i].GetComponent<FollowPath>().zCordToActiveAt)
+    //                        {
+    //                            actives[i].GetComponent<FollowPath>().activateEnemy();
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
     private void checkIfNeedActiveEnemyWithPath()
     {
         for (int i = 0; i < actives.Length; i++)
@@ -71,13 +93,13 @@ public class GameManagerScript : MonoBehaviour {
             {
                 if (actives[i].CompareTag("Enemy"))
                 {
-                    if (actives[i].GetComponent<FollowPath>() != null)
+                    if (actives[i].GetComponent<FollowPathVelocity>() != null)
                     {
-                        if (!actives[i].GetComponent<FollowPath>().checkIfIsActive())
+                        if (!actives[i].GetComponent<FollowPathVelocity>().checkIfIsActive())
                         {
-                            if (player.transform.position.z > actives[i].GetComponent<FollowPath>().zCordToActiveAt)
+                            if (player.transform.position.z > actives[i].GetComponent<FollowPathVelocity>().zCordToActiveAt)
                             {
-                                actives[i].GetComponent<FollowPath>().activateEnemy();
+                                actives[i].GetComponent<FollowPathVelocity>().activateEnemy();
                             }
                         }
                     }

@@ -817,4 +817,9 @@ public class PlayerControllerScript : MonoBehaviour {
     {
         return currentSpeed;
     }
+
+    public float getDefaultForwardSpeed()
+    {
+        return normalVelocity;
+    }
 }
