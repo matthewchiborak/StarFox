@@ -1,0 +1,11 @@
+Falco;Test Test this is a test. I'm Falco
+Krystal;Falco? You feeling alright?
+Falco;Huh? What you say something?
+Slippy;You were saying something about a test
+Falco;You must be hearing things
+Fox;Guys. Shouldn't we be focusing on something...
+Peppy;No you guys are all clear
+ROB;Affirmative. All enemies destroyed
+Fox;Well alright then
+Falco;Test Successful
+Krystal;...

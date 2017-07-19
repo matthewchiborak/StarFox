@@ -620,7 +620,7 @@ public class PlayerControllerScript : MonoBehaviour {
         }
 
         //Finally update the UI
-        _UIController.updateUI(numBombs, currentHealth/maxHealth, currentBoost/maxBoost, numGoldRings);
+        _UIController.updateUI(numBombs, currentHealth/maxHealth, currentBoost/maxBoost, numGoldRings, transform.position.z);
     }
 
     //Cause the arwing to bank to the left or right

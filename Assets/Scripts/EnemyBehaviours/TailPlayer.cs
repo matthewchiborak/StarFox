@@ -19,6 +19,8 @@ public class TailPlayer : MonoBehaviour {
     private float minRotZ;
     private float distanceAwayFromPlayerToThenDelete;
 
+    
+
     // Use this for initialization
     void Start ()
     {

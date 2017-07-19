@@ -1,7 +1,53 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
+
+public enum CharacterID
+{
+    Fox,
+    Falco,
+    Krystal,
+    Slippy,
+    Peppy,
+    ROB
+}
+
+public class DialogInfo
+{
+    public int[] character;
+    public string[] dialog;
+    public int currentPosition;
+    public int characterOnScreen;
+
+    public bool isDone()
+    {
+        if(currentPosition >= dialog.Length)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public int getCurrentCharacter()
+    {
+        return character[currentPosition];
+    }
+    public string getCurrentDialog()
+    {
+        return dialog[currentPosition];
+    }
+
+    public DialogInfo(int size)
+    {
+        character = new int[size];
+        dialog = new string[size];
+        currentPosition = 0;
+        characterOnScreen = 0;
+    }
+}
 
 public class UIController : MonoBehaviour {
 
@@ -34,13 +80,52 @@ public class UIController : MonoBehaviour {
     public Image ring3;
     public AudioSource hitBarStretchSource;
 
+    //Dialog functionality
+    public GameObject dialogBox;
+    public TextAsset[] levelDialog;
+    public int[] zCordToTriggerDialog;
+    private DialogInfo _dialogInfo;
+    private int nextDialogToBePlayed;
+    private bool currentlyPlayingDialog;
+
+    public Image[] portraits;
+    public Text dialogNameText;
+    public Text dialogText;
+    private float timeDialogPopup;
+    private float timeDialogRemainsOnScreen;
+
+    //Blinking
+    public Image[] eyes;
+    private float timeOfLastBlink;
+    private float timePassedBeforeNeedBlink;
+    private float durationOfBlink;
+
+    //Mouth movement
+    public Image[] mouth1;
+    public Image[] mouth2;
+    private int currentMouth; // 0 1 2 or 3
+    private float timeOfLastTalk;
+    private float durationOfEachTalk;
+
     // Use this for initialization
     void Start ()
     {
         hits = 0;
         duractionOfIncreasingBar = 3;
         timeOfStartIncreaseBar = Time.time - duractionOfIncreasingBar;
-    }
+        nextDialogToBePlayed = 0;
+        currentlyPlayingDialog = false;
+        timeDialogRemainsOnScreen = 5;
+        timeDialogPopup = Time.time - timeDialogRemainsOnScreen;
+
+        timePassedBeforeNeedBlink = 1.5f;
+        durationOfBlink = 0.125f;
+        timeOfLastBlink = Time.time - timePassedBeforeNeedBlink - durationOfBlink;
+
+        currentMouth = 0;
+        durationOfEachTalk = 0.08f;//0.125f;
+        timeOfLastTalk = Time.time - durationOfEachTalk;
+}
 
     public void doubleLifeBar()
     {
@@ -52,9 +137,114 @@ public class UIController : MonoBehaviour {
     }
     
     //Updates the UI in case of a change
-    public void updateUI(int numBombs, float currentHealthPercentage, float currentBoostPercentage, int numGoldRings)
+    public void updateUI(int numBombs, float currentHealthPercentage, float currentBoostPercentage, int numGoldRings, float zCord)
     {
-       
+        //Check if dialog needs to be played
+        if (nextDialogToBePlayed < levelDialog.Length)
+        {
+            if (zCord > zCordToTriggerDialog[nextDialogToBePlayed])
+            {
+                loadDialog(nextDialogToBePlayed);
+
+                currentlyPlayingDialog = true;
+                dialogBox.SetActive(true);
+                nextDialogToBePlayed++;
+            }
+        }
+
+        if(currentlyPlayingDialog)
+        {
+            //Blinking
+            if (Time.time - timeOfLastBlink > timePassedBeforeNeedBlink)
+            {
+                if(eyes[_dialogInfo.characterOnScreen] != null)
+                    eyes[_dialogInfo.characterOnScreen].enabled = true;
+
+                if(Time.time - timeOfLastBlink > timePassedBeforeNeedBlink + durationOfBlink)
+                {
+                    if (eyes[_dialogInfo.characterOnScreen] != null)
+                        eyes[_dialogInfo.characterOnScreen].enabled = false;
+                    timeOfLastBlink = Time.time;
+                }
+            }
+
+            //Talking
+            if(Time.time - timeOfLastTalk > durationOfEachTalk)
+            {
+                currentMouth++;
+                currentMouth = currentMouth % 4;
+
+                if (currentMouth == 0)
+                {
+                    mouth1[_dialogInfo.characterOnScreen].enabled = false;
+                    mouth2[_dialogInfo.characterOnScreen].enabled = false;
+                }
+                else if (currentMouth == 1)
+                {
+                    mouth1[_dialogInfo.characterOnScreen].enabled = true;
+                    mouth2[_dialogInfo.characterOnScreen].enabled = false;
+                }
+                else if (currentMouth == 2)
+                {
+                    mouth1[_dialogInfo.characterOnScreen].enabled = false;
+                    mouth2[_dialogInfo.characterOnScreen].enabled = true;
+                }
+                else if (currentMouth == 3)
+                {
+                    mouth1[_dialogInfo.characterOnScreen].enabled = true;
+                    mouth2[_dialogInfo.characterOnScreen].enabled = false;
+                }
+                
+                timeOfLastTalk = Time.time;
+            }
+
+            if (Time.time - timeDialogPopup > timeDialogRemainsOnScreen)
+            {
+                timeDialogPopup = Time.time;
+
+                if (_dialogInfo.isDone())
+                {
+                    currentlyPlayingDialog = false;
+                    dialogBox.SetActive(false);
+                }
+                else
+                {
+                    for (int i = 0; i < portraits.Length; i++)
+                    {
+                        if (i == _dialogInfo.getCurrentCharacter())
+                        {
+                            portraits[i].enabled = true;
+                            _dialogInfo.characterOnScreen = i;
+                            dialogNameText.text = ((CharacterID)i).ToString();
+                            //disable and reset the eyes
+                            if (eyes[i] != null)
+                                eyes[i].enabled = false;
+                            mouth1[i].enabled = false;
+                            mouth2[i].enabled = false;
+                            currentMouth = 0;
+                            timeOfLastTalk = Time.time;
+                            // timeOfLastBlink = Time.time;
+                        }
+                        else
+                        {
+                            portraits[i].enabled = false;
+                            //Disable the eyes
+                            if (eyes[i] != null)
+                            {
+                                eyes[i].enabled = false;
+                            }
+                            mouth1[i].enabled = false;
+                            mouth2[i].enabled = false;
+                        }
+                    }
+
+                    dialogText.text = _dialogInfo.getCurrentDialog();
+
+                    _dialogInfo.currentPosition++;
+                }
+            }
+        }
+
         //Increase the life bar if needed
         if (Time.time - timeOfStartIncreaseBar < duractionOfIncreasingBar)
         {
@@ -159,5 +349,22 @@ public class UIController : MonoBehaviour {
     public void increaseHits(int hitsToAdd)
     {
         hits += hitsToAdd;
+    }
+
+    public void loadDialog(int dialogIndex)
+    {
+        string fs = levelDialog[dialogIndex].text;
+        string[] fLines = fs.Split('\n');
+
+        _dialogInfo = new DialogInfo(fLines.Length);//[fLines.Length];
+
+        for (int i = 0; i < fLines.Length; i++)
+        {
+            string valueLine = fLines[i];
+            string[] values = valueLine.Split(';');//, ";"); // your splitter here
+            
+            _dialogInfo.character[i] = (int)Enum.Parse(typeof(CharacterID), values[0]);
+            _dialogInfo.dialog[i] = values[1];
+        }
     }
 }
