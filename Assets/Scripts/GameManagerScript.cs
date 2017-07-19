@@ -45,15 +45,43 @@ public class GameManagerScript : MonoBehaviour {
 
     private float distanceBehindPlayerToRemove;
 
+    //Teammates
+    private float maxTeammateHealth;
+    private float currentHealthKris;
+    private float currentHealthFalco;
+    private float currentHealthSlip;
+
     // Use this for initialization
     void Start ()
     {
         greenLasersActive = true;
         distanceBehindPlayerToRemove = 50;
         //loadLevel();
+
+        //For testing purposes
+        maxTeammateHealth = 100;
+        currentHealthKris = 75;
+        currentHealthSlip = 25;
+        currentHealthFalco = 100;
     }
 
-    
+    public float getTeammateHealthPercentage(int teamMateID)
+    {
+        if(teamMateID == (int)CharacterID.Falco)
+        {
+            return currentHealthFalco / maxTeammateHealth;
+        }
+        if (teamMateID == (int)CharacterID.Krystal)
+        {
+            return currentHealthKris / maxTeammateHealth;
+        }
+        if (teamMateID == (int)CharacterID.Slippy)
+        {
+            return currentHealthSlip / maxTeammateHealth;
+        }
+
+        return 0;
+    }
 	
 	// Update is called once per frame
 	void Update ()

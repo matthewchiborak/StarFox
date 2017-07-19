@@ -51,6 +51,8 @@ public class DialogInfo
 
 public class UIController : MonoBehaviour {
 
+    public GameManagerScript gameManager;
+
     private int hits;
 
     public Text hitCountUI;
@@ -107,6 +109,10 @@ public class UIController : MonoBehaviour {
     private float timeOfLastTalk;
     private float durationOfEachTalk;
 
+    //HealthBar under the portrait
+    public GameObject dialogHealthBar;
+    public Image dialogHealthBarBar;
+
     // Use this for initialization
     void Start ()
     {
@@ -118,7 +124,7 @@ public class UIController : MonoBehaviour {
         timeDialogRemainsOnScreen = 5;
         timeDialogPopup = Time.time - timeDialogRemainsOnScreen;
 
-        timePassedBeforeNeedBlink = 1.5f;
+        timePassedBeforeNeedBlink = 2f;
         durationOfBlink = 0.125f;
         timeOfLastBlink = Time.time - timePassedBeforeNeedBlink - durationOfBlink;
 
@@ -224,6 +230,25 @@ public class UIController : MonoBehaviour {
                             currentMouth = 0;
                             timeOfLastTalk = Time.time;
                             // timeOfLastBlink = Time.time;
+
+                            //Health bar below portrait
+                            if(i == (int)CharacterID.Falco || i == (int)CharacterID.Fox || i == (int)CharacterID.Krystal || i == (int)CharacterID.Slippy)
+                            {
+                                dialogHealthBar.SetActive(true);
+
+                                if(i == (int)CharacterID.Fox)
+                                {
+                                    dialogHealthBarBar.transform.localScale = new Vector3(currentHealthPercentage, 1, 1);
+                                }
+                                else
+                                {
+                                    dialogHealthBarBar.transform.localScale = new Vector3(gameManager.getTeammateHealthPercentage(i), 1, 1);
+                                }
+                            }
+                            else
+                            {
+                                dialogHealthBar.SetActive(false);
+                            }
                         }
                         else
                         {
