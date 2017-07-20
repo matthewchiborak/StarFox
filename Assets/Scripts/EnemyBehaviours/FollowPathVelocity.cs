@@ -96,7 +96,14 @@ public class FollowPathVelocity : MonoBehaviour {
 
                         GetComponent<Rigidbody>().velocity = direction / timeToGetToNextPoint[currentPoint];
 
-                        tilt = maxRotX / GetComponent<Rigidbody>().velocity.x;
+                        if (GetComponent<Rigidbody>().velocity.x != 0)
+                        {
+                            tilt = maxRotX / GetComponent<Rigidbody>().velocity.x;
+                        }
+                        else
+                        {
+                            tilt = 0;
+                        }
 
                         startRotation = targetRotation;
                         targetRotation = Quaternion.Euler
