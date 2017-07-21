@@ -51,12 +51,20 @@ public class GameManagerScript : MonoBehaviour {
     private float currentHealthFalco;
     private float currentHealthSlip;
 
+    public TextAsset[] shootingTeammatesDialog;
+    private float lastTimeShotTeammate;
+    private float shotTeammateCooldownDialog;
+    public TextAsset[] retireTeammatesDialog;
+
     // Use this for initialization
     void Start ()
     {
         greenLasersActive = true;
         distanceBehindPlayerToRemove = 50;
         //loadLevel();
+
+        shotTeammateCooldownDialog = 10f;
+        lastTimeShotTeammate = Time.time - shotTeammateCooldownDialog;
 
         //For testing purposes
         maxTeammateHealth = 100;
@@ -88,34 +96,52 @@ public class GameManagerScript : MonoBehaviour {
         if (teamMateID == (int)CharacterID.Falco)
         {
             currentHealthFalco -= damage;
+            if (Time.time - lastTimeShotTeammate > shotTeammateCooldownDialog)
+            {
+                _UIcontroller.loadDialog(shootingTeammatesDialog[0]);
+                lastTimeShotTeammate = Time.time;
+            }
             
             if(currentHealthFalco <= 0)
             {
                 currentHealthFalco = 0;
                 //TODO Retire the teammate
-                Debug.Log("Falco retire");
+                _UIcontroller.loadDialog(retireTeammatesDialog[0]);
+                _UIcontroller.enableRetireText();
             }
         }
         if (teamMateID == (int)CharacterID.Krystal)
         {
             currentHealthKris -= damage;
+            if (Time.time - lastTimeShotTeammate > shotTeammateCooldownDialog)
+            {
+                _UIcontroller.loadDialog(shootingTeammatesDialog[1]);
+                lastTimeShotTeammate = Time.time;
+            }
 
             if (currentHealthKris <= 0)
             {
                 currentHealthKris = 0;
                 //TODO Retire the teammate
-                Debug.Log("Kris retire");
+                _UIcontroller.loadDialog(retireTeammatesDialog[1]);
+                _UIcontroller.enableRetireText();
             }
         }
         if (teamMateID == (int)CharacterID.Slippy)
         {
             currentHealthSlip -= damage;
+            if (Time.time - lastTimeShotTeammate > shotTeammateCooldownDialog)
+            {
+                _UIcontroller.loadDialog(shootingTeammatesDialog[2]);
+                lastTimeShotTeammate = Time.time;
+            }
 
             if (currentHealthSlip <= 0)
             {
                 currentHealthSlip = 0;
                 //TODO Retire the teammate
-                Debug.Log("Slip retire");
+                _UIcontroller.loadDialog(retireTeammatesDialog[2]);
+                _UIcontroller.enableRetireText();
             }
         }
 

@@ -86,6 +86,7 @@ public class UIController : MonoBehaviour {
     public GameObject dialogBox;
     public TextAsset[] levelDialog;
     public int[] zCordToTriggerDialog;
+    public bool[] zCordDialogPlayed;
     private DialogInfo _dialogInfo;
     private int nextDialogToBePlayed;
     private bool currentlyPlayingDialog;
@@ -112,6 +113,7 @@ public class UIController : MonoBehaviour {
     //HealthBar under the portrait
     public GameObject dialogHealthBar;
     public Image dialogHealthBarBar;
+    public Text retireText;
 
     // Use this for initialization
     void Start ()
@@ -146,19 +148,27 @@ public class UIController : MonoBehaviour {
     public void updateUI(int numBombs, float currentHealthPercentage, float currentBoostPercentage, int numGoldRings, float zCord)
     {
         //Check if dialog needs to be played
-        if (nextDialogToBePlayed < levelDialog.Length)
-        {
-            if (zCord > zCordToTriggerDialog[nextDialogToBePlayed])
-            {
-                loadDialog(nextDialogToBePlayed);
+        //if (nextDialogToBePlayed < levelDialog.Length)
+        //{
+        //    if (zCord > zCordToTriggerDialog[nextDialogToBePlayed])
+        //    {
+        //        loadDialog(nextDialogToBePlayed);
 
-                currentlyPlayingDialog = true;
-                dialogBox.SetActive(true);
-                nextDialogToBePlayed++;
+        //        currentlyPlayingDialog = true;
+        //        dialogBox.SetActive(true);
+        //        nextDialogToBePlayed++;
+        //    }
+        //}
+        for(int i = 0; i < levelDialog.Length; i++)
+        {
+            if (zCord > zCordToTriggerDialog[i] && !zCordDialogPlayed[i])
+            {
+                loadDialog(i);
+                zCordDialogPlayed[i] = true;
             }
         }
 
-        if(currentlyPlayingDialog)
+        if (currentlyPlayingDialog)
         {
             //Blinking
             if (Time.time - timeOfLastBlink > timePassedBeforeNeedBlink)
@@ -264,6 +274,7 @@ public class UIController : MonoBehaviour {
                     }
 
                     dialogText.text = _dialogInfo.getCurrentDialog();
+                    dialogBox.SetActive(true);
 
                     _dialogInfo.currentPosition++;
                 }
@@ -378,6 +389,10 @@ public class UIController : MonoBehaviour {
 
     public void loadDialog(int dialogIndex)
     {
+        retireText.enabled = false;
+        currentlyPlayingDialog = true;
+        timeDialogPopup = Time.time - timeDialogRemainsOnScreen;
+
         string fs = levelDialog[dialogIndex].text;
         string[] fLines = fs.Split('\n');
 
@@ -391,5 +406,32 @@ public class UIController : MonoBehaviour {
             _dialogInfo.character[i] = (int)Enum.Parse(typeof(CharacterID), values[0]);
             _dialogInfo.dialog[i] = values[1];
         }
+    }
+
+    //Interrupting Dialog
+    public void loadDialog(TextAsset textAsset)
+    {
+        retireText.enabled = false;
+        currentlyPlayingDialog = true;
+        timeDialogPopup = Time.time - timeDialogRemainsOnScreen;
+
+        string fs = textAsset.text;
+        string[] fLines = fs.Split('\n');
+
+        _dialogInfo = new DialogInfo(fLines.Length);//[fLines.Length];
+
+        for (int i = 0; i < fLines.Length; i++)
+        {
+            string valueLine = fLines[i];
+            string[] values = valueLine.Split(';');//, ";"); // your splitter here
+
+            _dialogInfo.character[i] = (int)Enum.Parse(typeof(CharacterID), values[0]);
+            _dialogInfo.dialog[i] = values[1];
+        }
+    }
+
+    public void enableRetireText()
+    {
+        retireText.enabled = true;
     }
 }

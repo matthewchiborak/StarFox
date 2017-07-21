@@ -247,7 +247,7 @@ public class TeammateControlScript : MonoBehaviour {
         if (other.gameObject.CompareTag("PlayerShot") || other.gameObject.CompareTag("ChargeShot") || other.gameObject.CompareTag("EnemyShot"))
         {
             gameManager.damageTeammate(id, other.gameObject.GetComponent<LaserInformation>().damage);
-            Debug.Log("Hit mate");
+            
             hitSource.Play();
             currentTimeOfDamageFlash = Time.time;
         }
