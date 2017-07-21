@@ -60,9 +60,9 @@ public class GameManagerScript : MonoBehaviour {
 
         //For testing purposes
         maxTeammateHealth = 100;
-        currentHealthKris = 75;
-        currentHealthSlip = 25;
-        currentHealthFalco = 100;
+        currentHealthKris = maxTeammateHealth;
+        currentHealthSlip = maxTeammateHealth;
+        currentHealthFalco = maxTeammateHealth;
     }
 
     public float getTeammateHealthPercentage(int teamMateID)
@@ -82,9 +82,48 @@ public class GameManagerScript : MonoBehaviour {
 
         return 0;
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    public float damageTeammate(int teamMateID, float damage)
+    {
+        if (teamMateID == (int)CharacterID.Falco)
+        {
+            currentHealthFalco -= damage;
+            
+            if(currentHealthFalco <= 0)
+            {
+                currentHealthFalco = 0;
+                //TODO Retire the teammate
+                Debug.Log("Falco retire");
+            }
+        }
+        if (teamMateID == (int)CharacterID.Krystal)
+        {
+            currentHealthKris -= damage;
+
+            if (currentHealthKris <= 0)
+            {
+                currentHealthKris = 0;
+                //TODO Retire the teammate
+                Debug.Log("Kris retire");
+            }
+        }
+        if (teamMateID == (int)CharacterID.Slippy)
+        {
+            currentHealthSlip -= damage;
+
+            if (currentHealthSlip <= 0)
+            {
+                currentHealthSlip = 0;
+                //TODO Retire the teammate
+                Debug.Log("Slip retire");
+            }
+        }
+
+        return 0;
+    }
+
+    // Update is called once per frame
+    void Update ()
     {
         checkIfNeedToRemove();
         //checkIfNeedActivate();
