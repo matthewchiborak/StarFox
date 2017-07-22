@@ -36,39 +36,70 @@ public class TailPlayer : MonoBehaviour {
 
         distanceAwayFromPlayerToThenDelete = 300;
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
         //GetComponent<Rigidbody>().velocity = 
         //Quaternion newAngle = Quaternion.Euler(Mathf.Atan2(player.transform.position.x - transform.position.x, player.transform.position.z - transform.position.z), Mathf.Atan2(player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z), 0);
 
-        if (continueTailing && !player.GetComponent<PlayerControllerScript>().getIsSomerSaulting() && player.transform.position.z > transform.position.z)
-        {
-            Vector3 direction = new Vector3(player.transform.position.x - transform.position.x, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z).normalized;
-            direction.z = 1;
-            GetComponent<Rigidbody>().velocity = direction * player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed();
+        PlayerControllerScript playerControllScript = player.GetComponent<PlayerControllerScript>();
 
-            tilt = maxRotX / player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed();
+        if(!playerControllScript.isInAllRange())
+        { 
+            if (continueTailing && !playerControllScript.getIsSomerSaulting() && player.transform.position.z > transform.position.z)
+            {
+                Vector3 direction = new Vector3(player.transform.position.x - transform.position.x, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z).normalized;
+                direction.z = 1;
+                GetComponent<Rigidbody>().velocity = direction * playerControllScript.getDefaultForwardSpeed();
 
-            //Rotate to make it look natural
-            Vector3 rotation = new Vector3
-               (
-               Mathf.Clamp(GetComponent<Rigidbody>().velocity.y * -tilt, minRotX, maxRotX),
-               Mathf.Clamp(GetComponent<Rigidbody>().velocity.x * tilt, minRotX, maxRotX),
-               Mathf.Clamp(GetComponent<Rigidbody>().velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ)
-           );
-            GetComponent<Rigidbody>().rotation = Quaternion.Euler(-rotation.x, rotation.y + 180, rotation.z);
+                tilt = maxRotX / playerControllScript.getDefaultForwardSpeed();
+
+                //Rotate to make it look natural
+                Vector3 rotation = new Vector3
+                   (
+                   Mathf.Clamp(GetComponent<Rigidbody>().velocity.y * -tilt, minRotX, maxRotX),
+                   Mathf.Clamp(GetComponent<Rigidbody>().velocity.x * tilt, minRotX, maxRotX),
+                   Mathf.Clamp(GetComponent<Rigidbody>().velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ)
+               );
+                GetComponent<Rigidbody>().rotation = Quaternion.Euler(-rotation.x, rotation.y + 180, rotation.z);
+            }
+            else
+            {
+                continueTailing = false;
+                GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 1) * playerControllScript.getDefaultForwardSpeed() * 2.5f;
+                GetComponent<Rigidbody>().rotation = Quaternion.Euler(0, 180, 0);
+
+                if (transform.position.z - player.transform.position.z > distanceAwayFromPlayerToThenDelete)
+                {
+                    Destroy(gameObject);
+                }
+            }
         }
         else
         {
-            continueTailing = false;
-            GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 1) * player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed() * 2.5f;
-            GetComponent<Rigidbody>().rotation = Quaternion.Euler(0, 180, 0);
-
-            if(transform.position.z - player.transform.position.z > distanceAwayFromPlayerToThenDelete)
+            if (continueTailing && !playerControllScript.getIsSomerSaulting())
             {
-                Destroy(gameObject);
+                Vector3 direction = new Vector3(player.transform.position.x - transform.position.x, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z).normalized;
+                direction.z = 1;
+                GetComponent<Rigidbody>().velocity = direction * playerControllScript.getDefaultForwardSpeed();
+
+                tilt = maxRotX / playerControllScript.getDefaultForwardSpeed();
+
+                //Rotate to make it look natural
+                Vector3 rotation = new Vector3
+                   (
+                   Mathf.Clamp(GetComponent<Rigidbody>().velocity.y * -tilt, minRotX, maxRotX),
+                   Mathf.Clamp(GetComponent<Rigidbody>().velocity.x * tilt, minRotX, maxRotX),
+                   Mathf.Clamp(GetComponent<Rigidbody>().velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ)
+               );
+                GetComponent<Rigidbody>().rotation = Quaternion.Euler(-rotation.x, rotation.y + 180, rotation.z);
+            }
+            else
+            {
+                continueTailing = false;
+                GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 1) * playerControllScript.getDefaultForwardSpeed() * 2.5f;
+                GetComponent<Rigidbody>().rotation = Quaternion.Euler(0, 180, 0);
             }
         }
     }

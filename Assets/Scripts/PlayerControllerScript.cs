@@ -81,7 +81,7 @@ public class PlayerControllerScript : MonoBehaviour {
     private bool boostRecovering;
 
     //Forward movement
-    private bool atBoss;
+    private int notAtBoss; // 0 if at boss. 1 if not. Multipied by the current speed because not move during boss
     private float normalVelocity;
     private float boostVelocity;
     private float breakVelocity;
@@ -132,6 +132,9 @@ public class PlayerControllerScript : MonoBehaviour {
 
     //Shot deflecting
     public AudioSource deflectionSource;
+
+    //All range
+    private bool inAllRange;
 
     // Use this for initialization
     void Start ()
@@ -187,7 +190,7 @@ public class PlayerControllerScript : MonoBehaviour {
         boostRate = 40; //points per second?
         boostRecovering = false;
 
-        atBoss = false;
+        notAtBoss = 1;
         normalVelocity = 5;
         boostVelocity = 10f;
         breakVelocity = 1f;
@@ -213,414 +216,23 @@ public class PlayerControllerScript : MonoBehaviour {
         durationOfRingOnScreen = 1;
         timeRingGoldAppear = Time.time - durationOfRingOnScreen;
         timeRingSilverAppear = Time.time - durationOfRingOnScreen;
+
+        //inAllRange = true;
 }
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
     //Done before physics calculations
     void FixedUpdate()
     {
-        //Get user input and move the player if the game is still in progess
-        //Want get axis because will want controller support
-        moveHorizontal = Input.GetAxis("Horizontal");
-        moveVertical = -1 * Input.GetAxis("Vertical");
-
-        //Check if the player wants to perform a somersault
-        if (Input.GetKey(KeyCode.R) && (currentBoost == 0) && !boostRecovering && !isSomerSaulting && !rollingL && !rollingR && moveVertical > 0)
+        if(!inAllRange)
         {
-            isSomerSaulting = true;
-            currentForwardVelocity = 0;
-            boostSource.Play();
-        }
-
-        //Force the player to stay in the game area
-        if (transform.position.x < (cameraOffset))
-        {
-            transform.position = new Vector3(cameraOffset, transform.position.y, transform.position.z);
-        }
-        if (transform.position.x > (-1 * cameraOffset))
-        {
-            transform.position = new Vector3(-1 * cameraOffset, transform.position.y, transform.position.z);
-        }
-        if (transform.position.y < (cameraOffset / 2))
-        {
-            transform.position = new Vector3(transform.position.x, cameraOffset / 2, transform.position.z);
-        }
-        if (transform.position.y > (cameraOffset / -2) && !isSomerSaulting) //If somersaulting allow go out of bounds
-        {
-            transform.position = new Vector3(transform.position.x, cameraOffset / -2, transform.position.z);
-        }
-
-        //Movement when somersaulting will be different
-        if(!isSomerSaulting)
-        {
-            rb.velocity = new Vector3(moveHorizontal * currentSpeed, moveVertical * verticalSpeed, currentForwardVelocity);
-        }
-
-        //If performing a somersault advance the somersault
-        if(isSomerSaulting)
-        {
-            //Rotate the arwing accordingly
-            float angle = Mathf.Lerp(0, -360, currentBoost / maxBoost);
-
-            //transform.eulerAngles = new Vector3(angle, 0, 0); //HERE Mathf.Clamp(currentBankAngle + rb.velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ)
-            //transform.eulerAngles = new Vector3(angle, 0, currentBankAngle);
-            transform.eulerAngles = new Vector3(angle, 0, Mathf.Clamp(currentBankAngle + rb.velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ));
-            rb.velocity = new Vector3(transform.forward.x * somerSaultVelocity + moveHorizontal * currentSpeed, transform.forward.y * somerSaultVelocity, transform.forward.z * somerSaultVelocity);
-            //Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX)
-            //rotation = new Vector3
-            //(
-            //    rb.rotation.x,
-            //    Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX) + rb.rotation.y,
-            //    rb.rotation.z
-            //);
-            //rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
-
-            currentBoost += (boostRate * Time.deltaTime);
-            if (currentBoost > maxBoost)
-            {
-                currentBoost = maxBoost;
-                isSomerSaulting = false;
-                currentForwardVelocity = normalVelocity;
-            }
-        }
-
-        //Barrel roll functionallity
-        if (Input.GetKeyDown(KeyCode.Q) && !rollingL && !rollingR && !isSomerSaulting)
-        {
-            if (!tappingL)
-            {
-                tappingL = true;
-                lastTapL = Time.time;
-            }
-            else
-            {
-                //Start barrel roll to the left
-                rollingL = true;
-                startRollTime = Time.time;
-                rollTrails.Play();
-            }
-        }
-        //Time out the key press if pressed
-        if (tappingL && Time.time - lastTapL > tapTime)
-        {
-            tappingL = false;
-        }
-        //Right direction barrel roll
-        if (Input.GetKeyDown(KeyCode.E) && !rollingL && !rollingR && !isSomerSaulting)
-        {
-            if (!tappingR)
-            {
-                tappingR = true;
-                lastTapR = Time.time;
-            }
-            else
-            {
-                //Start barrel roll to the right
-                rollingR = true;
-                startRollTime = Time.time;
-                rollTrails.Play();
-            }
-        }
-        //Time out the key press if pressed
-        if (tappingR && Time.time - lastTapR > tapTime)
-        {
-            tappingR = false;
-        }
-
-        //Banking
-        if ((!rollingL && !rollingR))// && !isSomerSaulting)
-        {
-            if (Input.GetKey(KeyCode.Q) ^ Input.GetKey(KeyCode.E))
-            {
-                isBanking = true;
-            }
-            else
-            {
-                isBanking = false;
-            }
-            setIsBanking();
-
-            //Rotation the z-axis based on the banking
-            if (isBanking)
-            {
-                currentBankAngle = Mathf.Lerp(0, bankingAngle, (Time.time - startBankTime) / timeForBank);
-            }
-            else
-            {
-                currentBankAngle = Mathf.Lerp(bankingAngle, 0, (Time.time - startBankTime) / timeForBank);
-            }
-        }
-
-        //If barrel rolling, set the banking angle to the current point in the barrel roll
-        if ((rollingL || rollingR) && !isSomerSaulting)
-        {
-            if(rollingL)
-            {
-                currentBankAngle = Mathf.Lerp(0, 360, (Time.time - startRollTime) / durationOfRoll);
-                if(moveHorizontal < 0)
-                {
-                    currentSpeed = bankSpeed;
-                }
-                else
-                {
-                    currentSpeed = speed;
-                }
-            }
-            else if(rollingR)
-            {
-                currentBankAngle = Mathf.Lerp(0, -360, (Time.time - startRollTime) / durationOfRoll);
-                if (moveHorizontal > 0)
-                {
-                    currentSpeed = bankSpeed;
-                }
-                else
-                {
-                    currentSpeed = speed;
-                }
-            }
-
-            if((Time.time - startRollTime) > durationOfRoll)
-            {
-                currentBankAngle = 0;
-                rollingL = false;
-                rollingR = false;
-                rollTrails.Stop();
-            }
-        }
-
-        if (!isSomerSaulting)
-        {
-            if(rollingL || rollingR)
-            {
-                rotation = new Vector3
-                (
-                Mathf.Clamp(rb.velocity.y * -tilt, minRotX, maxRotX),
-                Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX),
-                currentBankAngle
-            );
-                rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
-            }
-            else
-            {
-                rotation = new Vector3
-                (
-                Mathf.Clamp(rb.velocity.y * -tilt, minRotX, maxRotX),
-                Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX),
-                Mathf.Clamp(currentBankAngle + rb.velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ)
-            );
-                rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
-            }
+            corridorControl();
         }
         else
         {
-           // rb.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, currentBankAngle);
+            //allRangeControl();
+            corridorControl();
         }
-
-        //Breaking and boosting
-        //TODO Check if have enough meter to do so
-        //Maybe should lerp to the new life time and speeds
-        //ALSO TODO ACTUALLY ADjUST THE SPEED WHENEVER YOU DECIDE TO ACTUALLY IMPLEMENT THAT
-
-        //Boost
-        if (Input.GetKey(KeyCode.R) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting)
-        {
-            currentBoost += (boostRate * Time.deltaTime);
-            if (currentBoost > maxBoost)
-            {
-                currentBoost = maxBoost;
-            }
-
-            if(!boostTriggered)
-            {
-                boostTriggered = true;
-                boostSource.Play();
-            }
-            
-            exhaustTrailL.startLifetime = boostExhaustLifeTime;
-            exhaustTrailR.startLifetime = boostExhaustLifeTime;
-
-            currentForwardVelocity = boostVelocity;
-        }
-        //Break
-        else if(Input.GetKey(KeyCode.F) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting)
-        {
-            currentBoost += (boostRate * Time.deltaTime);
-            if (currentBoost > maxBoost)
-            {
-                currentBoost = maxBoost;
-            }
-
-            if (!boostTriggered)
-            {
-                boostTriggered = true;
-                breakSource.Play();
-            }
-
-            exhaustTrailL.startLifetime = breakExhaustLifeTime;
-            exhaustTrailR.startLifetime = breakExhaustLifeTime;
-
-            currentForwardVelocity = breakVelocity;
-        }
-        else if(!isSomerSaulting)//Normal
-        {
-            boostRecovering = true;
-
-            currentBoost -= (boostRate * Time.deltaTime);
-            if (currentBoost <= 0)
-            {
-                currentBoost = 0;
-                boostRecovering = false;
-                boostTriggered = false;
-                boostSource.Stop();
-                breakSource.Stop();
-            }
-            
-            exhaustTrailL.startLifetime = normalExhaustLifeTime;
-            exhaustTrailR.startLifetime = normalExhaustLifeTime;
-
-            currentForwardVelocity = normalVelocity;
-        }
-        
-
-        //Check if the player is firing
-        if (Input.GetButtonDown("Fire1"))
-        {
-            //Create the shot
-            if (currentLaserMode == 0)
-            {
-                Instantiate(laserShot, shotSpawn.position, rb.rotation);
-            }
-            else if(currentLaserMode == 1)
-            {
-                Instantiate(twinShot, shotSpawn.position, rb.rotation);
-            }
-            else if(currentLaserMode == 2)
-            {
-                Instantiate(hyperShot, shotSpawn.position, rb.rotation);
-            }
-
-            //TODO the quick hold tripple shot
-
-            //Charge Shot
-            fireTimePressed = Time.time;
-            //Create the charge shot
-            if (currentLaserMode == 0)
-            {
-                _ChargeShot = Instantiate(chargeShot, chargeShotSpawn.position, rb.rotation);
-            }
-            else if (currentLaserMode == 1)
-            {
-                _ChargeShot = Instantiate(twinChargeShot, chargeShotSpawn.position, rb.rotation);
-            }
-            else if (currentLaserMode == 2)
-            {
-                _ChargeShot = Instantiate(hyperChargeShot, chargeShotSpawn.position, rb.rotation);
-            }
-            //_ChargeShot = Instantiate(chargeShot, chargeShotSpawn.position, rb.rotation);
-            _ChargeShot.GetComponent<ChargeShotControllerScript>().player = gameObject;
-            _ChargeShot.GetComponent<ChargeShotControllerScript>().chargeShotSpawn = bombSpawn;
-        }
-        //Check if release a charge shot if held long enough
-        if(Input.GetButtonUp("Fire1"))
-        {
-            if (_ChargeShot != null)
-            {
-                //If enough time passed, active the charge shot and release it
-                if (Time.time - fireTimePressed > durationNeededForCharge)
-                {
-                    _ChargeShot.GetComponent<ChargeShotControllerScript>().fire();
-                }
-                //If not, destroy it
-                else
-                {
-                    //Destroy(_ChargeShot);
-                }
-            }
-        }
-
-        //Check if firing a bomb
-        if (Input.GetButtonDown("Fire2"))
-        {
-            //Create the shot
-            if(numBombs > 0 && currentBomb == null)
-            {
-                currentBomb = Instantiate(bombShot, bombSpawn.position, rb.rotation);
-                numBombs--;
-
-                if(_ChargeShot != null)
-                {
-                    if(_ChargeShot.GetComponent<ChargeShotControllerScript>().homingTarget != null)
-                    {
-                        currentBomb.GetComponent<BombShotControlScript>().homingTarget = _ChargeShot.GetComponent<ChargeShotControllerScript>().homingTarget;
-                    }
-                }
-                
-            }
-            else if(currentBomb != null)
-            {
-                currentBomb.GetComponent<BombShotControlScript>().explode();
-            }
-        }
-
-        //Check if has a charge shot
-        if (_ChargeShot != null)
-        {
-            if(_ChargeShot.GetComponent<ChargeShotControllerScript>().homingTarget == null)
-            { 
-                //Check if charge shot is ready
-                if (Time.time - fireTimePressed > durationNeededForCharge)
-                {
-                    //Check if the direction the player is aiming collides with an enemy
-                    RaycastHit hit;
-
-                    if (Physics.Raycast(bombSpawn.position, transform.forward.normalized, out hit))//, 6 * col.radius))
-                    {
-                        if (hit.collider.gameObject.CompareTag("Enemy"))
-                        {
-                            //If does collide, mark that enemy has the lock on target and give that target to the charge shot so if released, will home in on that enemy
-                            _ChargeShot.GetComponent<ChargeShotControllerScript>().homingTarget = hit.collider.gameObject;
-
-                            //Also play a sound effect
-                            lockonSource.Play();
-
-                            //Move the secondary cursor to the emeny
-                            hit.collider.gameObject.GetComponent<DamagableByPlayer>().changeLockOnStatus(true);
-                        }
-                    }
-                }
-            }
-        }
-        
-        //Update the visual effect for the rings being collected
-        if(Time.time - timeRingGoldAppear < durationOfRingOnScreen)
-        {
-            if(Time.time - timeRingGoldAppear < durationOfRingOnScreen / 2)
-            {
-                float scale = Mathf.Lerp(0, 1, (Time.time - timeRingGoldAppear) / (durationOfRingOnScreen / 2));
-                goldRingAround.transform.localScale = new Vector3(scale, scale, scale);
-            }
-            else
-            {
-                float scale = Mathf.Lerp(1, 0, (Time.time - timeRingGoldAppear - (durationOfRingOnScreen / 2)) / (durationOfRingOnScreen / 2));
-                goldRingAround.transform.localScale = new Vector3(scale, scale, scale);
-            }
-        }
-        if (Time.time - timeRingSilverAppear < durationOfRingOnScreen)
-        {
-            if (Time.time - timeRingSilverAppear < durationOfRingOnScreen / 2)
-            {
-                float scale = Mathf.Lerp(0, 1, (Time.time - timeRingSilverAppear) / (durationOfRingOnScreen / 2));
-                silverRingAround.transform.localScale = new Vector3(scale, scale, scale);
-            }
-            else
-            {
-                float scale = Mathf.Lerp(1, 0, (Time.time - timeRingSilverAppear - (durationOfRingOnScreen / 2)) / (durationOfRingOnScreen / 2));
-                silverRingAround.transform.localScale = new Vector3(scale, scale, scale);
-            }
-        }
-
-        //Finally update the UI
-        _UIController.updateUI(numBombs, currentHealth/maxHealth, currentBoost/maxBoost, numGoldRings, transform.position.z);
     }
 
     //Cause the arwing to bank to the left or right
@@ -748,6 +360,417 @@ public class PlayerControllerScript : MonoBehaviour {
         }
     }
 
+    void corridorControl()
+    {
+        //Get user input and move the player if the game is still in progess
+        //Want get axis because will want controller support
+        moveHorizontal = Input.GetAxis("Horizontal");
+        moveVertical = -1 * Input.GetAxis("Vertical");
+
+        //Check if the player wants to perform a somersault
+        if (Input.GetKey(KeyCode.R) && (currentBoost == 0) && !boostRecovering && !isSomerSaulting && !rollingL && !rollingR && moveVertical > 0)
+        {
+            isSomerSaulting = true;
+            currentForwardVelocity = 0;
+            boostSource.Play();
+        }
+
+        //Force the player to stay in the game area
+        if (transform.position.x < (cameraOffset))
+        {
+            transform.position = new Vector3(cameraOffset, transform.position.y, transform.position.z);
+        }
+        if (transform.position.x > (-1 * cameraOffset))
+        {
+            transform.position = new Vector3(-1 * cameraOffset, transform.position.y, transform.position.z);
+        }
+        if (transform.position.y < (cameraOffset / 2))
+        {
+            transform.position = new Vector3(transform.position.x, cameraOffset / 2, transform.position.z);
+        }
+        if (transform.position.y > (cameraOffset / -2) && !isSomerSaulting) //If somersaulting allow go out of bounds
+        {
+            transform.position = new Vector3(transform.position.x, cameraOffset / -2, transform.position.z);
+        }
+
+        //Movement when somersaulting will be different
+        if (!isSomerSaulting)
+        {
+            rb.velocity = new Vector3(moveHorizontal * currentSpeed, moveVertical * verticalSpeed, currentForwardVelocity);
+        }
+
+        //If performing a somersault advance the somersault
+        if (isSomerSaulting)
+        {
+            //Rotate the arwing accordingly
+            float angle = Mathf.Lerp(0, -360, currentBoost / maxBoost);
+
+            //transform.eulerAngles = new Vector3(angle, 0, 0); //HERE Mathf.Clamp(currentBankAngle + rb.velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ)
+            //transform.eulerAngles = new Vector3(angle, 0, currentBankAngle);
+            transform.eulerAngles = new Vector3(angle, 0, Mathf.Clamp(currentBankAngle + rb.velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ));
+            rb.velocity = new Vector3(transform.forward.x * somerSaultVelocity + moveHorizontal * currentSpeed, transform.forward.y * somerSaultVelocity, transform.forward.z * somerSaultVelocity);
+            //Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX)
+            //rotation = new Vector3
+            //(
+            //    rb.rotation.x,
+            //    Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX) + rb.rotation.y,
+            //    rb.rotation.z
+            //);
+            //rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+
+            currentBoost += (boostRate * Time.deltaTime);
+            if (currentBoost > maxBoost)
+            {
+                currentBoost = maxBoost;
+                isSomerSaulting = false;
+                currentForwardVelocity = normalVelocity * notAtBoss;
+            }
+        }
+
+        //Barrel roll functionallity
+        if (Input.GetKeyDown(KeyCode.Q) && !rollingL && !rollingR && !isSomerSaulting)
+        {
+            if (!tappingL)
+            {
+                tappingL = true;
+                lastTapL = Time.time;
+            }
+            else
+            {
+                //Start barrel roll to the left
+                rollingL = true;
+                startRollTime = Time.time;
+                rollTrails.Play();
+            }
+        }
+        //Time out the key press if pressed
+        if (tappingL && Time.time - lastTapL > tapTime)
+        {
+            tappingL = false;
+        }
+        //Right direction barrel roll
+        if (Input.GetKeyDown(KeyCode.E) && !rollingL && !rollingR && !isSomerSaulting)
+        {
+            if (!tappingR)
+            {
+                tappingR = true;
+                lastTapR = Time.time;
+            }
+            else
+            {
+                //Start barrel roll to the right
+                rollingR = true;
+                startRollTime = Time.time;
+                rollTrails.Play();
+            }
+        }
+        //Time out the key press if pressed
+        if (tappingR && Time.time - lastTapR > tapTime)
+        {
+            tappingR = false;
+        }
+
+        //Banking
+        if ((!rollingL && !rollingR))// && !isSomerSaulting)
+        {
+            if (Input.GetKey(KeyCode.Q) ^ Input.GetKey(KeyCode.E))
+            {
+                isBanking = true;
+            }
+            else
+            {
+                isBanking = false;
+            }
+            setIsBanking();
+
+            //Rotation the z-axis based on the banking
+            if (isBanking)
+            {
+                currentBankAngle = Mathf.Lerp(0, bankingAngle, (Time.time - startBankTime) / timeForBank);
+            }
+            else
+            {
+                currentBankAngle = Mathf.Lerp(bankingAngle, 0, (Time.time - startBankTime) / timeForBank);
+            }
+        }
+
+        //If barrel rolling, set the banking angle to the current point in the barrel roll
+        if ((rollingL || rollingR) && !isSomerSaulting)
+        {
+            if (rollingL)
+            {
+                currentBankAngle = Mathf.Lerp(0, 360, (Time.time - startRollTime) / durationOfRoll);
+                if (moveHorizontal < 0)
+                {
+                    currentSpeed = bankSpeed;
+                }
+                else
+                {
+                    currentSpeed = speed;
+                }
+            }
+            else if (rollingR)
+            {
+                currentBankAngle = Mathf.Lerp(0, -360, (Time.time - startRollTime) / durationOfRoll);
+                if (moveHorizontal > 0)
+                {
+                    currentSpeed = bankSpeed;
+                }
+                else
+                {
+                    currentSpeed = speed;
+                }
+            }
+
+            if ((Time.time - startRollTime) > durationOfRoll)
+            {
+                currentBankAngle = 0;
+                rollingL = false;
+                rollingR = false;
+                rollTrails.Stop();
+            }
+        }
+
+        if (!isSomerSaulting)
+        {
+            if (rollingL || rollingR)
+            {
+                rotation = new Vector3
+                (
+                Mathf.Clamp(rb.velocity.y * -tilt, minRotX, maxRotX),
+                Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX),
+                currentBankAngle
+            );
+                rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+            }
+            else
+            {
+                rotation = new Vector3
+                (
+                Mathf.Clamp(rb.velocity.y * -tilt, minRotX, maxRotX),
+                Mathf.Clamp(rb.velocity.x * tilt, minRotX, maxRotX),
+                Mathf.Clamp(currentBankAngle + rb.velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ)
+            );
+                rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+            }
+        }
+        else
+        {
+            // rb.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, currentBankAngle);
+        }
+
+        //Breaking and boosting
+        //TODO Check if have enough meter to do so
+        //Maybe should lerp to the new life time and speeds
+        //ALSO TODO ACTUALLY ADjUST THE SPEED WHENEVER YOU DECIDE TO ACTUALLY IMPLEMENT THAT
+
+        //Boost
+        if (Input.GetKey(KeyCode.R) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting)
+        {
+            currentBoost += (boostRate * Time.deltaTime);
+            if (currentBoost > maxBoost)
+            {
+                currentBoost = maxBoost;
+            }
+
+            if (!boostTriggered)
+            {
+                boostTriggered = true;
+                boostSource.Play();
+            }
+
+            exhaustTrailL.startLifetime = boostExhaustLifeTime;
+            exhaustTrailR.startLifetime = boostExhaustLifeTime;
+
+            currentForwardVelocity = boostVelocity * notAtBoss;
+        }
+        //Break
+        else if (Input.GetKey(KeyCode.F) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting)
+        {
+            currentBoost += (boostRate * Time.deltaTime);
+            if (currentBoost > maxBoost)
+            {
+                currentBoost = maxBoost;
+            }
+
+            if (!boostTriggered)
+            {
+                boostTriggered = true;
+                breakSource.Play();
+            }
+
+            exhaustTrailL.startLifetime = breakExhaustLifeTime;
+            exhaustTrailR.startLifetime = breakExhaustLifeTime;
+
+            currentForwardVelocity = breakVelocity * notAtBoss;
+        }
+        else if (!isSomerSaulting)//Normal
+        {
+            boostRecovering = true;
+
+            currentBoost -= (boostRate * Time.deltaTime);
+            if (currentBoost <= 0)
+            {
+                currentBoost = 0;
+                boostRecovering = false;
+                boostTriggered = false;
+                boostSource.Stop();
+                breakSource.Stop();
+            }
+
+            exhaustTrailL.startLifetime = normalExhaustLifeTime;
+            exhaustTrailR.startLifetime = normalExhaustLifeTime;
+
+            currentForwardVelocity = normalVelocity * notAtBoss;
+        }
+
+
+        //Check if the player is firing
+        if (Input.GetButtonDown("Fire1"))
+        {
+            //Create the shot
+            if (currentLaserMode == 0)
+            {
+                Instantiate(laserShot, shotSpawn.position, rb.rotation);
+            }
+            else if (currentLaserMode == 1)
+            {
+                Instantiate(twinShot, shotSpawn.position, rb.rotation);
+            }
+            else if (currentLaserMode == 2)
+            {
+                Instantiate(hyperShot, shotSpawn.position, rb.rotation);
+            }
+
+            //TODO the quick hold tripple shot
+
+            //Charge Shot
+            fireTimePressed = Time.time;
+            //Create the charge shot
+            if (currentLaserMode == 0)
+            {
+                _ChargeShot = Instantiate(chargeShot, chargeShotSpawn.position, rb.rotation);
+            }
+            else if (currentLaserMode == 1)
+            {
+                _ChargeShot = Instantiate(twinChargeShot, chargeShotSpawn.position, rb.rotation);
+            }
+            else if (currentLaserMode == 2)
+            {
+                _ChargeShot = Instantiate(hyperChargeShot, chargeShotSpawn.position, rb.rotation);
+            }
+            //_ChargeShot = Instantiate(chargeShot, chargeShotSpawn.position, rb.rotation);
+            _ChargeShot.GetComponent<ChargeShotControllerScript>().player = gameObject;
+            _ChargeShot.GetComponent<ChargeShotControllerScript>().chargeShotSpawn = bombSpawn;
+        }
+        //Check if release a charge shot if held long enough
+        if (Input.GetButtonUp("Fire1"))
+        {
+            if (_ChargeShot != null)
+            {
+                //If enough time passed, active the charge shot and release it
+                if (Time.time - fireTimePressed > durationNeededForCharge)
+                {
+                    _ChargeShot.GetComponent<ChargeShotControllerScript>().fire();
+                }
+                //If not, destroy it
+                else
+                {
+                    //Destroy(_ChargeShot);
+                }
+            }
+        }
+
+        //Check if firing a bomb
+        if (Input.GetButtonDown("Fire2"))
+        {
+            //Create the shot
+            if (numBombs > 0 && currentBomb == null)
+            {
+                currentBomb = Instantiate(bombShot, bombSpawn.position, rb.rotation);
+                numBombs--;
+
+                if (_ChargeShot != null)
+                {
+                    if (_ChargeShot.GetComponent<ChargeShotControllerScript>().homingTarget != null)
+                    {
+                        currentBomb.GetComponent<BombShotControlScript>().homingTarget = _ChargeShot.GetComponent<ChargeShotControllerScript>().homingTarget;
+                    }
+                }
+
+            }
+            else if (currentBomb != null)
+            {
+                currentBomb.GetComponent<BombShotControlScript>().explode();
+            }
+        }
+
+        //Check if has a charge shot
+        if (_ChargeShot != null)
+        {
+            if (_ChargeShot.GetComponent<ChargeShotControllerScript>().homingTarget == null)
+            {
+                //Check if charge shot is ready
+                if (Time.time - fireTimePressed > durationNeededForCharge)
+                {
+                    //Check if the direction the player is aiming collides with an enemy
+                    RaycastHit hit;
+
+                    if (Physics.Raycast(bombSpawn.position, transform.forward.normalized, out hit))//, 6 * col.radius))
+                    {
+                        if (hit.collider.gameObject.CompareTag("Enemy"))
+                        {
+                            //If does collide, mark that enemy has the lock on target and give that target to the charge shot so if released, will home in on that enemy
+                            _ChargeShot.GetComponent<ChargeShotControllerScript>().homingTarget = hit.collider.gameObject;
+
+                            //Also play a sound effect
+                            lockonSource.Play();
+
+                            //Move the secondary cursor to the emeny
+                            hit.collider.gameObject.GetComponent<DamagableByPlayer>().changeLockOnStatus(true);
+                        }
+                    }
+                }
+            }
+        }
+
+        //Update the visual effect for the rings being collected
+        if (Time.time - timeRingGoldAppear < durationOfRingOnScreen)
+        {
+            if (Time.time - timeRingGoldAppear < durationOfRingOnScreen / 2)
+            {
+                float scale = Mathf.Lerp(0, 1, (Time.time - timeRingGoldAppear) / (durationOfRingOnScreen / 2));
+                goldRingAround.transform.localScale = new Vector3(scale, scale, scale);
+            }
+            else
+            {
+                float scale = Mathf.Lerp(1, 0, (Time.time - timeRingGoldAppear - (durationOfRingOnScreen / 2)) / (durationOfRingOnScreen / 2));
+                goldRingAround.transform.localScale = new Vector3(scale, scale, scale);
+            }
+        }
+        if (Time.time - timeRingSilverAppear < durationOfRingOnScreen)
+        {
+            if (Time.time - timeRingSilverAppear < durationOfRingOnScreen / 2)
+            {
+                float scale = Mathf.Lerp(0, 1, (Time.time - timeRingSilverAppear) / (durationOfRingOnScreen / 2));
+                silverRingAround.transform.localScale = new Vector3(scale, scale, scale);
+            }
+            else
+            {
+                float scale = Mathf.Lerp(1, 0, (Time.time - timeRingSilverAppear - (durationOfRingOnScreen / 2)) / (durationOfRingOnScreen / 2));
+                silverRingAround.transform.localScale = new Vector3(scale, scale, scale);
+            }
+        }
+
+        //Finally update the UI
+        _UIController.updateUI(numBombs, currentHealth / maxHealth, currentBoost / maxBoost, numGoldRings, transform.position.z);
+    }
+
+    void allRangeControl()
+    {
+
+    }
+
     void Update()
     {
         if (Time.time - currentTimeOfDamageFlash < durationOfDamageFlash)
@@ -821,5 +844,22 @@ public class PlayerControllerScript : MonoBehaviour {
     public float getDefaultForwardSpeed()
     {
         return normalVelocity;
+    }
+
+    public void setAtBoss(bool isAtBoss)
+    {
+        if(isAtBoss)
+        {
+            notAtBoss = 0;
+        }
+        else
+        {
+            notAtBoss = 1;
+        }
+    }
+
+    public bool isInAllRange()
+    {
+        return inAllRange;
     }
 }

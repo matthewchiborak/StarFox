@@ -15,10 +15,10 @@ public class FollowPlayer : MonoBehaviour {
     void Start()
     {
         cameraTransform = GetComponent<Transform>();
-        cameraTransform.localPosition = new Vector3(0, 0, transformToFollow.localPosition.z + zOffset);
         playerScript = transformToFollow.GetComponentInParent<PlayerControllerScript>();
         zOffset = playerScript.cameraOffset;
-
+        cameraTransform.localPosition = new Vector3(0, 0, transformToFollow.localPosition.z + zOffset);
+        
         startedLoop = false;
         startYPosition = 0;
     }
@@ -26,25 +26,43 @@ public class FollowPlayer : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
-        //Never go backwards
-        if (!playerScript.getIsSomerSaulting())
+        if (!playerScript.isInAllRange())
         {
-            cameraTransform.localPosition = new Vector3(0, 0, transformToFollow.localPosition.z + zOffset);
-
-            if(startedLoop)
+            //Never go backwards
+            if (!playerScript.getIsSomerSaulting())
             {
-                startedLoop = false;
+                cameraTransform.localPosition = new Vector3(0, 0, transformToFollow.localPosition.z + zOffset);
+
+                if (startedLoop)
+                {
+                    startedLoop = false;
+                }
+            }
+            else
+            {
+                if (!startedLoop)
+                {
+                    startedLoop = true;
+                    startYPosition = transformToFollow.position.y;
+                }
+
+                cameraTransform.localPosition = new Vector3(cameraTransform.position.x, transformToFollow.position.y - startYPosition, cameraTransform.position.z);
             }
         }
         else
         {
-            if(!startedLoop)
+            //Stay behind the player always because is in all range mode
+            //Vector3 direction = transformToFollow.forward.normalized * zOffset;
+            if(!playerScript.getIsSomerSaulting())
             {
-                startedLoop = true;
-                startYPosition = transformToFollow.position.y;
+                cameraTransform.localPosition = transformToFollow.position + (transformToFollow.forward.normalized * zOffset);
+                cameraTransform.localPosition = new Vector3(cameraTransform.localPosition.x, transformToFollow.position.y, cameraTransform.localPosition.z);
             }
-
-            cameraTransform.localPosition = new Vector3(cameraTransform.position.x, transformToFollow.position.y - startYPosition, cameraTransform.position.z);
+            cameraTransform.LookAt(transformToFollow);
+           // cameraTransform.localRotation = Quaternion.
+            //cameraTransform.localRotation = Quaternion.Euler(0, transformToFollow.rotation.y, 0);
+            //transform.rotation = Quaternion.AngleAxis(30, Vector3.up);
+            //transformToFollow.rotation;
         }
-	}
+    }
 }
