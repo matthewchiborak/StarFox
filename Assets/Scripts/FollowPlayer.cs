@@ -58,6 +58,10 @@ public class FollowPlayer : MonoBehaviour {
                 cameraTransform.localPosition = transformToFollow.position + (transformToFollow.forward.normalized * zOffset);
                 cameraTransform.localPosition = new Vector3(cameraTransform.localPosition.x, transformToFollow.position.y, cameraTransform.localPosition.z);
             }
+            else
+            {
+
+            }
             cameraTransform.LookAt(transformToFollow);
            // cameraTransform.localRotation = Quaternion.
             //cameraTransform.localRotation = Quaternion.Euler(0, transformToFollow.rotation.y, 0);
