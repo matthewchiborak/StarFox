@@ -1347,4 +1347,9 @@ public class PlayerControllerScript : MonoBehaviour {
     {
         return inAllRange;
     }
+
+    public Vector3 getForward()
+    {
+        return transform.forward;
+    }
 }
