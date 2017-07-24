@@ -91,15 +91,18 @@ public class GameManagerScript : MonoBehaviour {
         return 0;
     }
 
-    public float damageTeammate(int teamMateID, float damage)
+    public float damageTeammate(int teamMateID, float damage, bool friendlyFire)
     {
         if (teamMateID == (int)CharacterID.Falco)
         {
             currentHealthFalco -= damage;
-            if (Time.time - lastTimeShotTeammate > shotTeammateCooldownDialog)
+            if (friendlyFire)
             {
-                _UIcontroller.loadDialog(shootingTeammatesDialog[0]);
-                lastTimeShotTeammate = Time.time;
+                if (Time.time - lastTimeShotTeammate > shotTeammateCooldownDialog)
+                {
+                    _UIcontroller.loadDialog(shootingTeammatesDialog[0]);
+                    lastTimeShotTeammate = Time.time;
+                }
             }
             
             if(currentHealthFalco <= 0)
@@ -113,10 +116,13 @@ public class GameManagerScript : MonoBehaviour {
         if (teamMateID == (int)CharacterID.Krystal)
         {
             currentHealthKris -= damage;
-            if (Time.time - lastTimeShotTeammate > shotTeammateCooldownDialog)
+            if (friendlyFire)
             {
-                _UIcontroller.loadDialog(shootingTeammatesDialog[1]);
-                lastTimeShotTeammate = Time.time;
+                if (Time.time - lastTimeShotTeammate > shotTeammateCooldownDialog)
+                {
+                    _UIcontroller.loadDialog(shootingTeammatesDialog[1]);
+                    lastTimeShotTeammate = Time.time;
+                }
             }
 
             if (currentHealthKris <= 0)
@@ -130,10 +136,13 @@ public class GameManagerScript : MonoBehaviour {
         if (teamMateID == (int)CharacterID.Slippy)
         {
             currentHealthSlip -= damage;
-            if (Time.time - lastTimeShotTeammate > shotTeammateCooldownDialog)
+            if (friendlyFire)
             {
-                _UIcontroller.loadDialog(shootingTeammatesDialog[2]);
-                lastTimeShotTeammate = Time.time;
+                if (Time.time - lastTimeShotTeammate > shotTeammateCooldownDialog)
+                {
+                    _UIcontroller.loadDialog(shootingTeammatesDialog[2]);
+                    lastTimeShotTeammate = Time.time;
+                }
             }
 
             if (currentHealthSlip <= 0)

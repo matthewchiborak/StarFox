@@ -145,6 +145,7 @@ public class PlayerControllerScript : MonoBehaviour {
     private float allRangeTurnAngleY;
     private float ARSomersaultTurnRatePenalty;
     private bool isUturning;
+    private float uTurnVelocity;
 
     // Use this for initialization
     void Start ()
@@ -233,6 +234,7 @@ public class PlayerControllerScript : MonoBehaviour {
         allRangeTurnAngleX = 0;
         ARSomersaultTurnRatePenalty = 20;
         isUturning = false;
+        uTurnVelocity = 25;
 }
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
@@ -892,7 +894,29 @@ public class PlayerControllerScript : MonoBehaviour {
         //Uturning
         if(isUturning)
         {
+            //Rotate the arwing accordingly
+            if (currentBoost / maxBoost < 0.5f)
+            {
+                float angle = Mathf.Lerp(0, -180, 2 * currentBoost / maxBoost);
+                transform.eulerAngles = new Vector3(angle, allRangeTurnAngleY, Mathf.Clamp(currentBankAngle, minRotZ, maxRotZ));
+            }
+            else
+            {
+                float angle = Mathf.Lerp(0, -180, (2 * currentBoost / maxBoost) - 1);
+                transform.eulerAngles = new Vector3(-180, allRangeTurnAngleY, currentBankAngle + angle);
+            }
 
+            rb.velocity = new Vector3(transform.forward.x * uTurnVelocity + moveHorizontal * currentSpeed, transform.forward.y * uTurnVelocity, transform.forward.z * uTurnVelocity);
+
+            currentBoost += (boostRate * Time.deltaTime);
+            if (currentBoost > maxBoost)
+            {
+                currentBoost = maxBoost;
+                isUturning = false;
+                allRangeTurnAngleY -= 180;
+                transform.eulerAngles = new Vector3(0, allRangeTurnAngleY, currentBankAngle);
+                currentForwardVelocity = normalVelocity * notAtBoss;
+            }
         }
 
         //Barrel roll functionallity
