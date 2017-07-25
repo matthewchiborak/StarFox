@@ -806,7 +806,7 @@ public class PlayerControllerScript : MonoBehaviour {
             boostSource.Play();
         }
 
-        //Force the player to stay in the game area
+        //Force the player to stay in the game area. If leave do a uturn to get back into the area
         //if (transform.position.x < (cameraOffset))
         //{
         //    transform.position = new Vector3(cameraOffset, transform.position.y, transform.position.z);
@@ -888,6 +888,7 @@ public class PlayerControllerScript : MonoBehaviour {
             {
                 currentBoost = maxBoost;
                 isSomerSaulting = false;
+                allRangeTurnAngleX = 0;
                 currentForwardVelocity = normalVelocity * notAtBoss;
             }
         }
@@ -914,6 +915,7 @@ public class PlayerControllerScript : MonoBehaviour {
                 currentBoost = maxBoost;
                 isUturning = false;
                 allRangeTurnAngleY -= 180;
+                allRangeTurnAngleX = 0;
                 transform.eulerAngles = new Vector3(0, allRangeTurnAngleY, currentBankAngle);
                 currentForwardVelocity = normalVelocity * notAtBoss;
             }

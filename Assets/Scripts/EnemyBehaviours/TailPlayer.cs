@@ -81,7 +81,7 @@ public class TailPlayer : MonoBehaviour {
             if (continueTailing && !playerControllScript.getIsSomerSaulting())
             {
                 Vector3 direction = new Vector3(player.transform.position.x - transform.position.x, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z).normalized;
-                direction.z = 1;
+                //direction.z = 1;
                 GetComponent<Rigidbody>().velocity = direction * playerControllScript.getDefaultForwardSpeed();
 
                 tilt = maxRotX / playerControllScript.getDefaultForwardSpeed();
