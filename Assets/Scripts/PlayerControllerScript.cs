@@ -12,6 +12,8 @@ public class PlayerControllerScript : MonoBehaviour {
     private Vector3 movement;
     private Vector3 rotation;
 
+    private bool controlsEnabled;
+
     private float moveHorizontal;
     private float moveVertical;
     private float moveHorizontalRaw;
@@ -146,6 +148,8 @@ public class PlayerControllerScript : MonoBehaviour {
     private float ARSomersaultTurnRatePenalty;
     private bool isUturning;
     private float uTurnVelocity;
+    private bool turnDuringUturnEnabled;
+    private float ARUTurnRatePenalty;
 
     // Use this for initialization
     void Start ()
@@ -154,6 +158,8 @@ public class PlayerControllerScript : MonoBehaviour {
         rb = GetComponent<Rigidbody>();
 
         currentLaserMode = 0;
+
+        controlsEnabled = true;
 
         minRotX = -45;
         minRotY = -45;
@@ -202,9 +208,12 @@ public class PlayerControllerScript : MonoBehaviour {
         boostRecovering = false;
 
         notAtBoss = 1;
-        normalVelocity = 5;
-        boostVelocity = 10f;
-        breakVelocity = 1f;
+        //normalVelocity = 5;
+        //boostVelocity = 10f;
+        //breakVelocity = 1f;
+        normalVelocity = 10;
+        boostVelocity = 15f;
+        breakVelocity = 5f;
         currentForwardVelocity = normalVelocity;
 
         currentBomb = null;
@@ -235,6 +244,8 @@ public class PlayerControllerScript : MonoBehaviour {
         ARSomersaultTurnRatePenalty = 20;
         isUturning = false;
         uTurnVelocity = 25;
+        turnDuringUturnEnabled = true;
+        ARUTurnRatePenalty = 2;
 }
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
@@ -786,20 +797,31 @@ public class PlayerControllerScript : MonoBehaviour {
     {
         //Get user input and move the player if the game is still in progess
         //Want get axis because will want controller support
-        moveHorizontal = Input.GetAxis("Horizontal");
-        moveVertical = -1 * Input.GetAxis("Vertical");
-        moveHorizontalRaw = Input.GetAxisRaw("Horizontal");
-        moveVerticalRaw = -1 * Input.GetAxisRaw("Vertical");
+        if(controlsEnabled)
+        {
+            moveHorizontal = Input.GetAxis("Horizontal");
+            moveVertical = -1 * Input.GetAxis("Vertical");
+            moveHorizontalRaw = Input.GetAxisRaw("Horizontal");
+            moveVerticalRaw = -1 * Input.GetAxisRaw("Vertical");
+        }
+        else
+        {
+            moveHorizontal = 0;
+            moveVertical = 0;
+            moveHorizontalRaw = 0;
+            moveVerticalRaw = 0;
+        }
+        
 
         //Check if the player wants to perform a somersault
-        if (Input.GetKey(KeyCode.R) && (currentBoost == 0) && !boostRecovering && !isSomerSaulting && !isUturning && !rollingL && !rollingR && moveVertical > 0)
+        if (controlsEnabled && Input.GetKey(KeyCode.R) && (currentBoost == 0) && !boostRecovering && !isSomerSaulting && !isUturning && !rollingL && !rollingR && moveVertical > 0)
         {
             isSomerSaulting = true;
             currentForwardVelocity = 0;
             boostSource.Play();
         }
         //U-turn
-        if (Input.GetKey(KeyCode.F) && (currentBoost == 0) && !boostRecovering && !isSomerSaulting && !isUturning && !rollingL && !rollingR && moveVertical > 0)
+        if (controlsEnabled && Input.GetKey(KeyCode.F) && (currentBoost == 0) && !boostRecovering && !isSomerSaulting && !isUturning && !rollingL && !rollingR && moveVertical > 0)
         {
             isUturning = true;
             currentForwardVelocity = 0;
@@ -825,11 +847,15 @@ public class PlayerControllerScript : MonoBehaviour {
         //}
 
         //Turning
-        if (isSomerSaulting || isUturning)
+        if (isSomerSaulting)
         {
             allRangeTurnAngleY += (ARTurnRateY / ARSomersaultTurnRatePenalty) * moveHorizontal * Time.deltaTime;
         }
-        else
+        else if((isUturning && currentBoost / maxBoost > 0.5f && turnDuringUturnEnabled))
+        {
+            allRangeTurnAngleY += (ARTurnRateY / ARUTurnRatePenalty) * moveHorizontal * Time.deltaTime;
+        }
+        else if(!isUturning)
         {
             allRangeTurnAngleY += ARTurnRateY * moveHorizontal * Time.deltaTime;
         }
@@ -871,6 +897,10 @@ public class PlayerControllerScript : MonoBehaviour {
             }
 
             rb.velocity = transform.forward * currentForwardVelocity;
+            //If banking, increase the horizontal speed
+            rb.velocity += transform.up.normalized * (moveHorizontalRaw * (currentSpeed - speed));
+            
+            //rb.velocity = new Vector3(rb.velocity.x + (moveHorizontalRaw * (currentSpeed - speed)), rb.velocity.y, rb.velocity.z);
         }
 
         //If performing a somersault advance the somersault
@@ -900,18 +930,22 @@ public class PlayerControllerScript : MonoBehaviour {
             {
                 float angle = Mathf.Lerp(0, -180, 2 * currentBoost / maxBoost);
                 transform.eulerAngles = new Vector3(angle, allRangeTurnAngleY, Mathf.Clamp(currentBankAngle, minRotZ, maxRotZ));
+                //rb.velocity = new Vector3(transform.forward.x * uTurnVelocity, transform.forward.y * uTurnVelocity, transform.forward.z * uTurnVelocity);
             }
             else
             {
                 float angle = Mathf.Lerp(0, -180, (2 * currentBoost / maxBoost) - 1);
                 transform.eulerAngles = new Vector3(-180, allRangeTurnAngleY, currentBankAngle + angle);
+                //rb.velocity = new Vector3(transform.forward.x * uTurnVelocity + moveHorizontal * currentSpeed, transform.forward.y * uTurnVelocity, transform.forward.z * uTurnVelocity);
             }
 
-            rb.velocity = new Vector3(transform.forward.x * uTurnVelocity + moveHorizontal * currentSpeed, transform.forward.y * uTurnVelocity, transform.forward.z * uTurnVelocity);
+            //rb.velocity = new Vector3(transform.forward.x * uTurnVelocity + moveHorizontal * currentSpeed, transform.forward.y * uTurnVelocity, transform.forward.z * uTurnVelocity);
+            rb.velocity = new Vector3(transform.forward.x * uTurnVelocity, transform.forward.y * uTurnVelocity, transform.forward.z * uTurnVelocity);
 
             currentBoost += (boostRate * Time.deltaTime);
             if (currentBoost > maxBoost)
             {
+                turnDuringUturnEnabled = true;
                 currentBoost = maxBoost;
                 isUturning = false;
                 allRangeTurnAngleY -= 180;
@@ -922,7 +956,7 @@ public class PlayerControllerScript : MonoBehaviour {
         }
 
         //Barrel roll functionallity
-        if (Input.GetKeyDown(KeyCode.Q) && !rollingL && !rollingR && !isSomerSaulting && !isUturning)
+        if (controlsEnabled && Input.GetKeyDown(KeyCode.Q) && !rollingL && !rollingR && !isSomerSaulting && !isUturning)
         {
             if (!tappingL)
             {
@@ -943,7 +977,7 @@ public class PlayerControllerScript : MonoBehaviour {
             tappingL = false;
         }
         //Right direction barrel roll
-        if (Input.GetKeyDown(KeyCode.E) && !rollingL && !rollingR && !isSomerSaulting && !isUturning)
+        if (controlsEnabled && Input.GetKeyDown(KeyCode.E) && !rollingL && !rollingR && !isSomerSaulting && !isUturning)
         {
             if (!tappingR)
             {
@@ -1057,7 +1091,7 @@ public class PlayerControllerScript : MonoBehaviour {
 
         //Breaking and boosting
         //Boost
-        if (Input.GetKey(KeyCode.R) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting && !isUturning)
+        if (controlsEnabled && Input.GetKey(KeyCode.R) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting && !isUturning)
         {
             currentBoost += (boostRate * Time.deltaTime);
             if (currentBoost > maxBoost)
@@ -1077,7 +1111,7 @@ public class PlayerControllerScript : MonoBehaviour {
             currentForwardVelocity = boostVelocity * notAtBoss;
         }
         //Break
-        else if (Input.GetKey(KeyCode.F) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting && !isUturning)
+        else if (controlsEnabled && Input.GetKey(KeyCode.F) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting && !isUturning)
         {
             currentBoost += (boostRate * Time.deltaTime);
             if (currentBoost > maxBoost)
@@ -1333,6 +1367,11 @@ public class PlayerControllerScript : MonoBehaviour {
         return normalVelocity;
     }
 
+    public float getCurrentForwardVelocity()
+    {
+        return currentForwardVelocity;
+    }
+
     public void setAtBoss(bool isAtBoss)
     {
         if(isAtBoss)
@@ -1353,5 +1392,30 @@ public class PlayerControllerScript : MonoBehaviour {
     public Vector3 getForward()
     {
         return transform.forward;
+    }
+
+    public void movePlayerBackIntoBounds()
+    {
+        if(!isUturning && !isSomerSaulting && !rollingL && !rollingR)
+        {
+            currentBoost = 0;
+            turnDuringUturnEnabled = false;
+            isUturning = true;
+        }
+    }
+
+    public void setPlayerControlEnable(bool status)
+    {
+        controlsEnabled = status;
+    }
+
+    public bool getPlayerControlEnabled()
+    {
+        return controlsEnabled;
+    }
+
+    public bool getIsUturning()
+    {
+        return isUturning;
     }
 }

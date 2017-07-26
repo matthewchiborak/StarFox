@@ -24,6 +24,10 @@ public class GameManagerScript : MonoBehaviour {
 
     public GameObject player;
     public UIController _UIcontroller;
+
+    //All range mode level bounds
+    public Vector3 minLevelBounds;
+    public Vector3 maxLevelBounds;
     
     public GameObject[] prefabs;
     public GameObject[] actives;
@@ -165,6 +169,40 @@ public class GameManagerScript : MonoBehaviour {
             checkIfNeedToRemove();
             //checkIfNeedActivate();
             checkIfNeedActiveEnemyWithPath();
+        }
+        else
+        {
+            //Keep the player in the game area
+            if(player.GetComponent<PlayerControllerScript>().getPlayerControlEnabled() && (player.transform.position.x < minLevelBounds.x || player.transform.position.x > maxLevelBounds.x ||
+                player.transform.position.z < minLevelBounds.z || player.transform.position.z > maxLevelBounds.z))
+            {
+                player.GetComponent<PlayerControllerScript>().movePlayerBackIntoBounds();
+                player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(false);
+            }
+
+            if(!player.GetComponent<PlayerControllerScript>().getPlayerControlEnabled() &&
+                (player.transform.position.x > minLevelBounds.x && player.transform.position.x < maxLevelBounds.x &&
+                player.transform.position.z > minLevelBounds.z && player.transform.position.z < maxLevelBounds.z))
+            {
+                player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(true);
+            }
+            else if(!player.GetComponent<PlayerControllerScript>().getIsUturning() && !player.GetComponent<PlayerControllerScript>().getPlayerControlEnabled() &&
+                ((player.transform.position.x < minLevelBounds.x && player.GetComponent<Rigidbody>().velocity.x < 0) ||
+                (player.transform.position.x > maxLevelBounds.x && player.GetComponent<Rigidbody>().velocity.x > 0) ||
+                (player.transform.position.z < minLevelBounds.z && player.GetComponent<Rigidbody>().velocity.z < 0) ||
+                (player.transform.position.z > maxLevelBounds.z && player.GetComponent<Rigidbody>().velocity.z > 0)))
+            {
+                player.GetComponent<PlayerControllerScript>().movePlayerBackIntoBounds();
+            }
+
+            if(player.transform.position.y < minLevelBounds.y)
+            {
+                player.transform.position = new Vector3(player.transform.position.x, minLevelBounds.y, player.transform.position.z);
+            }
+            if(player.transform.position.y > maxLevelBounds.y)
+            {
+                player.transform.position = new Vector3(player.transform.position.x, maxLevelBounds.y, player.transform.position.z);
+            }
         }
     }
 
