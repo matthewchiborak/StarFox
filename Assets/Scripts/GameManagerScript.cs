@@ -66,6 +66,8 @@ public class GameManagerScript : MonoBehaviour {
     private bool isAtBoss;
     public GameObject boss;
     public Vector3 bossSpawnLocation;
+    private GameObject _boss;
+    private bool bossDestroyed;
 
     // Use this for initialization
     void Start ()
@@ -82,6 +84,8 @@ public class GameManagerScript : MonoBehaviour {
         currentHealthKris = maxTeammateHealth;
         currentHealthSlip = maxTeammateHealth;
         currentHealthFalco = maxTeammateHealth;
+
+        bossDestroyed = false;
     }
 
     public float getTeammateHealthPercentage(int teamMateID)
@@ -181,7 +185,28 @@ public class GameManagerScript : MonoBehaviour {
             {
                 isAtBoss = true;
                 player.GetComponent<PlayerControllerScript>().setAtBoss(true);
-                Instantiate(boss, bossSpawnLocation, Quaternion.identity);
+                //_boss = Instantiate(boss, bossSpawnLocation, Quaternion.identity);
+                boss.SetActive(true);
+                boss.GetComponent<BossControlScript>().resetHealth();
+                //Activate health bar
+                _UIcontroller.activateHealthBar();
+            }
+
+            //Update the health UI
+            if(isAtBoss)
+            {
+                //Set health on the UI
+                _UIcontroller.updateBossHealth(boss.GetComponent<BossControlScript>().getCurrentHealthPercentage());
+
+                //Check if the boss is done
+                if(!bossDestroyed && boss.GetComponent<BossControlScript>().getCurrentHealthPercentage() <= 0)
+                {
+                    //_UIController.increaseHits(hits);
+                    _UIcontroller.increaseHits(boss.GetComponent<BossControlScript>().hits);
+                    boss.SetActive(false);
+                    bossDestroyed = true;
+                    Debug.Log("Boss Destroyed");
+                }
             }
         }
         else

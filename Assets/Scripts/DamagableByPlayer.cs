@@ -96,7 +96,7 @@ public class DamagableByPlayer : MonoBehaviour {
         //Collide with bombs
         if (other.gameObject.CompareTag("BombExplosion"))
         {
-            currentHealth -= bombDamage;
+            currentHealth -= other.gameObject.GetComponent<BombExplosionControlScript>().getBombDamage();
             hitSource.Play();
             currentTimeOfDamageFlash = Time.time;
 

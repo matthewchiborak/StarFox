@@ -115,6 +115,10 @@ public class UIController : MonoBehaviour {
     public Image dialogHealthBarBar;
     public Text retireText;
 
+    //Boss Health Bar
+    public GameObject bossHealthBar;
+    public Image bossHealthBarFront;
+
     // Use this for initialization
     void Start ()
     {
@@ -142,6 +146,16 @@ public class UIController : MonoBehaviour {
         ring1.enabled = true;
         ring2.enabled = true;
         ring3.enabled = true;
+    }
+
+    public void activateHealthBar()
+    {
+        bossHealthBar.SetActive(true);
+    }
+
+    public void updateBossHealth(float healthPercent)
+    {
+        bossHealthBarFront.transform.localScale = new Vector3(1, healthPercent, 1);
     }
     
     //Updates the UI in case of a change

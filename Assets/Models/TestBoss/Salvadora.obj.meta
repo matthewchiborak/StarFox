@@ -1,0 +1,214 @@
+fileFormatVersion: 2
+guid: f527660aa4822774c9edd74723dfc8f5
+timeCreated: 1501187469
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: 1_bm0104_10_body_break__f2
+    100002: 1_bm0104_11_body_break__f2
+    100004: 1_bm0104_12_body_break__f2
+    100006: 1_bm0104_13_body_break__f2
+    100008: 1_bm0104_14_body_break__f2
+    100010: 1_bm0104_15_body_break__f2
+    100012: 1_bm0104_16_body_break__f2
+    100014: 1_bm0104_17_body_break__f2
+    100016: 1_bm0104_18_body_break__f2
+    100018: 1_bm0104_19_body_break__f2
+    100020: 1_bm0104_1_body__f2
+    100022: 1_bm0104_2_body__f2
+    100024: 1_bm0104_3_body__f2
+    100026: 1_bm0104_4_body__f2
+    100028: 1_bm0104_5_body__f2
+    100030: 1_bm0104_6_body__f2
+    100032: 1_bm0104_7_body__f2
+    100034: 1_bm0104_8_body__f2
+    100036: 1_bm0104_9_body__f2
+    100038: Bone1
+    100040: Bone2
+    100042: Bone3
+    100044: Bone4
+    100046: Bone5
+    100048: Bone6
+    100050: Bone7
+    100052: Bone8
+    100054: //RootNode
+    400000: 1_bm0104_10_body_break__f2
+    400002: 1_bm0104_11_body_break__f2
+    400004: 1_bm0104_12_body_break__f2
+    400006: 1_bm0104_13_body_break__f2
+    400008: 1_bm0104_14_body_break__f2
+    400010: 1_bm0104_15_body_break__f2
+    400012: 1_bm0104_16_body_break__f2
+    400014: 1_bm0104_17_body_break__f2
+    400016: 1_bm0104_18_body_break__f2
+    400018: 1_bm0104_19_body_break__f2
+    400020: 1_bm0104_1_body__f2
+    400022: 1_bm0104_2_body__f2
+    400024: 1_bm0104_3_body__f2
+    400026: 1_bm0104_4_body__f2
+    400028: 1_bm0104_5_body__f2
+    400030: 1_bm0104_6_body__f2
+    400032: 1_bm0104_7_body__f2
+    400034: 1_bm0104_8_body__f2
+    400036: 1_bm0104_9_body__f2
+    400038: Bone1
+    400040: Bone2
+    400042: Bone3
+    400044: Bone4
+    400046: Bone5
+    400048: Bone6
+    400050: Bone7
+    400052: Bone8
+    400054: //RootNode
+    2300000: 1_bm0104_10_body_break__f2
+    2300002: 1_bm0104_11_body_break__f2
+    2300004: 1_bm0104_12_body_break__f2
+    2300006: 1_bm0104_13_body_break__f2
+    2300008: 1_bm0104_14_body_break__f2
+    2300010: 1_bm0104_15_body_break__f2
+    2300012: 1_bm0104_16_body_break__f2
+    2300014: 1_bm0104_17_body_break__f2
+    2300016: 1_bm0104_18_body_break__f2
+    2300018: 1_bm0104_19_body_break__f2
+    2300020: 1_bm0104_1_body__f2
+    2300022: 1_bm0104_2_body__f2
+    2300024: 1_bm0104_3_body__f2
+    2300026: 1_bm0104_4_body__f2
+    2300028: 1_bm0104_5_body__f2
+    2300030: 1_bm0104_6_body__f2
+    2300032: 1_bm0104_7_body__f2
+    2300034: 1_bm0104_8_body__f2
+    2300036: 1_bm0104_9_body__f2
+    2300038: Bone1
+    2300040: Bone2
+    2300042: Bone3
+    2300044: Bone4
+    2300046: Bone5
+    2300048: Bone6
+    2300050: Bone7
+    2300052: Bone8
+    3300000: 1_bm0104_10_body_break__f2
+    3300002: 1_bm0104_11_body_break__f2
+    3300004: 1_bm0104_12_body_break__f2
+    3300006: 1_bm0104_13_body_break__f2
+    3300008: 1_bm0104_14_body_break__f2
+    3300010: 1_bm0104_15_body_break__f2
+    3300012: 1_bm0104_16_body_break__f2
+    3300014: 1_bm0104_17_body_break__f2
+    3300016: 1_bm0104_18_body_break__f2
+    3300018: 1_bm0104_19_body_break__f2
+    3300020: 1_bm0104_1_body__f2
+    3300022: 1_bm0104_2_body__f2
+    3300024: 1_bm0104_3_body__f2
+    3300026: 1_bm0104_4_body__f2
+    3300028: 1_bm0104_5_body__f2
+    3300030: 1_bm0104_6_body__f2
+    3300032: 1_bm0104_7_body__f2
+    3300034: 1_bm0104_8_body__f2
+    3300036: 1_bm0104_9_body__f2
+    3300038: Bone1
+    3300040: Bone2
+    3300042: Bone3
+    3300044: Bone4
+    3300046: Bone5
+    3300048: Bone6
+    3300050: Bone7
+    3300052: Bone8
+    4300000: 1_bm0104_10_body_break__f2
+    4300002: 1_bm0104_11_body_break__f2
+    4300004: 1_bm0104_12_body_break__f2
+    4300006: 1_bm0104_13_body_break__f2
+    4300008: 1_bm0104_14_body_break__f2
+    4300010: 1_bm0104_15_body_break__f2
+    4300012: 1_bm0104_16_body_break__f2
+    4300014: 1_bm0104_17_body_break__f2
+    4300016: 1_bm0104_18_body_break__f2
+    4300018: 1_bm0104_19_body_break__f2
+    4300020: 1_bm0104_1_body__f2
+    4300022: 1_bm0104_2_body__f2
+    4300024: 1_bm0104_3_body__f2
+    4300026: 1_bm0104_4_body__f2
+    4300028: 1_bm0104_5_body__f2
+    4300030: 1_bm0104_6_body__f2
+    4300032: 1_bm0104_7_body__f2
+    4300034: 1_bm0104_8_body__f2
+    4300036: 1_bm0104_9_body__f2
+    4300038: Bone1
+    4300040: Bone2
+    4300042: Bone3
+    4300044: Bone4
+    4300046: Bone5
+    4300048: Bone6
+    4300050: Bone7
+    4300052: Bone8
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

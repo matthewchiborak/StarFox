@@ -11,6 +11,7 @@ public class BombExplosionControlScript : MonoBehaviour {
     public SphereCollider hitbox;
     public Light explosionLight;
     private float maxLightIntensity;
+    private float bombDamage;
 
 	// Use this for initialization
 	void Start ()
@@ -18,6 +19,12 @@ public class BombExplosionControlScript : MonoBehaviour {
         durationOfActiveHitBox = 2.5f;
         timeOfExplosion = Time.time;
         maxLightIntensity = 100;
+        bombDamage = 100;
+    }
+
+    public float getBombDamage()
+    {
+        return bombDamage;
     }
 	
 	// Update is called once per frame
