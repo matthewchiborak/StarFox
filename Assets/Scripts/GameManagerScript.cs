@@ -60,6 +60,13 @@ public class GameManagerScript : MonoBehaviour {
     private float shotTeammateCooldownDialog;
     public TextAsset[] retireTeammatesDialog;
 
+    //Boss
+    public bool hasBoss;
+    public float zCordToTriggerBoss;
+    private bool isAtBoss;
+    public GameObject boss;
+    public Vector3 bossSpawnLocation;
+
     // Use this for initialization
     void Start ()
     {
@@ -70,7 +77,7 @@ public class GameManagerScript : MonoBehaviour {
         shotTeammateCooldownDialog = 10f;
         lastTimeShotTeammate = Time.time - shotTeammateCooldownDialog;
 
-        //For testing purposes
+        //Team mate health
         maxTeammateHealth = 100;
         currentHealthKris = maxTeammateHealth;
         currentHealthSlip = maxTeammateHealth;
@@ -169,6 +176,13 @@ public class GameManagerScript : MonoBehaviour {
             checkIfNeedToRemove();
             //checkIfNeedActivate();
             checkIfNeedActiveEnemyWithPath();
+
+            if(hasBoss && !isAtBoss && player.transform.position.z > zCordToTriggerBoss)
+            {
+                isAtBoss = true;
+                player.GetComponent<PlayerControllerScript>().setAtBoss(true);
+                Instantiate(boss, bossSpawnLocation, Quaternion.identity);
+            }
         }
         else
         {
