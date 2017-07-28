@@ -24,6 +24,7 @@ public class GameManagerScript : MonoBehaviour {
 
     public GameObject player;
     public UIController _UIcontroller;
+    public BackgroundMusicControl _bgmusicControl;
 
     //All range mode level bounds
     public Vector3 minLevelBounds;
@@ -68,6 +69,7 @@ public class GameManagerScript : MonoBehaviour {
     public Vector3 bossSpawnLocation;
     private GameObject _boss;
     private bool bossDestroyed;
+    private bool updateBossHealthBar;
 
     // Use this for initialization
     void Start ()
@@ -86,6 +88,7 @@ public class GameManagerScript : MonoBehaviour {
         currentHealthFalco = maxTeammateHealth;
 
         bossDestroyed = false;
+        updateBossHealthBar = false;
     }
 
     public float getTeammateHealthPercentage(int teamMateID)
@@ -104,6 +107,11 @@ public class GameManagerScript : MonoBehaviour {
         }
 
         return 0;
+    }
+
+    public void allowHealthBarUpdates()
+    {
+        updateBossHealthBar = true;
     }
 
     public float damageTeammate(int teamMateID, float damage, bool friendlyFire)
@@ -188,15 +196,19 @@ public class GameManagerScript : MonoBehaviour {
                 //_boss = Instantiate(boss, bossSpawnLocation, Quaternion.identity);
                 boss.SetActive(true);
                 boss.GetComponent<BossControlScript>().resetHealth();
+                _bgmusicControl.playBossMusic();
                 //Activate health bar
-                _UIcontroller.activateHealthBar();
+                //_UIcontroller.activateHealthBar();
             }
 
             //Update the health UI
             if(isAtBoss)
             {
                 //Set health on the UI
-                _UIcontroller.updateBossHealth(boss.GetComponent<BossControlScript>().getCurrentHealthPercentage());
+                if(updateBossHealthBar)
+                {
+                    _UIcontroller.updateBossHealth(boss.GetComponent<BossControlScript>().getCurrentHealthPercentage());
+                }
 
                 //Check if the boss is done
                 if(!bossDestroyed && boss.GetComponent<BossControlScript>().getCurrentHealthPercentage() <= 0)

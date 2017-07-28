@@ -10,6 +10,9 @@ public class BossControlScript : MonoBehaviour {
     public AudioSource hitSource;
     public int hits;
 
+    private bool isVulerable;
+    private bool isActive;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -21,9 +24,20 @@ public class BossControlScript : MonoBehaviour {
 		
 	//}
 
+    public void setIsVulnerable(bool status)
+    {
+        isVulerable = status;
+    }
+
     public void resetHealth()
     {
         currentHealth = maxHealth;
+        isActive = true;
+    }
+
+    public bool checkIfActive()
+    {
+        return isActive;
     }
 
     public float getCurrentHealthPercentage()

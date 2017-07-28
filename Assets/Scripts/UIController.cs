@@ -118,6 +118,7 @@ public class UIController : MonoBehaviour {
     //Boss Health Bar
     public GameObject bossHealthBar;
     public Image bossHealthBarFront;
+    private bool bossHealthBarStartGrowing;
 
     // Use this for initialization
     void Start ()
@@ -137,6 +138,8 @@ public class UIController : MonoBehaviour {
         currentMouth = 0;
         durationOfEachTalk = 0.08f;//0.125f;
         timeOfLastTalk = Time.time - durationOfEachTalk;
+
+        bossHealthBarStartGrowing = false;
 }
 
     public void doubleLifeBar()
@@ -152,7 +155,7 @@ public class UIController : MonoBehaviour {
     {
         bossHealthBar.SetActive(true);
     }
-
+    
     public void updateBossHealth(float healthPercent)
     {
         bossHealthBarFront.transform.localScale = new Vector3(1, healthPercent, 1);
