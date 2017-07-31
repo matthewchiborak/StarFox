@@ -46,6 +46,10 @@ public class TestBossBehaviour : MonoBehaviour {
 
     public AudioSource healthGrowSource;
 
+    public ParticleSystem explosion;
+    public Light explosionLight;
+    public AudioSource explosionSource;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -113,8 +117,7 @@ public class TestBossBehaviour : MonoBehaviour {
                 break;
 
             case TestBossBehaviourMode.Attack:
-
-
+                
                 for (int i = 0; i < shotSpawn.Length; i++)
                 {
                     if (Time.time - currentTimeBetweenShots[i] > amountOfTimeToPassBeforeFire[i])
@@ -135,6 +138,16 @@ public class TestBossBehaviour : MonoBehaviour {
                         currentTimeBetweenShots[i] = Time.time;
                         ///////////////////////
                     }
+                }
+
+                //Check if the boss is defeated
+                if(_bossControl.getCurrentHealthPercentage() <= 0)
+                {
+                    explosion.Play();
+                    explosionLight.enabled = true;
+                    currentBehaviour = TestBossBehaviourMode.Destroyed;
+                    GetComponent<Rigidbody>().useGravity = true;
+                    explosionSource.Play();
                 }
 
                 break;

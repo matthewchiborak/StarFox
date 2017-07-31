@@ -47,13 +47,16 @@ public class BossControlScript : MonoBehaviour {
 
     public void damageBoss(float damage)
     {
-        currentHealth -= damage;
-
-        hitSource.Play();
-
-        if(currentHealth < 0)
+        if (isVulerable)
         {
-            currentHealth = 0;
+            currentHealth -= damage;
+
+            hitSource.Play();
+
+            if (currentHealth < 0)
+            {
+                currentHealth = 0;
+            }
         }
     }
 

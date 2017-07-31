@@ -391,11 +391,14 @@ public class PlayerControllerScript : MonoBehaviour {
     {
         //Get user input and move the player if the game is still in progess
         //Want get axis because will want controller support
-        moveHorizontal = Input.GetAxis("Horizontal");
-        moveVertical = -1 * Input.GetAxis("Vertical");
+        if (controlsEnabled)
+        {
+            moveHorizontal = Input.GetAxis("Horizontal");
+            moveVertical = -1 * Input.GetAxis("Vertical");
+        }
 
         //Check if the player wants to perform a somersault
-        if (Input.GetKey(KeyCode.R) && (currentBoost == 0) && !boostRecovering && !isSomerSaulting && !rollingL && !rollingR && moveVertical > 0)
+        if (controlsEnabled && Input.GetKey(KeyCode.R) && (currentBoost == 0) && !boostRecovering && !isSomerSaulting && !rollingL && !rollingR && moveVertical > 0)
         {
             isSomerSaulting = true;
             currentForwardVelocity = 0;
@@ -455,7 +458,7 @@ public class PlayerControllerScript : MonoBehaviour {
         }
 
         //Barrel roll functionallity
-        if (Input.GetKeyDown(KeyCode.Q) && !rollingL && !rollingR && !isSomerSaulting)
+        if (controlsEnabled && Input.GetKeyDown(KeyCode.Q) && !rollingL && !rollingR && !isSomerSaulting)
         {
             if (!tappingL)
             {
@@ -476,7 +479,7 @@ public class PlayerControllerScript : MonoBehaviour {
             tappingL = false;
         }
         //Right direction barrel roll
-        if (Input.GetKeyDown(KeyCode.E) && !rollingL && !rollingR && !isSomerSaulting)
+        if (controlsEnabled && Input.GetKeyDown(KeyCode.E) && !rollingL && !rollingR && !isSomerSaulting)
         {
             if (!tappingR)
             {
@@ -592,7 +595,7 @@ public class PlayerControllerScript : MonoBehaviour {
         //ALSO TODO ACTUALLY ADjUST THE SPEED WHENEVER YOU DECIDE TO ACTUALLY IMPLEMENT THAT
 
         //Boost
-        if (Input.GetKey(KeyCode.R) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting)
+        if (controlsEnabled && Input.GetKey(KeyCode.R) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting)
         {
             currentBoost += (boostRate * Time.deltaTime);
             if (currentBoost > maxBoost)
@@ -612,7 +615,7 @@ public class PlayerControllerScript : MonoBehaviour {
             currentForwardVelocity = boostVelocity * notAtBoss;
         }
         //Break
-        else if (Input.GetKey(KeyCode.F) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting)
+        else if (controlsEnabled && Input.GetKey(KeyCode.F) && (currentBoost < maxBoost) && !boostRecovering && !isSomerSaulting)
         {
             currentBoost += (boostRate * Time.deltaTime);
             if (currentBoost > maxBoost)
@@ -653,7 +656,7 @@ public class PlayerControllerScript : MonoBehaviour {
 
 
         //Check if the player is firing
-        if (Input.GetButtonDown("Fire1"))
+        if (controlsEnabled && Input.GetButtonDown("Fire1"))
         {
             //Create the shot
             if (currentLaserMode == 0)
@@ -691,7 +694,7 @@ public class PlayerControllerScript : MonoBehaviour {
             _ChargeShot.GetComponent<ChargeShotControllerScript>().chargeShotSpawn = bombSpawn;
         }
         //Check if release a charge shot if held long enough
-        if (Input.GetButtonUp("Fire1"))
+        if (controlsEnabled && Input.GetButtonUp("Fire1"))
         {
             if (_ChargeShot != null)
             {
@@ -709,7 +712,7 @@ public class PlayerControllerScript : MonoBehaviour {
         }
 
         //Check if firing a bomb
-        if (Input.GetButtonDown("Fire2"))
+        if (controlsEnabled && Input.GetButtonDown("Fire2"))
         {
             //Create the shot
             if (numBombs > 0 && currentBomb == null)
@@ -1335,15 +1338,19 @@ public class PlayerControllerScript : MonoBehaviour {
 
     public void damagePlayer(float damage)
     {
-        currentHealth -= damage;
-        hitSource.Play();
-
-        currentTimeOfDamageFlash = Time.time;
-
-        if (currentHealth <= 0)
+        //Cant be hurt if not in control
+        if (controlsEnabled)
         {
-            currentHealth = 0;
-            Debug.Log("Game over");
+            currentHealth -= damage;
+            hitSource.Play();
+
+            currentTimeOfDamageFlash = Time.time;
+
+            if (currentHealth <= 0)
+            {
+                currentHealth = 0;
+                Debug.Log("Game over");
+            }
         }
     }
 
@@ -1408,6 +1415,11 @@ public class PlayerControllerScript : MonoBehaviour {
     {
         controlsEnabled = status;
     }
+
+    //public void cancelMovement()
+    //{
+    //    rb.velocity = new Vector3(0, 0, 0);
+    //}
 
     public bool getPlayerControlEnabled()
     {

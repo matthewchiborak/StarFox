@@ -71,6 +71,10 @@ public class GameManagerScript : MonoBehaviour {
     private bool bossDestroyed;
     private bool updateBossHealthBar;
 
+    public float timeAfterBossDestroyedToDisappear;
+    private float timeBossDestroyed;
+    private bool victoryPlaying;
+
     // Use this for initialization
     void Start ()
     {
@@ -89,6 +93,8 @@ public class GameManagerScript : MonoBehaviour {
 
         bossDestroyed = false;
         updateBossHealthBar = false;
+        
+        victoryPlaying = false;
     }
 
     public float getTeammateHealthPercentage(int teamMateID)
@@ -215,9 +221,18 @@ public class GameManagerScript : MonoBehaviour {
                 {
                     //_UIController.increaseHits(hits);
                     _UIcontroller.increaseHits(boss.GetComponent<BossControlScript>().hits);
-                    boss.SetActive(false);
+                    //boss.SetActive(false);
                     bossDestroyed = true;
-                    Debug.Log("Boss Destroyed");
+                    timeBossDestroyed = Time.time;
+                    _bgmusicControl.stopMusic();
+                    //Debug.Log("Boss Destroyed");
+                    player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(false);
+                }
+
+                if(!victoryPlaying && bossDestroyed && Time.time - timeBossDestroyed > timeAfterBossDestroyedToDisappear)
+                {
+                    _bgmusicControl.playVictoryTrack();
+                    victoryPlaying = true;
                 }
             }
         }
