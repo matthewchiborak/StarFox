@@ -6,8 +6,10 @@ public class WeakpointControl : MonoBehaviour {
 
     public BossControlScript ownerOfWeakpoint;
 
-	// Use this for initialization
-	void Start () {
+    public AudioSource hitSource;
+
+    // Use this for initialization
+    void Start () {
 		
 	}
 	
@@ -28,7 +30,9 @@ public class WeakpointControl : MonoBehaviour {
         if (other.gameObject.CompareTag("PlayerShot") || other.gameObject.CompareTag("ChargeShot"))
         {
             ownerOfWeakpoint.damageBoss(other.gameObject.GetComponent<LaserInformation>().damage);
-            
+
+            hitSource.Play();
+
             Destroy(other.gameObject);
         }
     }

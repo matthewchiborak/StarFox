@@ -18,6 +18,19 @@ public class TestBossBehaviour : MonoBehaviour {
     public UIController _UIControl;
     public GameManagerScript _gameManager;
 
+    //Laser to fire
+    public GameObject laser;
+    public GameObject player;
+    public Transform[] shotSpawn;
+
+    //Shoots at a random interval between 2 values
+    public float minTimeBetweenShot;
+    public float maxTimeBetweenShots;
+    private float[] amountOfTimeToPassBeforeFire;
+    private float[] currentTimeBetweenShots;
+    private float shotLead;
+    public float shotSpeed;
+
     TestBossBehaviourMode currentBehaviour;
 
     //Appear
@@ -37,6 +50,15 @@ public class TestBossBehaviour : MonoBehaviour {
 	void Start ()
     {
         currentBehaviour = TestBossBehaviourMode.StandBy;
+
+        amountOfTimeToPassBeforeFire = new float[shotSpawn.Length];
+        currentTimeBetweenShots = new float[shotSpawn.Length];
+
+        for (int i = 0; i < amountOfTimeToPassBeforeFire.Length; i++)
+        {
+            amountOfTimeToPassBeforeFire[i] = Random.Range(minTimeBetweenShot, maxTimeBetweenShots);
+            currentTimeBetweenShots[i] = Time.time;
+        }
 	}
     
 	// Update is called once per frame
@@ -91,9 +113,30 @@ public class TestBossBehaviour : MonoBehaviour {
                 break;
 
             case TestBossBehaviourMode.Attack:
-                //Activate health bar
-                _UIControl.activateHealthBar();
-                Debug.Log("I'm attacking");
+
+
+                for (int i = 0; i < shotSpawn.Length; i++)
+                {
+                    if (Time.time - currentTimeBetweenShots[i] > amountOfTimeToPassBeforeFire[i])
+                    {
+                        ///////////////////////
+                        shotLead = (player.transform.position.z - shotSpawn[i].position.z) / (shotSpeed + player.GetComponent<PlayerControllerScript>().getCurrentSpeed());
+                        shotLead = shotSpeed * shotLead;
+
+                        Quaternion newAngle = Quaternion.Euler(Mathf.Atan2(player.transform.position.x - shotSpawn[i].position.x, player.transform.position.z + shotLead - shotSpawn[i].position.z), Mathf.Atan2(player.transform.position.y - shotSpawn[i].position.y, player.transform.position.z + shotLead - shotSpawn[i].position.z), 0);
+                        GameObject newShot = Instantiate(laser, shotSpawn[i].position, newAngle);//Instantiate(enemyShot, transform.position, newAngle);
+
+                        Vector3 direction = new Vector3(player.transform.position.x - shotSpawn[i].position.x, player.transform.position.y - shotSpawn[i].position.y, player.transform.position.z - shotSpawn[i].position.z).normalized;
+                        
+                        newShot.GetComponent<Rigidbody>().velocity = direction * shotSpeed;
+                        //transform.forward.normalized * -shotSpeed;
+
+                        amountOfTimeToPassBeforeFire[i] = Random.Range(minTimeBetweenShot, maxTimeBetweenShots);
+                        currentTimeBetweenShots[i] = Time.time;
+                        ///////////////////////
+                    }
+                }
+
                 break;
 
             case TestBossBehaviourMode.Destroyed:
