@@ -9,6 +9,7 @@ public class BackgroundMusicControl : MonoBehaviour {
     public AudioClip musicTrack;
     public AudioClip bossMusicTrack;
     public AudioClip victoryMusicTrack;
+    public AudioClip gameOverMusicTrack;
 
 	public void playBossMusic()
     {
@@ -21,6 +22,13 @@ public class BackgroundMusicControl : MonoBehaviour {
     {
         audioSource.loop = true;
         audioSource.clip = musicTrack;
+        audioSource.Play();
+    }
+
+    public void playGameOverTrack()
+    {
+        audioSource.loop = false;
+        audioSource.clip = gameOverMusicTrack;
         audioSource.Play();
     }
 

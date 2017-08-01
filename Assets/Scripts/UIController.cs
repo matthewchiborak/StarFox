@@ -65,6 +65,7 @@ public class UIController : MonoBehaviour {
     //private float increaseLifeBarMult;
 
     //For health bar streaching
+    private bool hasLongLifeBar;
     private float timeOfStartIncreaseBar;
     private float duractionOfIncreasingBar;
 
@@ -84,9 +85,9 @@ public class UIController : MonoBehaviour {
 
     //Dialog functionality
     public GameObject dialogBox;
-    public TextAsset[] levelDialog;
-    public int[] zCordToTriggerDialog;
-    public bool[] zCordDialogPlayed;
+    //public TextAsset[] levelDialog;
+    //public int[] zCordToTriggerDialog;
+    //public bool[] zCordDialogPlayed;
     private DialogInfo _dialogInfo;
     private int nextDialogToBePlayed;
     private bool currentlyPlayingDialog;
@@ -120,6 +121,8 @@ public class UIController : MonoBehaviour {
     public Image bossHealthBarFront;
     private bool bossHealthBarStartGrowing;
 
+   
+
     // Use this for initialization
     void Start ()
     {
@@ -140,10 +143,12 @@ public class UIController : MonoBehaviour {
         timeOfLastTalk = Time.time - durationOfEachTalk;
 
         bossHealthBarStartGrowing = false;
+        hasLongLifeBar = false;
 }
 
     public void doubleLifeBar()
     {
+        hasLongLifeBar = true;
         timeOfStartIncreaseBar = Time.time;
         hitBarStretchSource.Play();
         ring1.enabled = true;
@@ -176,14 +181,14 @@ public class UIController : MonoBehaviour {
         //        nextDialogToBePlayed++;
         //    }
         //}
-        for(int i = 0; i < levelDialog.Length; i++)
-        {
-            if (zCord > zCordToTriggerDialog[i] && !zCordDialogPlayed[i])
-            {
-                loadDialog(i);
-                zCordDialogPlayed[i] = true;
-            }
-        }
+        //for(int i = 0; i < levelDialog.Length; i++)
+        //{
+        //    if (zCord > zCordToTriggerDialog[i] && !zCordDialogPlayed[i])
+        //    {
+        //        loadDialog(i);
+        //        zCordDialogPlayed[i] = true;
+        //    }
+        //}
 
         if (currentlyPlayingDialog)
         {
@@ -299,7 +304,7 @@ public class UIController : MonoBehaviour {
         }
 
         //Increase the life bar if needed
-        if (Time.time - timeOfStartIncreaseBar < duractionOfIncreasingBar)
+        if (hasLongLifeBar && Time.time - timeOfStartIncreaseBar < duractionOfIncreasingBar)
         {
             hitBarStretchSource.pitch = Mathf.Lerp(0.5f, 2.5f, (Time.time - timeOfStartIncreaseBar) / duractionOfIncreasingBar);
 
@@ -404,26 +409,26 @@ public class UIController : MonoBehaviour {
         hits += hitsToAdd;
     }
 
-    public void loadDialog(int dialogIndex)
-    {
-        retireText.enabled = false;
-        currentlyPlayingDialog = true;
-        timeDialogPopup = Time.time - timeDialogRemainsOnScreen;
+    //public void loadDialog(int dialogIndex)
+    //{
+    //    retireText.enabled = false;
+    //    currentlyPlayingDialog = true;
+    //    timeDialogPopup = Time.time - timeDialogRemainsOnScreen;
 
-        string fs = levelDialog[dialogIndex].text;
-        string[] fLines = fs.Split('\n');
+    //    string fs = levelDialog[dialogIndex].text;
+    //    string[] fLines = fs.Split('\n');
 
-        _dialogInfo = new DialogInfo(fLines.Length);//[fLines.Length];
+    //    _dialogInfo = new DialogInfo(fLines.Length);//[fLines.Length];
 
-        for (int i = 0; i < fLines.Length; i++)
-        {
-            string valueLine = fLines[i];
-            string[] values = valueLine.Split(';');//, ";"); // your splitter here
+    //    for (int i = 0; i < fLines.Length; i++)
+    //    {
+    //        string valueLine = fLines[i];
+    //        string[] values = valueLine.Split(';');//, ";"); // your splitter here
             
-            _dialogInfo.character[i] = (int)Enum.Parse(typeof(CharacterID), values[0]);
-            _dialogInfo.dialog[i] = values[1];
-        }
-    }
+    //        _dialogInfo.character[i] = (int)Enum.Parse(typeof(CharacterID), values[0]);
+    //        _dialogInfo.dialog[i] = values[1];
+    //    }
+    //}
 
     //Interrupting Dialog
     public void loadDialog(TextAsset textAsset)

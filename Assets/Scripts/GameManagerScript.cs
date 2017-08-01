@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class UnitInfo
 {
@@ -20,6 +21,7 @@ public class UnitInfo
 
 public class GameManagerScript : MonoBehaviour {
 
+    public string sceneName;
     public TextAsset levelInfo;
 
     public GameObject player;
@@ -61,6 +63,17 @@ public class GameManagerScript : MonoBehaviour {
     private float shotTeammateCooldownDialog;
     public TextAsset[] retireTeammatesDialog;
 
+    //Gameover info
+    private bool playerIsDead;
+    private float durationOfGameOverSeq;
+    private float timeOfDeath;
+    public TextAsset[] playerDiedTeammatesDialog;
+
+    //Level Dialog
+    public TextAsset[] levelDialog;
+    public int[] zCordToTriggerDialog;
+    public bool[] zCordDialogPlayed;
+
     //Boss
     public bool hasBoss;
     public float zCordToTriggerBoss;
@@ -74,6 +87,8 @@ public class GameManagerScript : MonoBehaviour {
     public float timeAfterBossDestroyedToDisappear;
     private float timeBossDestroyed;
     private bool victoryPlaying;
+
+    
 
     // Use this for initialization
     void Start ()
@@ -95,6 +110,10 @@ public class GameManagerScript : MonoBehaviour {
         updateBossHealthBar = false;
         
         victoryPlaying = false;
+
+        playerIsDead = false;
+        durationOfGameOverSeq = 5;
+        timeOfDeath = Time.time - durationOfGameOverSeq;
     }
 
     public float getTeammateHealthPercentage(int teamMateID)
@@ -120,8 +139,18 @@ public class GameManagerScript : MonoBehaviour {
         updateBossHealthBar = true;
     }
 
+    public void playATeammateGameOverDialog()
+    {
+        _UIcontroller.loadDialog(playerDiedTeammatesDialog[Random.Range(0, playerDiedTeammatesDialog.Length - 1)]);
+    }
+
     public float damageTeammate(int teamMateID, float damage, bool friendlyFire)
     {
+        if(playerIsDead)
+        {
+            return 0;
+        }
+
         if (teamMateID == (int)CharacterID.Falco)
         {
             currentHealthFalco -= damage;
@@ -189,8 +218,43 @@ public class GameManagerScript : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
+        //Check if player is dead
+        if (!playerIsDead && player.GetComponent<PlayerControllerScript>().getCurrentHealth() <= 0)
+        {
+            playerIsDead = true;
+            timeOfDeath = Time.time;
+
+            //Play gameover dialog from a teammate
+            playATeammateGameOverDialog();
+
+            _bgmusicControl.playGameOverTrack();
+        }
+
+        if(playerIsDead)
+        {
+            //Countdown time to reset
+            if(Time.time - timeOfDeath > durationOfGameOverSeq)
+            {
+                SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+            }
+
+            //TODO allow player to immediately reset the level if push button
+
+            return;
+        }
+        
         if (!player.GetComponent<PlayerControllerScript>().isInAllRange())
         {
+            //Check if play level dialog
+            for (int i = 0; i < levelDialog.Length; i++)
+            {
+                if (player.transform.position.z > zCordToTriggerDialog[i] && !zCordDialogPlayed[i])
+                {
+                    _UIcontroller.loadDialog(levelDialog[i]);
+                    zCordDialogPlayed[i] = true;
+                }
+            }
+
             checkIfNeedToRemove();
             //checkIfNeedActivate();
             checkIfNeedActiveEnemyWithPath();
@@ -271,6 +335,11 @@ public class GameManagerScript : MonoBehaviour {
             }
         }
     }
+
+    //public void playerHasDied()
+    //{
+        
+    //}
 
     //private void checkIfNeedActiveEnemyWithPath()
     //{

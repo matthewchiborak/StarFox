@@ -151,6 +151,20 @@ public class PlayerControllerScript : MonoBehaviour {
     private bool turnDuringUturnEnabled;
     private float ARUTurnRatePenalty;
 
+    //Game over state
+    private bool isDead;
+    public ParticleSystem fire;
+    public ParticleSystem explosion;
+    private float timeOfDeath;
+    private float timeToExplode;
+    private bool exploded;
+    public GameObject[] visualComponents;
+    private float crashAngle;
+    private float crashAngleIncrement;
+
+    //For testing purposes
+    public bool isInvinsible;
+
     // Use this for initialization
     void Start ()
     {
@@ -246,19 +260,34 @@ public class PlayerControllerScript : MonoBehaviour {
         uTurnVelocity = 25;
         turnDuringUturnEnabled = true;
         ARUTurnRatePenalty = 2;
+
+        isDead = false;
+        timeToExplode = 3;
+        exploded = false;
+        crashAngle = 0;
+        crashAngleIncrement = 150f;
 }
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
     //Done before physics calculations
     void FixedUpdate()
     {
-        if(!inAllRange)
+        if (!isDead)
         {
-            corridorControl();
+            if (!inAllRange)
+            {
+                corridorControl();
+            }
+            else
+            {
+                allRangeControl();
+            }
         }
         else
         {
-            allRangeControl();
+            crashShip();
+            forcePlayerInPlayAreaCorridor();
+            _UIController.updateUI(numBombs, currentHealth / maxHealth, currentBoost / maxBoost, numGoldRings, transform.position.z);
         }
     }
 
@@ -314,7 +343,7 @@ public class PlayerControllerScript : MonoBehaviour {
     void OnTriggerEnter(Collider other)
     {
         //Collide with bombs
-        if (other.gameObject.CompareTag("BombPickup"))
+        if (other.gameObject.CompareTag("BombPickup") && !isDead)
         {
             pickupSound.Play();
             Destroy(other.gameObject);
@@ -325,7 +354,7 @@ public class PlayerControllerScript : MonoBehaviour {
             }
         }
 
-        if (other.gameObject.CompareTag("LaserPickup"))
+        if (other.gameObject.CompareTag("LaserPickup") && !isDead)
         {
             if(currentLaserMode < 2)
             {
@@ -335,7 +364,7 @@ public class PlayerControllerScript : MonoBehaviour {
             Destroy(other.gameObject);
         }
 
-        if (other.gameObject.CompareTag("SilverRing"))
+        if (other.gameObject.CompareTag("SilverRing") && !isDead)
         {
             currentHealth += silverRingRecoverAmount;
 
@@ -348,7 +377,7 @@ public class PlayerControllerScript : MonoBehaviour {
             Destroy(other.gameObject);
         }
 
-        if (other.gameObject.CompareTag("GoldRing"))
+        if (other.gameObject.CompareTag("GoldRing") && !isDead)
         {
             numGoldRings++;
             currentHealth += goldRingRecoverAmount;
@@ -406,22 +435,23 @@ public class PlayerControllerScript : MonoBehaviour {
         }
 
         //Force the player to stay in the game area
-        if (transform.position.x < (cameraOffset))
-        {
-            transform.position = new Vector3(cameraOffset, transform.position.y, transform.position.z);
-        }
-        if (transform.position.x > (-1 * cameraOffset))
-        {
-            transform.position = new Vector3(-1 * cameraOffset, transform.position.y, transform.position.z);
-        }
-        if (transform.position.y < (cameraOffset / 2))
-        {
-            transform.position = new Vector3(transform.position.x, cameraOffset / 2, transform.position.z);
-        }
-        if (transform.position.y > (cameraOffset / -2) && !isSomerSaulting) //If somersaulting allow go out of bounds
-        {
-            transform.position = new Vector3(transform.position.x, cameraOffset / -2, transform.position.z);
-        }
+        forcePlayerInPlayAreaCorridor();
+        //if (transform.position.x < (cameraOffset))
+        //{
+        //    transform.position = new Vector3(cameraOffset, transform.position.y, transform.position.z);
+        //}
+        //if (transform.position.x > (-1 * cameraOffset))
+        //{
+        //    transform.position = new Vector3(-1 * cameraOffset, transform.position.y, transform.position.z);
+        //}
+        //if (transform.position.y < (cameraOffset / 2))
+        //{
+        //    transform.position = new Vector3(transform.position.x, cameraOffset / 2, transform.position.z);
+        //}
+        //if (transform.position.y > (cameraOffset / -2) && !isSomerSaulting) //If somersaulting allow go out of bounds
+        //{
+        //    transform.position = new Vector3(transform.position.x, cameraOffset / -2, transform.position.z);
+        //}
 
         //Movement when somersaulting will be different
         if (!isSomerSaulting)
@@ -1331,6 +1361,27 @@ public class PlayerControllerScript : MonoBehaviour {
         }
     }
 
+    private void crashShip()
+    {
+        if(!exploded && Time.time - timeOfDeath > timeToExplode)
+        {
+            for(int i = 0; i < visualComponents.Length; i++)
+            {
+                visualComponents[i].SetActive(false);
+            }
+
+            fire.Stop();
+            explosion.Play();
+            exploded = true;
+        }
+        else
+        {
+            //Spin ship
+            rb.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, crashAngle);
+            crashAngle += crashAngleIncrement * Time.deltaTime;
+        }
+    }
+
     public bool getIsSomerSaulting()
     {
         return isSomerSaulting;
@@ -1341,7 +1392,10 @@ public class PlayerControllerScript : MonoBehaviour {
         //Cant be hurt if not in control
         if (controlsEnabled)
         {
-            currentHealth -= damage;
+            if (!isInvinsible)
+            {
+                currentHealth -= damage;
+            }
             hitSource.Play();
 
             currentTimeOfDamageFlash = Time.time;
@@ -1349,9 +1403,31 @@ public class PlayerControllerScript : MonoBehaviour {
             if (currentHealth <= 0)
             {
                 currentHealth = 0;
-                Debug.Log("Game over");
+                //Debug.Log("Game over");
+
+                //_UIController.updateUI(numBombs, currentHealth / maxHealth, currentBoost / maxBoost, numGoldRings, transform.position.z);
+
+                isDead = true;
+                controlsEnabled = false;
+
+                isSomerSaulting = false;
+                isUturning = false;
+                rollingL = false;
+                rollingR = false;
+
+                timeOfDeath = Time.time;
+                crashAngle = transform.rotation.z;
+
+                //Active the fire
+                fire.Play();
+                //_gameManager.playerHasDied();
             }
         }
+    }
+    
+    public float getCurrentHealth()
+    {
+        return currentHealth;
     }
 
     public float getPercentageDurationForChargeShot()
@@ -1429,5 +1505,26 @@ public class PlayerControllerScript : MonoBehaviour {
     public bool getIsUturning()
     {
         return isUturning;
+    }
+
+    private void forcePlayerInPlayAreaCorridor()
+    {
+        //Force the player to stay in the game area
+        if (transform.position.x < (cameraOffset))
+        {
+            transform.position = new Vector3(cameraOffset, transform.position.y, transform.position.z);
+        }
+        if (transform.position.x > (-1 * cameraOffset))
+        {
+            transform.position = new Vector3(-1 * cameraOffset, transform.position.y, transform.position.z);
+        }
+        if (transform.position.y < (cameraOffset / 2))
+        {
+            transform.position = new Vector3(transform.position.x, cameraOffset / 2, transform.position.z);
+        }
+        if (transform.position.y > (cameraOffset / -2) && !isSomerSaulting) //If somersaulting allow go out of bounds
+        {
+            transform.position = new Vector3(transform.position.x, cameraOffset / -2, transform.position.z);
+        }
     }
 }
