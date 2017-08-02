@@ -55,6 +55,12 @@ public class UIController : MonoBehaviour {
 
     private int hits;
 
+    public Image blackScreen;
+    private bool fadeIn;
+    private bool fadeOut;
+    private float timeForScreenToFade;
+    private float timeScreenFadeBegin;
+
     public Text hitCountUI;
     public Image[] bombs;
     public Text bombMultiplyerText;
@@ -144,7 +150,10 @@ public class UIController : MonoBehaviour {
 
         bossHealthBarStartGrowing = false;
         hasLongLifeBar = false;
-}
+        
+        timeForScreenToFade = 3;
+        timeScreenFadeBegin = Time.time - timeForScreenToFade;
+    }
 
     public void doubleLifeBar()
     {
@@ -156,6 +165,17 @@ public class UIController : MonoBehaviour {
         ring3.enabled = true;
     }
 
+    public void activateFadeIn()
+    {
+        fadeIn = true;
+        timeScreenFadeBegin = Time.time;
+    }
+    public void activateFadeOut()
+    {
+        fadeOut = true;
+        timeScreenFadeBegin = Time.time;
+    }
+
     public void activateHealthBar()
     {
         bossHealthBar.SetActive(true);
@@ -165,31 +185,34 @@ public class UIController : MonoBehaviour {
     {
         bossHealthBarFront.transform.localScale = new Vector3(1, healthPercent, 1);
     }
+
+    public bool checkIfFadeInFinished()
+    {
+        return fadeIn;
+    }
     
     //Updates the UI in case of a change
     public void updateUI(int numBombs, float currentHealthPercentage, float currentBoostPercentage, int numGoldRings, float zCord)
     {
-        //Check if dialog needs to be played
-        //if (nextDialogToBePlayed < levelDialog.Length)
-        //{
-        //    if (zCord > zCordToTriggerDialog[nextDialogToBePlayed])
-        //    {
-        //        loadDialog(nextDialogToBePlayed);
+        //Fade the black screen in or out if neccessary
+        if(fadeIn)
+        {
+            blackScreen.color = new Vector4(0, 0, 0, Mathf.Lerp(0, 1, (Time.time - timeScreenFadeBegin) / timeForScreenToFade));
+            if(Time.time - timeScreenFadeBegin > timeForScreenToFade)
+            {
+                fadeIn = false;
+            }
+        }
+        if(fadeOut)
+        {
+            blackScreen.color = new Vector4(0, 0, 0, Mathf.Lerp(1, 0, (Time.time - timeScreenFadeBegin) / timeForScreenToFade));
+            if (Time.time - timeScreenFadeBegin > timeForScreenToFade)
+            {
+                fadeOut = false;
+            }
+        }
 
-        //        currentlyPlayingDialog = true;
-        //        dialogBox.SetActive(true);
-        //        nextDialogToBePlayed++;
-        //    }
-        //}
-        //for(int i = 0; i < levelDialog.Length; i++)
-        //{
-        //    if (zCord > zCordToTriggerDialog[i] && !zCordDialogPlayed[i])
-        //    {
-        //        loadDialog(i);
-        //        zCordDialogPlayed[i] = true;
-        //    }
-        //}
-
+        //Update dialog if there is one playing
         if (currentlyPlayingDialog)
         {
             //Blinking

@@ -68,6 +68,7 @@ public class GameManagerScript : MonoBehaviour {
     private float durationOfGameOverSeq;
     private float timeOfDeath;
     public TextAsset[] playerDiedTeammatesDialog;
+    private bool fadeInTriggered;
 
     //Level Dialog
     public TextAsset[] levelDialog;
@@ -114,6 +115,8 @@ public class GameManagerScript : MonoBehaviour {
         playerIsDead = false;
         durationOfGameOverSeq = 5;
         timeOfDeath = Time.time - durationOfGameOverSeq;
+
+        _UIcontroller.activateFadeOut();
     }
 
     public float getTeammateHealthPercentage(int teamMateID)
@@ -235,7 +238,15 @@ public class GameManagerScript : MonoBehaviour {
             //Countdown time to reset
             if(Time.time - timeOfDeath > durationOfGameOverSeq)
             {
-                SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+                if(!fadeInTriggered)
+                {
+                    fadeInTriggered = true;
+                    _UIcontroller.activateFadeIn();
+                }
+                if (!_UIcontroller.checkIfFadeInFinished())
+                {
+                    SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+                }
             }
 
             //TODO allow player to immediately reset the level if push button

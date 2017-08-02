@@ -161,6 +161,7 @@ public class PlayerControllerScript : MonoBehaviour {
     public GameObject[] visualComponents;
     private float crashAngle;
     private float crashAngleIncrement;
+    public AudioSource explosionSource;
 
     //For testing purposes
     public bool isInvinsible;
@@ -1372,6 +1373,7 @@ public class PlayerControllerScript : MonoBehaviour {
 
             fire.Stop();
             explosion.Play();
+            explosionSource.Play();
             exploded = true;
         }
         else
