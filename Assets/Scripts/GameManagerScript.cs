@@ -89,6 +89,9 @@ public class GameManagerScript : MonoBehaviour {
     private float timeBossDestroyed;
     private bool victoryPlaying;
 
+    private bool levelWinFadeOutActivated;
+    private float timeForLevelOrderFadeOutToStart;
+    private float timeOfVictoryActivated;
     
 
     // Use this for initialization
@@ -115,6 +118,9 @@ public class GameManagerScript : MonoBehaviour {
         playerIsDead = false;
         durationOfGameOverSeq = 5;
         timeOfDeath = Time.time - durationOfGameOverSeq;
+
+        timeForLevelOrderFadeOutToStart = 25;
+        timeOfVictoryActivated = Time.time - timeForLevelOrderFadeOutToStart;
 
         _UIcontroller.activateFadeOut();
     }
@@ -144,7 +150,7 @@ public class GameManagerScript : MonoBehaviour {
 
     public void playATeammateGameOverDialog()
     {
-        _UIcontroller.loadDialog(playerDiedTeammatesDialog[Random.Range(0, playerDiedTeammatesDialog.Length - 1)]);
+        _UIcontroller.loadDialog(playerDiedTeammatesDialog[Random.Range(0, playerDiedTeammatesDialog.Length)]);
     }
 
     public float damageTeammate(int teamMateID, float damage, bool friendlyFire)
@@ -308,6 +314,21 @@ public class GameManagerScript : MonoBehaviour {
                 {
                     _bgmusicControl.playVictoryTrack();
                     victoryPlaying = true;
+                    timeOfVictoryActivated = Time.time;
+                }
+
+                if(victoryPlaying && !levelWinFadeOutActivated && Time.time - timeOfVictoryActivated > timeForLevelOrderFadeOutToStart)
+                {
+                    levelWinFadeOutActivated = true;
+                    _UIcontroller.activateFadeIn();
+                }
+
+                if(levelWinFadeOutActivated)
+                {
+                    if(!_UIcontroller.checkIfFadeInFinished())
+                    {
+                        SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+                    }
                 }
             }
         }

@@ -287,7 +287,12 @@ public class PlayerControllerScript : MonoBehaviour {
         else
         {
             crashShip();
-            forcePlayerInPlayAreaCorridor();
+
+            if (!inAllRange)
+            {
+                forcePlayerInPlayAreaCorridor();
+            }
+
             _UIController.updateUI(numBombs, currentHealth / maxHealth, currentBoost / maxBoost, numGoldRings, transform.position.z);
         }
     }
@@ -1379,8 +1384,9 @@ public class PlayerControllerScript : MonoBehaviour {
         else
         {
             //Spin ship
-            rb.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, crashAngle);
-            crashAngle += crashAngleIncrement * Time.deltaTime;
+            //rb.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, crashAngle);
+            transform.Rotate(0, 0, crashAngleIncrement * Time.deltaTime);
+            //crashAngle += crashAngleIncrement * Time.deltaTime;
         }
     }
 
