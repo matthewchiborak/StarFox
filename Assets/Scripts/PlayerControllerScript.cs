@@ -1384,9 +1384,10 @@ public class PlayerControllerScript : MonoBehaviour {
         else
         {
             //Spin ship
-            //rb.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, crashAngle);
-            transform.Rotate(0, 0, crashAngleIncrement * Time.deltaTime);
-            //crashAngle += crashAngleIncrement * Time.deltaTime;
+            if (!exploded)
+            {
+                transform.Rotate(0, 0, crashAngleIncrement * Time.deltaTime);
+            }
         }
     }
 

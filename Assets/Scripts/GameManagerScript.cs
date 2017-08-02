@@ -78,6 +78,7 @@ public class GameManagerScript : MonoBehaviour {
     //Boss
     public bool hasBoss;
     public float zCordToTriggerBoss;
+    //public bool keepPlayerAndBossMoving;
     private bool isAtBoss;
     public GameObject boss;
     public Vector3 bossSpawnLocation;
