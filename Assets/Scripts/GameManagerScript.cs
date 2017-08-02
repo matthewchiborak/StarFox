@@ -27,6 +27,7 @@ public class GameManagerScript : MonoBehaviour {
     public GameObject player;
     public UIController _UIcontroller;
     public BackgroundMusicControl _bgmusicControl;
+    public CameraControlScript _cameraControl;
 
     //All range mode level bounds
     public Vector3 minLevelBounds;
@@ -53,6 +54,7 @@ public class GameManagerScript : MonoBehaviour {
     private float distanceBehindPlayerToRemove;
 
     //Teammates
+    public GameObject[] teammates;
     private float maxTeammateHealth;
     private float currentHealthKris;
     private float currentHealthFalco;
@@ -127,7 +129,7 @@ public class GameManagerScript : MonoBehaviour {
         durationOfGameOverSeq = 5;
         timeOfDeath = Time.time - durationOfGameOverSeq;
 
-        timeForLevelOrderFadeOutToStart = 25;
+        timeForLevelOrderFadeOutToStart = 40;
         timeOfVictoryActivated = Time.time - timeForLevelOrderFadeOutToStart;
 
         timeBeforeDisplayingMissionComplete = 3;
@@ -327,6 +329,38 @@ public class GameManagerScript : MonoBehaviour {
                     _bgmusicControl.playVictoryTrack();
                     victoryPlaying = true;
                     timeOfVictoryActivated = Time.time;
+                    _cameraControl.missionCompleteMode();
+                    player.GetComponent<PlayerControllerScript>().disableCursor();
+                    _UIcontroller.setUIStatus(false);
+
+                    //Move the teammates
+                    if(currentHealthFalco > 0)
+                    {
+                        teammates[0].SetActive(true);
+                        teammates[0].transform.position = new Vector3(player.transform.position.x - 30, player.transform.position.y, player.transform.position.z - 50);
+                    }
+                    else
+                    {
+                        teammates[0].SetActive(false);
+                    }
+                    if (currentHealthKris > 0)
+                    {
+                        teammates[1].SetActive(true);
+                        teammates[1].transform.position = new Vector3(player.transform.position.x + 30, player.transform.position.y, player.transform.position.z - 50);
+                    }
+                    else
+                    {
+                        teammates[1].SetActive(false);
+                    }
+                    if (currentHealthSlip > 0)
+                    {
+                        teammates[2].SetActive(true);
+                        teammates[2].transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - 70);
+                    }
+                    else
+                    {
+                        teammates[2].SetActive(false);
+                    }
                 }
 
                 //Activate the mission complete text

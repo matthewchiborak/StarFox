@@ -1396,6 +1396,12 @@ public class PlayerControllerScript : MonoBehaviour {
         return isSomerSaulting;
     }
 
+    public void disableCursor()
+    {
+        visualComponents[0].SetActive(false);
+        visualComponents[1].SetActive(false);
+    }
+
     public void damagePlayer(float damage)
     {
         //Cant be hurt if not in control

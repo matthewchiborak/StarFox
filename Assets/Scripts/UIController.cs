@@ -55,6 +55,10 @@ public class UIController : MonoBehaviour {
 
     private int hits;
 
+    //Encompasing UI elements
+    public GameObject playerHealthBarTotal;
+    public GameObject playerBoostBarTotal;
+
     public Image blackScreen;
     private bool fadeIn;
     private bool fadeOut;
@@ -193,6 +197,13 @@ public class UIController : MonoBehaviour {
         missionCompleteText[0].enabled = false;
         missionCompleteText[1].enabled = false;
         missionCompleteText[2].enabled = false;
+    }
+
+    public void setUIStatus(bool enabled)
+    {
+        bossHealthBar.SetActive(enabled);
+        playerHealthBarTotal.SetActive(enabled);
+        playerBoostBarTotal.SetActive(enabled);
     }
 
     public void doubleLifeBar()
