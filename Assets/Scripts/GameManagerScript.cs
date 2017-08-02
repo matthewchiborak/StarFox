@@ -93,7 +93,14 @@ public class GameManagerScript : MonoBehaviour {
     private bool levelWinFadeOutActivated;
     private float timeForLevelOrderFadeOutToStart;
     private float timeOfVictoryActivated;
-    
+
+    private bool displayingMissionComplete;
+    private float timeBeforeDisplayingMissionComplete;
+
+    private float timeBetweenMissionComplete;
+    private float timeSinceActivateMissionComplete;
+
+    private float totalTimeDisplayingMissionComplete;
 
     // Use this for initialization
     void Start ()
@@ -122,6 +129,10 @@ public class GameManagerScript : MonoBehaviour {
 
         timeForLevelOrderFadeOutToStart = 25;
         timeOfVictoryActivated = Time.time - timeForLevelOrderFadeOutToStart;
+
+        timeBeforeDisplayingMissionComplete = 3;
+        timeBetweenMissionComplete = 0.3f;
+        totalTimeDisplayingMissionComplete = 15;
 
         _UIcontroller.activateFadeOut();
     }
@@ -318,7 +329,24 @@ public class GameManagerScript : MonoBehaviour {
                     timeOfVictoryActivated = Time.time;
                 }
 
-                if(victoryPlaying && !levelWinFadeOutActivated && Time.time - timeOfVictoryActivated > timeForLevelOrderFadeOutToStart)
+                //Activate the mission complete text
+                if (victoryPlaying && !displayingMissionComplete && Time.time - timeOfVictoryActivated > timeBeforeDisplayingMissionComplete)
+                {
+                    displayingMissionComplete = true;
+                    _UIcontroller.activateNextMissionComplete();
+                    timeSinceActivateMissionComplete = Time.time;
+                }
+                if(displayingMissionComplete && Time.time - timeSinceActivateMissionComplete > timeBetweenMissionComplete)
+                {
+                    _UIcontroller.activateNextMissionComplete();
+                    timeSinceActivateMissionComplete = Time.time;
+                }
+                if(displayingMissionComplete && Time.time - timeOfVictoryActivated > (totalTimeDisplayingMissionComplete + timeBetweenMissionComplete))
+                {
+                    _UIcontroller.turnOffMissionComplete();
+                }
+
+                if (victoryPlaying && !levelWinFadeOutActivated && Time.time - timeOfVictoryActivated > timeForLevelOrderFadeOutToStart)
                 {
                     levelWinFadeOutActivated = true;
                     _UIcontroller.activateFadeIn();

@@ -127,7 +127,11 @@ public class UIController : MonoBehaviour {
     public Image bossHealthBarFront;
     private bool bossHealthBarStartGrowing;
 
-   
+    //Mission Complete
+    public Image missionCompleteBox;
+    public Text[] missionCompleteText;
+    private int currentMissionCompleteComponent;
+    public AudioSource missionCompleteThud;
 
     // Use this for initialization
     void Start ()
@@ -153,6 +157,42 @@ public class UIController : MonoBehaviour {
         
         timeForScreenToFade = 3;
         timeScreenFadeBegin = Time.time - timeForScreenToFade;
+
+        currentMissionCompleteComponent = 0;
+    }
+
+    public void activateNextMissionComplete()
+    {
+        switch(currentMissionCompleteComponent)
+        {
+            case 0:
+                missionCompleteBox.enabled = true;
+                break;
+            case 1:
+                missionCompleteText[0].enabled = true;
+                missionCompleteThud.Play();
+                break;
+            case 2:
+                missionCompleteText[1].enabled = true;
+                missionCompleteThud.Play();
+                break;
+            case 3:
+                missionCompleteText[2].enabled = true;
+                missionCompleteThud.Play();
+                break;
+            default:
+                currentMissionCompleteComponent--;
+                break;
+        }
+
+        currentMissionCompleteComponent++;
+    }
+    public void turnOffMissionComplete()
+    {
+        missionCompleteBox.enabled = false;
+        missionCompleteText[0].enabled = false;
+        missionCompleteText[1].enabled = false;
+        missionCompleteText[2].enabled = false;
     }
 
     public void doubleLifeBar()
