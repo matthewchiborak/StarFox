@@ -65,6 +65,13 @@ public class GameManagerScript : MonoBehaviour {
     private float shotTeammateCooldownDialog;
     public TextAsset[] retireTeammatesDialog;
 
+    public TextAsset[] missionCompleteText;
+    public TextAsset[] repairsCompleteText;
+    private int currentMissionCompleteDialog;
+    private float timeBeforePlayMissionCompleteNextDialog;
+    private float timeDialogMissionCompleteStart;
+    private bool playingMissionOverDialog;
+
     //Gameover info
     private bool playerIsDead;
     private float durationOfGameOverSeq;
@@ -87,6 +94,13 @@ public class GameManagerScript : MonoBehaviour {
     private GameObject _boss;
     private bool bossDestroyed;
     private bool updateBossHealthBar;
+
+    public bool hasLevelGeo;
+    public float resetToCordinate;
+    public float resetFromCordinate;
+    public GameObject bossPortion1;
+    public GameObject bossPortion2;
+    public GameObject behindBossPortion;
 
     public float timeAfterBossDestroyedToDisappear;
     private float timeBossDestroyed;
@@ -135,6 +149,11 @@ public class GameManagerScript : MonoBehaviour {
         timeBeforeDisplayingMissionComplete = 3;
         timeBetweenMissionComplete = 0.3f;
         totalTimeDisplayingMissionComplete = 15;
+
+        currentMissionCompleteDialog = 0;
+        timeBeforePlayMissionCompleteNextDialog = 10;
+        timeDialogMissionCompleteStart = Time.time - timeBeforePlayMissionCompleteNextDialog;
+        playingMissionOverDialog = false;
 
         _UIcontroller.activateFadeOut();
     }
@@ -300,6 +319,14 @@ public class GameManagerScript : MonoBehaviour {
                 _bgmusicControl.playBossMusic();
                 //Activate health bar
                 //_UIcontroller.activateHealthBar();
+
+                //Start moving the geometry
+                if(hasLevelGeo)
+                {
+                    bossPortion1.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, -player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed());
+                    bossPortion2.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, -player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed());
+                    //behindBossPortion.SetActive(true);
+                }
             }
 
             //Update the health UI
@@ -309,6 +336,21 @@ public class GameManagerScript : MonoBehaviour {
                 if(updateBossHealthBar)
                 {
                     _UIcontroller.updateBossHealth(boss.GetComponent<BossControlScript>().getCurrentHealthPercentage());
+                }
+
+                //Move the geo to give the appearance of movement
+                if(hasLevelGeo)
+                {
+                    if(bossPortion1.transform.position.z < resetFromCordinate)
+                    {
+                        bossPortion1.transform.position = new Vector3(bossPortion1.transform.position.x, bossPortion1.transform.position.y, resetToCordinate);
+                        behindBossPortion.SetActive(true);
+                    }
+                    if (bossPortion2.transform.position.z < resetFromCordinate)
+                    {
+                        bossPortion2.transform.position = new Vector3(bossPortion2.transform.position.x, bossPortion2.transform.position.y, resetToCordinate);
+                        behindBossPortion.SetActive(true);
+                    }
                 }
 
                 //Check if the boss is done
@@ -369,15 +411,61 @@ public class GameManagerScript : MonoBehaviour {
                     displayingMissionComplete = true;
                     _UIcontroller.activateNextMissionComplete();
                     timeSinceActivateMissionComplete = Time.time;
+
+                    timeDialogMissionCompleteStart = Time.time;
                 }
                 if(displayingMissionComplete && Time.time - timeSinceActivateMissionComplete > timeBetweenMissionComplete)
                 {
                     _UIcontroller.activateNextMissionComplete();
                     timeSinceActivateMissionComplete = Time.time;
                 }
-                if(displayingMissionComplete && Time.time - timeOfVictoryActivated > (totalTimeDisplayingMissionComplete + timeBetweenMissionComplete))
+                if(!playingMissionOverDialog && displayingMissionComplete && Time.time - timeOfVictoryActivated > (totalTimeDisplayingMissionComplete + timeBetweenMissionComplete))
                 {
                     _UIcontroller.turnOffMissionComplete();
+                    playingMissionOverDialog = true;
+                    //timeDialogMissionCompleteStart = Time.time;
+                }
+
+                //End of mission Dialog
+                if(playingMissionOverDialog && currentMissionCompleteDialog < 3 && Time.time - timeDialogMissionCompleteStart > timeBeforePlayMissionCompleteNextDialog)
+                {
+                    // _UIcontroller
+                    switch(currentMissionCompleteDialog)
+                    {
+                        case 0:
+                            if(currentHealthFalco > 0)
+                            {
+                                _UIcontroller.loadDialog(missionCompleteText[0]);
+                            }
+                            else
+                            {
+                                _UIcontroller.loadDialog(repairsCompleteText[0]);
+                            }
+                            break;
+                        case 1:
+                            if (currentHealthKris > 0)
+                            {
+                                _UIcontroller.loadDialog(missionCompleteText[1]);
+                            }
+                            else
+                            {
+                                _UIcontroller.loadDialog(repairsCompleteText[1]);
+                            }
+                            break;
+                        case 2:
+                            if (currentHealthSlip > 0)
+                            {
+                                _UIcontroller.loadDialog(missionCompleteText[2]);
+                            }
+                            else
+                            {
+                                _UIcontroller.loadDialog(repairsCompleteText[2]);
+                            }
+                            break;
+                    }
+
+                    timeDialogMissionCompleteStart = Time.time;
+                    currentMissionCompleteDialog++;
                 }
 
                 if (victoryPlaying && !levelWinFadeOutActivated && Time.time - timeOfVictoryActivated > timeForLevelOrderFadeOutToStart)

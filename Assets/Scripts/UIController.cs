@@ -108,6 +108,9 @@ public class UIController : MonoBehaviour {
     private float timeDialogPopup;
     private float timeDialogRemainsOnScreen;
 
+    public AudioSource dialogUpSource;
+    public AudioSource dialogDownSource;
+
     //Blinking
     public Image[] eyes;
     private float timeOfLastBlink;
@@ -140,6 +143,8 @@ public class UIController : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
+        blackScreen.color = new Vector4(0, 0, 0, 1);
+
         hits = 0;
         duractionOfIncreasingBar = 3;
         timeOfStartIncreaseBar = Time.time - duractionOfIncreasingBar;
@@ -164,6 +169,11 @@ public class UIController : MonoBehaviour {
 
         currentMissionCompleteComponent = 0;
     }
+
+    //public void playHealthBarStretchSource()
+    //{
+    //    hitBarStretchSource.Play();
+    //}
 
     public void activateNextMissionComplete()
     {
@@ -318,6 +328,7 @@ public class UIController : MonoBehaviour {
                 {
                     currentlyPlayingDialog = false;
                     dialogBox.SetActive(false);
+                    dialogDownSource.Play();
                 }
                 else
                 {
@@ -524,6 +535,8 @@ public class UIController : MonoBehaviour {
             _dialogInfo.character[i] = (int)Enum.Parse(typeof(CharacterID), values[0]);
             _dialogInfo.dialog[i] = values[1];
         }
+
+        dialogUpSource.Play();
     }
 
     public void enableRetireText()
