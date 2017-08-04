@@ -7,9 +7,13 @@ public class TeammateControlScript : MonoBehaviour {
     public GameManagerScript gameManager;
     public int id;
 
+    private bool finishedPath;
+
     //These two must be the same size
-    public Vector3[] points;
-    public float[] timeToGetToNextPoint;
+    //public Vector3[] points;
+    //public float[] timeToGetToNextPoint;
+    private Vector3[] points;
+    private float[] timeToGetToNextPoint;
 
     private Transform transform;
     private float timeStartedCurrentPoint;
@@ -66,17 +70,21 @@ public class TeammateControlScript : MonoBehaviour {
         //GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
         //startRotation = Quaternion.Euler(0, 0, 0);
         //targetRotation = Quaternion.Euler(0, 0, 0);
+
+        init();
     }
 
     void init()
     {
         transform = GetComponent<Transform>();
         currentPoint = 0;
-        
-        if (points.Length > timeToGetToNextPoint.Length)
-        {
-            Debug.Log("Each point does not have a time required to get to");
-        }
+
+        //if (points.Length > timeToGetToNextPoint.Length)
+        //{
+        //    Debug.Log("Each point does not have a time required to get to");
+        //}
+        points = new Vector3[1];
+        timeToGetToNextPoint = new float[1];
 
         zTiltTurnFactor = 0.5f;
         minRotX = -45;
@@ -99,6 +107,24 @@ public class TeammateControlScript : MonoBehaviour {
         timeBetweenFlashes = 0.05f;
         currentTimeBetweenFlashes = Time.time - timeBetweenFlashes;
         flashOn = false;
+        finishedPath = true;
+    }
+
+    public void giveNewPoints(Vector3[] pointsNew, float[] timeToGetToNextPointNew)
+    {
+        points = new Vector3[pointsNew.Length];
+        timeToGetToNextPoint = new float[timeToGetToNextPointNew.Length];
+        
+        transform.position = new Vector3(pointsNew[0].x, pointsNew[0].y, pointsNew[0].z);
+        points = pointsNew;
+        timeToGetToNextPoint = timeToGetToNextPointNew;
+        finishedPath = false;
+        currentPoint = 0;
+    }
+
+    public bool isFinishedPath()
+    {
+        return finishedPath;
     }
 
     // Update is called once per frame
@@ -191,6 +217,7 @@ public class TeammateControlScript : MonoBehaviour {
                     }
                     else
                     {
+                        finishedPath = true;
                         GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
                         GetComponent<Rigidbody>().rotation = Quaternion.Euler(0, 0, 0);
                     }

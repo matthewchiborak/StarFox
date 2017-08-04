@@ -118,6 +118,21 @@ public class GameManagerScript : MonoBehaviour {
 
     private float totalTimeDisplayingMissionComplete;
 
+    //Teammate paths
+    public TextAsset[] teammatePathInstructions; //Contains the teammate, the points of the path, and the amounts of time it takes to reach each one.
+    public int[] zCordToTriggerTheTeammates;
+    private int nextTeammatePath;
+
+    private Vector3[] pointsF;
+    private float[] timesF;
+    private Vector3[] pointsK;
+    private float[] timesK;
+    private Vector3[] pointsS;
+    private float[] timesS;
+    private bool FOnPath;
+    private bool KOnPath;
+    private bool SOnPath;
+
     // Use this for initialization
     void Start ()
     {
@@ -154,6 +169,11 @@ public class GameManagerScript : MonoBehaviour {
         timeBeforePlayMissionCompleteNextDialog = 10;
         timeDialogMissionCompleteStart = Time.time - timeBeforePlayMissionCompleteNextDialog;
         playingMissionOverDialog = false;
+
+        nextTeammatePath = 0;
+        FOnPath = false;
+        KOnPath = false;
+        SOnPath = false;
 
         _UIcontroller.activateFadeOut();
     }
@@ -295,6 +315,130 @@ public class GameManagerScript : MonoBehaviour {
         
         if (!player.GetComponent<PlayerControllerScript>().isInAllRange())
         {
+            //Check if a teammate needs to do something
+            if(nextTeammatePath < zCordToTriggerTheTeammates.Length)
+            {
+                if(player.transform.position.z > zCordToTriggerTheTeammates[nextTeammatePath])
+                {
+                    //Read the file
+                    string fs = teammatePathInstructions[nextTeammatePath].text;
+                    string[] fLines = fs.Split('\n');
+
+                    //Vector3[] points = new Vector3[fLines.Length - 1];
+                    //float[] times = new float[fLines.Length - 1];
+                    //Line 0 has the teammate
+                    
+                    //Check if the teammate has enough health to appear
+                    if (int.Parse(fLines[0]) == 0)
+                    {
+                        if(currentHealthFalco > 0)
+                        {
+                            pointsF = new Vector3[fLines.Length - 1];
+                            timesF = new float[fLines.Length - 1];
+
+                            for (int i = 1; i < fLines.Length; i++)
+                            {
+                                string valueLine = fLines[i];
+                                string[] values = valueLine.Split(';');//, ";"); // your splitter here
+
+                                pointsF[i - 1].x = float.Parse(values[0]);
+                                pointsF[i - 1].y = float.Parse(values[1]);
+                                pointsF[i - 1].z = float.Parse(values[2]);
+                                timesF[i - 1] = float.Parse(values[3]);
+                            }
+
+                            FOnPath = true;
+                            //teammates[0].SetActive(true);
+                            teammates[0].GetComponent<TeammateControlScript>().giveNewPoints(pointsF, timesF);
+                        }
+                    }
+                    else if (int.Parse(fLines[0]) == 1)
+                    {
+                        if (currentHealthKris > 0)
+                        {
+                            pointsK = new Vector3[fLines.Length - 1];
+                            timesK = new float[fLines.Length - 1];
+
+                            for (int i = 1; i < fLines.Length; i++)
+                            {
+                                string valueLine = fLines[i];
+                                string[] values = valueLine.Split(';');//, ";"); // your splitter here
+
+                                pointsK[i - 1].x = float.Parse(values[0]);
+                                pointsK[i - 1].y = float.Parse(values[1]);
+                                pointsK[i - 1].z = float.Parse(values[2]);
+                                timesK[i - 1] = float.Parse(values[3]);
+                            }
+
+                            KOnPath = true;
+                            //teammates[1].SetActive(true);
+                            teammates[1].GetComponent<TeammateControlScript>().giveNewPoints(pointsK, timesK);
+                        }
+                    }
+                    else if (int.Parse(fLines[0]) == 2)
+                    {
+                        if (currentHealthSlip > 0)
+                        {
+                            pointsS = new Vector3[fLines.Length - 1];
+                            timesS = new float[fLines.Length - 1];
+
+                            for (int i = 1; i < fLines.Length; i++)
+                            {
+                                string valueLine = fLines[i];
+                                string[] values = valueLine.Split(';');//, ";"); // your splitter here
+
+                                pointsS[i - 1].x = float.Parse(values[0]);
+                                pointsS[i - 1].y = float.Parse(values[1]);
+                                pointsS[i - 1].z = float.Parse(values[2]);
+                                timesS[i - 1] = float.Parse(values[3]);
+                            }
+
+                            SOnPath = true;
+                            //teammates[2].SetActive(true);
+                            teammates[2].GetComponent<TeammateControlScript>().giveNewPoints(pointsS, timesS);
+                        }
+                    }
+
+                    nextTeammatePath++;
+                }
+            }
+            //Disable teammates if they need to be disabled
+            if(FOnPath)
+            {
+                if (teammates[0].GetComponent<TeammateControlScript>().isFinishedPath())
+                {
+                    //teammates[0].SetActive(false);
+                    teammates[0].transform.position = new Vector3(0, 0, -1000);
+                    FOnPath = false;
+                }
+            }
+            if (KOnPath)
+            {
+                if (teammates[1].GetComponent<TeammateControlScript>().isFinishedPath())
+                {
+                    //teammates[1].SetActive(false);
+                    teammates[1].transform.position = new Vector3(0, 0, -1000);
+                    KOnPath = false;
+                }
+            }
+            if (SOnPath)
+            {
+                if (teammates[2].GetComponent<TeammateControlScript>().isFinishedPath())
+                {
+                    //teammates[2].SetActive(false);
+                    teammates[2].transform.position = new Vector3(0, 0, -1000);
+                    SOnPath = false;
+                }
+            }
+            //for(int i = 0; i < 3; i++)
+            //{
+            //    if(teammates[i].GetComponent<TeammateControlScript>().isFinishedPath())
+            //    {
+            //        teammates[i].SetActive(false);
+            //        //teammates[i].transform.position = new Vector3(0, 0, -1000);
+            //    }
+            //}
+
             //Check if play level dialog
             for (int i = 0; i < levelDialog.Length; i++)
             {
