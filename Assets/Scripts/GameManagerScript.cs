@@ -64,6 +64,9 @@ public class GameManagerScript : MonoBehaviour {
     private float lastTimeShotTeammate;
     private float shotTeammateCooldownDialog;
     public TextAsset[] retireTeammatesDialog;
+    private bool FalcoRetire;
+    private bool KrisRetire;
+    private bool SlipRetire;
 
     public TextAsset[] missionCompleteText;
     public TextAsset[] repairsCompleteText;
@@ -175,6 +178,10 @@ public class GameManagerScript : MonoBehaviour {
         KOnPath = false;
         SOnPath = false;
 
+        FalcoRetire = false;
+        KrisRetire = false;
+        SlipRetire = false;
+
         _UIcontroller.activateFadeOut();
     }
 
@@ -229,8 +236,12 @@ public class GameManagerScript : MonoBehaviour {
             {
                 currentHealthFalco = 0;
                 //TODO Retire the teammate
-                _UIcontroller.loadDialog(retireTeammatesDialog[0]);
-                _UIcontroller.enableRetireText();
+                if (!FalcoRetire)
+                {
+                    FalcoRetire = true;
+                    _UIcontroller.loadDialog(retireTeammatesDialog[0]);
+                    _UIcontroller.enableRetireText();
+                }
             }
         }
         if (teamMateID == (int)CharacterID.Krystal)
@@ -249,8 +260,12 @@ public class GameManagerScript : MonoBehaviour {
             {
                 currentHealthKris = 0;
                 //TODO Retire the teammate
-                _UIcontroller.loadDialog(retireTeammatesDialog[1]);
-                _UIcontroller.enableRetireText();
+                if (!KrisRetire)
+                {
+                    KrisRetire = true;
+                    _UIcontroller.loadDialog(retireTeammatesDialog[1]);
+                    _UIcontroller.enableRetireText();
+                }
             }
         }
         if (teamMateID == (int)CharacterID.Slippy)
@@ -269,8 +284,12 @@ public class GameManagerScript : MonoBehaviour {
             {
                 currentHealthSlip = 0;
                 //TODO Retire the teammate
-                _UIcontroller.loadDialog(retireTeammatesDialog[2]);
-                _UIcontroller.enableRetireText();
+                if (!SlipRetire)
+                {
+                    SlipRetire = true;
+                    _UIcontroller.loadDialog(retireTeammatesDialog[2]);
+                    _UIcontroller.enableRetireText();
+                }
             }
         }
 
@@ -508,14 +527,17 @@ public class GameManagerScript : MonoBehaviour {
                     _bgmusicControl.stopMusic();
                     //Debug.Log("Boss Destroyed");
                     player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(false);
-                }
 
+                    //Move the camera so the player is in the same place of the victory camera position
+                    _cameraControl.missionCompleteMode(timeAfterBossDestroyedToDisappear);
+                }
+                
                 if(!victoryPlaying && bossDestroyed && Time.time - timeBossDestroyed > timeAfterBossDestroyedToDisappear)
                 {
                     _bgmusicControl.playVictoryTrack();
                     victoryPlaying = true;
                     timeOfVictoryActivated = Time.time;
-                    _cameraControl.missionCompleteMode();
+                    //_cameraControl.missionCompleteMode();
                     player.GetComponent<PlayerControllerScript>().disableCursor();
                     _UIcontroller.setUIStatus(false);
 

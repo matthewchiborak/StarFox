@@ -163,6 +163,11 @@ public class PlayerControllerScript : MonoBehaviour {
     private float crashAngleIncrement;
     public AudioSource explosionSource;
 
+    private float timeControlsDisabled;
+    private float timeForRotationToLevelOutOnLevelComplete;
+    private Quaternion rotationAtTimeOfControlsDisabled;
+    private Quaternion defaultRotation;
+
     //For testing purposes
     public bool isInvinsible;
 
@@ -267,6 +272,9 @@ public class PlayerControllerScript : MonoBehaviour {
         exploded = false;
         crashAngle = 0;
         crashAngleIncrement = 150f;
+
+        timeForRotationToLevelOutOnLevelComplete = 1;
+        defaultRotation = Quaternion.Euler(0, 0, 0);
 }
 
     //Should be used instead of update when dealing with object with rigidbody because of physics calculations
@@ -430,6 +438,13 @@ public class PlayerControllerScript : MonoBehaviour {
         {
             moveHorizontal = Input.GetAxis("Horizontal");
             moveVertical = -1 * Input.GetAxis("Vertical");
+        }
+        else
+        {
+            moveHorizontal = 0;
+            moveVertical = 0;
+
+            transform.rotation = Quaternion.Lerp(rotationAtTimeOfControlsDisabled, defaultRotation, (Time.time - timeControlsDisabled) / timeForRotationToLevelOutOnLevelComplete);
         }
 
         //Check if the player wants to perform a somersault
@@ -609,7 +624,7 @@ public class PlayerControllerScript : MonoBehaviour {
             );
                 rb.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
             }
-            else
+            else if(controlsEnabled)
             {
                 rotation = new Vector3
                 (
@@ -1505,6 +1520,12 @@ public class PlayerControllerScript : MonoBehaviour {
     public void setPlayerControlEnable(bool status)
     {
         controlsEnabled = status;
+
+        if(!status)
+        {
+            timeControlsDisabled = Time.time;
+            rotationAtTimeOfControlsDisabled = transform.rotation;
+        }
     }
 
     //public void cancelMovement()

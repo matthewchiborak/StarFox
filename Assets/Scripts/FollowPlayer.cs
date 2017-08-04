@@ -11,6 +11,7 @@ public class FollowPlayer : MonoBehaviour {
     private float zOffset;
     private float startYPosition;
     private bool startedLoop;
+    private Vector3 playerPositionWhenStartedLoop;
 
     void Start()
     {
@@ -44,6 +45,7 @@ public class FollowPlayer : MonoBehaviour {
                 {
                     startedLoop = true;
                     startYPosition = transformToFollow.position.y;
+                    playerPositionWhenStartedLoop = transformToFollow.position;
                 }
 
                 cameraTransform.localPosition = new Vector3(cameraTransform.position.x, transformToFollow.position.y - startYPosition, cameraTransform.position.z);
@@ -68,5 +70,18 @@ public class FollowPlayer : MonoBehaviour {
             //transform.rotation = Quaternion.AngleAxis(30, Vector3.up);
             //transformToFollow.rotation;
         }
+    }
+
+    public bool checkIfStartedLoop()
+    {
+        return startedLoop;
+    }
+    public Vector3 getEndOfLoopPosition()
+    {
+        return playerPositionWhenStartedLoop;
+    }
+    public float getStartYPosition()
+    {
+        return startYPosition;
     }
 }
