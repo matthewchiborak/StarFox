@@ -28,6 +28,8 @@ public class MissionCompleteCameraControl : MonoBehaviour {
     private Quaternion endRot;
     public Transform transformForCalc;
 
+    private bool playerInAllRange;
+
     void Start()
     {
         cameraTransform = GetComponent<Transform>();
@@ -40,7 +42,9 @@ public class MissionCompleteCameraControl : MonoBehaviour {
         startedLoop = false;
         startYPosition = 0;
 
-        currentAngle = 90;// 270f;
+        if(!playerScript.isInAllRange())
+            currentAngle = 90;// 270f;
+
         angleIncrement = 5;//0.1f;
 
         start = cameraTransform.position;
@@ -53,6 +57,10 @@ public class MissionCompleteCameraControl : MonoBehaviour {
         transformForCalc.LookAt(transformToFollow);
         endRot = transformForCalc.rotation;
 
+        //All range
+        playerInAllRange = playerScript.isInAllRange();
+        ////
+
         isRotating = false;
         startTime = Time.time;
     }
@@ -64,28 +72,62 @@ public class MissionCompleteCameraControl : MonoBehaviour {
         //cameraTransform.localPosition = transformToFollow.position + (transformToFollow.forward.normalized * zOffset);
         //cameraTransform.localPosition = new Vector3(cameraTransform.localPosition.x, transformToFollow.position.y, cameraTransform.localPosition.z);
 
-        if(isRotating)
+        if (!playerInAllRange)
         {
-            //Slowly rotate around the player
-            cameraTransform.position = new Vector3(transformToFollow.position.x + Mathf.Cos(currentAngle * (3.1415f / 180f)) * zOffset, transformToFollow.position.y + yOffset, transformToFollow.position.z + Mathf.Sin(currentAngle * (3.1415f / 180f)) * zOffset);
+            if (isRotating)
+            {
+                //Slowly rotate around the player
+                cameraTransform.position = new Vector3(transformToFollow.position.x + Mathf.Cos(currentAngle * (3.1415f / 180f)) * zOffset, transformToFollow.position.y + yOffset, transformToFollow.position.z + Mathf.Sin(currentAngle * (3.1415f / 180f)) * zOffset);
 
-            cameraTransform.LookAt(transformToFollow);
+                cameraTransform.LookAt(transformToFollow);
 
-            currentAngle += angleIncrement * Time.deltaTime;
+                currentAngle += angleIncrement * Time.deltaTime;
+            }
+            else
+            {
+                cameraTransform.position = Vector3.Lerp(start, end, (Time.time - startTime) / timeToGetToPlace);
+                cameraTransform.rotation = Quaternion.Lerp(startRot, endRot, (Time.time - startTime) / timeToGetToPlace);
+                if ((Time.time - startTime) > timeToGetToPlace)
+                {
+                    isRotating = true;
+                }
+            }
         }
         else
         {
-            cameraTransform.position = Vector3.Lerp(start, end, (Time.time - startTime) / timeToGetToPlace);
-            cameraTransform.rotation = Quaternion.Lerp(startRot, endRot, (Time.time - startTime) / timeToGetToPlace);
-            if((Time.time - startTime) > timeToGetToPlace)
+            //All range
+            if (isRotating)
             {
-                isRotating = true;
+                //Slowly rotate around the player
+                //cameraTransform.position = new Vector3(transformToFollow.position.x + Mathf.Cos(currentAngle * (3.1415f / 180f)) * zOffset, transformToFollow.position.y, transformToFollow.position.z + Mathf.Sin(currentAngle * (3.1415f / 180f)) * zOffset);
+                cameraTransform.position = new Vector3(transformToFollow.position.x + Mathf.Sin(currentAngle * (3.1415f / 180f)) * zOffset, transformToFollow.position.y, transformToFollow.position.z + Mathf.Cos(currentAngle * (3.1415f / 180f)) * zOffset);
+
+                cameraTransform.LookAt(transformToFollow);
+
+                currentAngle -= angleIncrement * Time.deltaTime;
+            }
+            else
+            {
+                cameraTransform.localPosition = transformToFollow.position + (transformToFollow.forward.normalized * zOffset);
+                cameraTransform.localPosition = new Vector3(cameraTransform.localPosition.x, transformToFollow.position.y, cameraTransform.localPosition.z);
+                cameraTransform.LookAt(transformToFollow);
+
+                if ((Time.time - startTime) > timeToGetToPlace)
+                {
+                    isRotating = true;
+                }
             }
         }
     }
     
     public void setTime(float t)
     {
+        playerInAllRange = transformToFollow.GetComponentInParent<PlayerControllerScript>().isInAllRange();
+        if(playerInAllRange)
+        {
+            currentAngle += Quaternion.Angle(transform.rotation, Quaternion.identity);
+        }
+
         startTime = Time.time;
         timeToGetToPlace = t;
     }

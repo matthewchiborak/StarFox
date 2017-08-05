@@ -1206,7 +1206,7 @@ public class PlayerControllerScript : MonoBehaviour {
 
 
         //Check if the player is firing
-        if (Input.GetButtonDown("Fire1"))
+        if (controlsEnabled && Input.GetButtonDown("Fire1"))
         {
             //Create the shot
             if (currentLaserMode == 0)
@@ -1244,7 +1244,7 @@ public class PlayerControllerScript : MonoBehaviour {
             _ChargeShot.GetComponent<ChargeShotControllerScript>().chargeShotSpawn = bombSpawn;
         }
         //Check if release a charge shot if held long enough
-        if (Input.GetButtonUp("Fire1"))
+        if (controlsEnabled && Input.GetButtonUp("Fire1"))
         {
             if (_ChargeShot != null)
             {
@@ -1262,7 +1262,7 @@ public class PlayerControllerScript : MonoBehaviour {
         }
 
         //Check if firing a bomb
-        if (Input.GetButtonDown("Fire2"))
+        if (controlsEnabled && Input.GetButtonDown("Fire2"))
         {
             //Create the shot
             if (numBombs > 0 && currentBomb == null)
@@ -1500,6 +1500,11 @@ public class PlayerControllerScript : MonoBehaviour {
     public bool isInAllRange()
     {
         return inAllRange;
+    }
+
+    public void switchToAllRange()
+    {
+        inAllRange = true;
     }
 
     public Vector3 getForward()
