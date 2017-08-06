@@ -98,6 +98,8 @@ public class GameManagerScript : MonoBehaviour {
     private bool bossDestroyed;
     private bool updateBossHealthBar;
 
+    public bool bossChangesToAR;
+
     //Triggering boss in all range mode
     public float timeNeededToPassForBossAppearAR;
     private float timeARStarted;
@@ -108,6 +110,8 @@ public class GameManagerScript : MonoBehaviour {
     public GameObject bossPortion1;
     public GameObject bossPortion2;
     public GameObject behindBossPortion;
+
+    
 
     public float timeAfterBossDestroyedToDisappear;
     private float timeBossDestroyed;
@@ -489,6 +493,16 @@ public class GameManagerScript : MonoBehaviour {
 
             if(hasBoss && !isAtBoss && player.transform.position.z > zCordToTriggerBoss)
             {
+                if(bossChangesToAR)
+                {
+                    switchToAllRange();
+                    isAtBoss = true;
+                    boss.SetActive(true);
+                    boss.GetComponent<BossControlScript>().resetHealth();
+                    _bgmusicControl.playBossMusic();
+                    return;
+                }
+
                 isAtBoss = true;
                 player.GetComponent<PlayerControllerScript>().setAtBoss(true);
                 //_boss = Instantiate(boss, bossSpawnLocation, Quaternion.identity);
