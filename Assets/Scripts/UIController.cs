@@ -140,9 +140,31 @@ public class UIController : MonoBehaviour {
     private int currentMissionCompleteComponent;
     public AudioSource missionCompleteThud;
 
+    //Level Introduction
+    public int levelNo;
+    public string missionName;
+    public string planetName;
+    public Image totalIntroduction;
+    public Text missionNoText;
+    public Text missionNameText;
+    public Text planetNameText;
+    public float timeForEachIntroSlide;
+    public float timeIntroStaysOnScreen;
+    private float timeOfLevelStart;
+    private bool introFinished;
+    private int currentIntroSlide;
+
     // Use this for initialization
     void Start ()
     {
+        //Level introduction text
+        introFinished = false;
+        currentIntroSlide = 0;
+        missionNoText.text = levelNo.ToString();
+        missionNameText.text = missionName;
+        planetNameText.text = planetName;
+        timeOfLevelStart = Time.time;
+
         blackScreen.color = new Vector4(0, 0, 0, 1);
 
         hits = 0;
@@ -170,10 +192,56 @@ public class UIController : MonoBehaviour {
         currentMissionCompleteComponent = 0;
     }
 
-    //public void playHealthBarStretchSource()
-    //{
-    //    hitBarStretchSource.Play();
-    //}
+    void Update()
+    {
+        if(!introFinished)
+        {
+            switch(currentIntroSlide)
+            {
+                case 0:
+                    totalIntroduction.rectTransform.localPosition = new Vector3(Mathf.Lerp(5000, 0, (Time.time - timeOfLevelStart) / timeForEachIntroSlide), 0, 0);
+                    if((Time.time - timeOfLevelStart) > timeForEachIntroSlide)
+                    {
+                        currentIntroSlide++;
+                        timeOfLevelStart = Time.time;
+                    }
+                    break;
+                case 1:
+                    if ((Time.time - timeOfLevelStart) > timeIntroStaysOnScreen)
+                    {
+                        currentIntroSlide++;
+                        timeOfLevelStart = Time.time;
+                    }
+                    break;
+                case 2:
+                    totalIntroduction.rectTransform.localPosition = new Vector3(Mathf.Lerp(0, -5000, (Time.time - timeOfLevelStart) / timeForEachIntroSlide), 0, 0);
+                    if ((Time.time - timeOfLevelStart) > timeForEachIntroSlide)
+                    {
+                        currentIntroSlide++;
+                        timeOfLevelStart = Time.time;
+                    }
+                    break;
+                case 3:
+                    if ((Time.time - timeOfLevelStart) > timeIntroStaysOnScreen)
+                    {
+                        currentIntroSlide++;
+                        timeOfLevelStart = Time.time;
+                    }
+                    break;
+                case 4:
+                    totalIntroduction.rectTransform.localPosition = new Vector3(Mathf.Lerp(-5000, -10000, (Time.time - timeOfLevelStart) / timeForEachIntroSlide), 0, 0);
+                    if ((Time.time - timeOfLevelStart) > timeForEachIntroSlide)
+                    {
+                        currentIntroSlide++;
+                        timeOfLevelStart = Time.time;
+                    }
+                    break;
+                case 5:
+                    introFinished = true;
+                    break;
+            }
+        }
+    }
 
     public void activateNextMissionComplete()
     {
