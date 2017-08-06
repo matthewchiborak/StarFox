@@ -99,10 +99,14 @@ public class GameManagerScript : MonoBehaviour {
     private bool updateBossHealthBar;
 
     public bool bossChangesToAR;
+    private bool finishedTransitionTOAR;
+    private bool startedTransitionTOAR;
 
     //Triggering boss in all range mode
     public float timeNeededToPassForBossAppearAR;
     private float timeARStarted;
+
+    public TextAsset switchingToARDialog;
 
     public bool hasLevelGeo;
     public float resetToCordinate;
@@ -177,7 +181,8 @@ public class GameManagerScript : MonoBehaviour {
         totalTimeDisplayingMissionComplete = 15;
 
         currentMissionCompleteDialog = 0;
-        timeBeforePlayMissionCompleteNextDialog = 10;
+        //timeBeforePlayMissionCompleteNextDialog = 10;
+        timeBeforePlayMissionCompleteNextDialog = 6;
         timeDialogMissionCompleteStart = Time.time - timeBeforePlayMissionCompleteNextDialog;
         playingMissionOverDialog = false;
 
@@ -190,7 +195,10 @@ public class GameManagerScript : MonoBehaviour {
         KrisRetire = false;
         SlipRetire = false;
 
-        if(player.GetComponent<PlayerControllerScript>().isInAllRange())
+        finishedTransitionTOAR = false;
+        startedTransitionTOAR = false;
+
+        if (player.GetComponent<PlayerControllerScript>().isInAllRange())
         {
             timeARStarted = Time.time;
         }
@@ -496,10 +504,15 @@ public class GameManagerScript : MonoBehaviour {
                 if(bossChangesToAR)
                 {
                     switchToAllRange();
-                    isAtBoss = true;
-                    boss.SetActive(true);
-                    boss.GetComponent<BossControlScript>().resetHealth();
-                    _bgmusicControl.playBossMusic();
+
+                    //isAtBoss = true;
+                    //boss.SetActive(true);
+                    //boss.GetComponent<BossControlScript>().resetHealth();
+                    //_bgmusicControl.playBossMusic();
+
+                    _bgmusicControl.stopMusic();
+                    startedTransitionTOAR = true;
+                    _cameraControl.transitionToAR(timeNeededToPassForBossAppearAR);
                     return;
                 }
 
@@ -622,35 +635,38 @@ public class GameManagerScript : MonoBehaviour {
                 }
 
                 //End of mission Dialog
-                if(playingMissionOverDialog && currentMissionCompleteDialog < 3 && Time.time - timeDialogMissionCompleteStart > timeBeforePlayMissionCompleteNextDialog)
+                if(playingMissionOverDialog && currentMissionCompleteDialog < 4 && Time.time - timeDialogMissionCompleteStart > timeBeforePlayMissionCompleteNextDialog)
                 {
                     // _UIcontroller
                     switch(currentMissionCompleteDialog)
                     {
                         case 0:
+                            _UIcontroller.loadDialog(missionCompleteText[0]);
+                            break;
+                        case 1:
                             if(currentHealthFalco > 0)
                             {
-                                _UIcontroller.loadDialog(missionCompleteText[0]);
+                                _UIcontroller.loadDialog(missionCompleteText[1]);
                             }
                             else
                             {
                                 _UIcontroller.loadDialog(repairsCompleteText[0]);
                             }
                             break;
-                        case 1:
+                        case 2:
                             if (currentHealthKris > 0)
                             {
-                                _UIcontroller.loadDialog(missionCompleteText[1]);
+                                _UIcontroller.loadDialog(missionCompleteText[2]);
                             }
                             else
                             {
                                 _UIcontroller.loadDialog(repairsCompleteText[1]);
                             }
                             break;
-                        case 2:
+                        case 3:
                             if (currentHealthSlip > 0)
                             {
-                                _UIcontroller.loadDialog(missionCompleteText[2]);
+                                _UIcontroller.loadDialog(missionCompleteText[3]);
                             }
                             else
                             {
@@ -692,7 +708,7 @@ public class GameManagerScript : MonoBehaviour {
                 (player.transform.position.x > minLevelBounds.x && player.transform.position.x < maxLevelBounds.x &&
                 player.transform.position.z > minLevelBounds.z && player.transform.position.z < maxLevelBounds.z))
             {
-                if(!bossDestroyed)
+                if(!bossDestroyed && finishedTransitionTOAR)
                 player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(true);
             }
             else if(!player.GetComponent<PlayerControllerScript>().getIsUturning() && !player.GetComponent<PlayerControllerScript>().getPlayerControlEnabled() &&
@@ -714,9 +730,27 @@ public class GameManagerScript : MonoBehaviour {
             }
             /////End of keep player in game area
 
+            ////Transition to allrange
+            //if(bossChangesToAR && !finishedTransitionTOAR && (Time.time - timeARStarted) < timeNeededToPassForBossAppearAR)
+            //{
+            //    player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(false);
+            //}
+            //else
+            //{
+            //    finishedTransitionTOAR = true;
+            //}
+
+            if(startedTransitionTOAR)
+            {
+                startedTransitionTOAR = false;
+                player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(false);
+                _UIcontroller.loadDialog(switchingToARDialog);
+            }
+
             //Trigger boss TODO
             if (hasBoss && !isAtBoss && (Time.time - timeARStarted) > timeNeededToPassForBossAppearAR)
             {
+                finishedTransitionTOAR = true;
                 isAtBoss = true;
                 boss.SetActive(true);
                 boss.GetComponent<BossControlScript>().resetHealth();
@@ -780,35 +814,38 @@ public class GameManagerScript : MonoBehaviour {
                 }
 
                 //End of mission Dialog
-                if (playingMissionOverDialog && currentMissionCompleteDialog < 3 && Time.time - timeDialogMissionCompleteStart > timeBeforePlayMissionCompleteNextDialog)
+                if (playingMissionOverDialog && currentMissionCompleteDialog < 4 && Time.time - timeDialogMissionCompleteStart > timeBeforePlayMissionCompleteNextDialog)
                 {
                     // _UIcontroller
                     switch (currentMissionCompleteDialog)
                     {
                         case 0:
+                            _UIcontroller.loadDialog(missionCompleteText[0]);
+                            break;
+                        case 1:
                             if (currentHealthFalco > 0)
                             {
-                                _UIcontroller.loadDialog(missionCompleteText[0]);
+                                _UIcontroller.loadDialog(missionCompleteText[1]);
                             }
                             else
                             {
                                 _UIcontroller.loadDialog(repairsCompleteText[0]);
                             }
                             break;
-                        case 1:
+                        case 2:
                             if (currentHealthKris > 0)
                             {
-                                _UIcontroller.loadDialog(missionCompleteText[1]);
+                                _UIcontroller.loadDialog(missionCompleteText[2]);
                             }
                             else
                             {
                                 _UIcontroller.loadDialog(repairsCompleteText[1]);
                             }
                             break;
-                        case 2:
+                        case 3:
                             if (currentHealthSlip > 0)
                             {
-                                _UIcontroller.loadDialog(missionCompleteText[2]);
+                                _UIcontroller.loadDialog(missionCompleteText[3]);
                             }
                             else
                             {
@@ -982,6 +1019,8 @@ public class GameManagerScript : MonoBehaviour {
             }
         }
 
+
+
         //for (int i = 0; i < bombPickups.Length; i++)
         //{
         //    if (bombPickups[i] != null)
@@ -1096,5 +1135,10 @@ public class GameManagerScript : MonoBehaviour {
         //    }
         //}
     }
+
+    //public float getTransitionTime()
+    //{
+    //    return timeNeededToPassForBossAppearAR;
+    //}
 
 }

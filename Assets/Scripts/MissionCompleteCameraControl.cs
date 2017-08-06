@@ -125,7 +125,7 @@ public class MissionCompleteCameraControl : MonoBehaviour {
         playerInAllRange = transformToFollow.GetComponentInParent<PlayerControllerScript>().isInAllRange();
         if(playerInAllRange)
         {
-            currentAngle += Quaternion.Angle(transform.rotation, Quaternion.identity);
+            currentAngle = Quaternion.Angle(transform.rotation, Quaternion.identity);
         }
 
         startTime = Time.time;
