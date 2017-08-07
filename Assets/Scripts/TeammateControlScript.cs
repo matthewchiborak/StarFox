@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class TeammateControlScript : MonoBehaviour {
 
-    public GameManagerScript gameManager;
-    public int id;
+    //public GameManagerScript gameManager;
+    //public int id;
 
     private bool finishedPath;
 
@@ -36,16 +36,16 @@ public class TeammateControlScript : MonoBehaviour {
     private Quaternion startRotation;
     private Quaternion targetRotation;
 
-    public AudioSource hitSource;
+    //public AudioSource hitSource;
 
     //For damage flash
-    private float durationOfDamageFlash;
-    private float currentTimeOfDamageFlash;
-    private float timeBetweenFlashes;
-    private bool flashOn;
-    private float currentTimeBetweenFlashes;
+    //private float durationOfDamageFlash;
+    //private float currentTimeOfDamageFlash;
+    //private float timeBetweenFlashes;
+    //private bool flashOn;
+    //private float currentTimeBetweenFlashes;
 
-    public Renderer[] rend;
+    //public Renderer[] rend;
 
     // Use this for initialization
     void Start()
@@ -102,11 +102,11 @@ public class TeammateControlScript : MonoBehaviour {
 
         isActive = true;
 
-        durationOfDamageFlash = 1;
-        currentTimeOfDamageFlash = Time.time - durationOfDamageFlash;
-        timeBetweenFlashes = 0.05f;
-        currentTimeBetweenFlashes = Time.time - timeBetweenFlashes;
-        flashOn = false;
+        //durationOfDamageFlash = 1;
+        //currentTimeOfDamageFlash = Time.time - durationOfDamageFlash;
+        //timeBetweenFlashes = 0.05f;
+        //currentTimeBetweenFlashes = Time.time - timeBetweenFlashes;
+        //flashOn = false;
         finishedPath = true;
     }
 
@@ -229,39 +229,39 @@ public class TeammateControlScript : MonoBehaviour {
             init();
         }
 
-        //Damage Flash
-        if (Time.time - currentTimeOfDamageFlash < durationOfDamageFlash)
-        {
-            if (Time.time - currentTimeBetweenFlashes > timeBetweenFlashes)
-            {
-                currentTimeBetweenFlashes = Time.time;
+        ////Damage Flash
+        //if (Time.time - currentTimeOfDamageFlash < durationOfDamageFlash)
+        //{
+        //    if (Time.time - currentTimeBetweenFlashes > timeBetweenFlashes)
+        //    {
+        //        currentTimeBetweenFlashes = Time.time;
 
-                if (flashOn)
-                {
-                    flashOn = false;
-                    for (int i = 0; i < rend.Length; i++)
-                    {
-                        rend[i].material.SetFloat("_FlashTintBool", 0);
-                    }
-                }
-                else
-                {
-                    flashOn = true;
-                    for (int i = 0; i < rend.Length; i++)
-                    {
-                        rend[i].material.SetFloat("_FlashTintBool", 1);
-                    }
-                }
-            }
-        }
-        else if (flashOn)
-        {
-            flashOn = false;
-            for (int i = 0; i < rend.Length; i++)
-            {
-                rend[i].material.SetFloat("_FlashTintBool", 0);
-            }
-        }
+        //        if (flashOn)
+        //        {
+        //            flashOn = false;
+        //            for (int i = 0; i < rend.Length; i++)
+        //            {
+        //                rend[i].material.SetFloat("_FlashTintBool", 0);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            flashOn = true;
+        //            for (int i = 0; i < rend.Length; i++)
+        //            {
+        //                rend[i].material.SetFloat("_FlashTintBool", 1);
+        //            }
+        //        }
+        //    }
+        //}
+        //else if (flashOn)
+        //{
+        //    flashOn = false;
+        //    for (int i = 0; i < rend.Length; i++)
+        //    {
+        //        rend[i].material.SetFloat("_FlashTintBool", 0);
+        //    }
+        //}
     }
 
     public bool checkIfIsActive()
@@ -269,14 +269,14 @@ public class TeammateControlScript : MonoBehaviour {
         return isActive;
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("PlayerShot") || other.gameObject.CompareTag("ChargeShot") || other.gameObject.CompareTag("EnemyShot"))
-        {
-            gameManager.damageTeammate(id, other.gameObject.GetComponent<LaserInformation>().damage, !other.gameObject.CompareTag("EnemyShot"));
+    //void OnTriggerEnter(Collider other)
+    //{
+    //    if (other.gameObject.CompareTag("PlayerShot") || other.gameObject.CompareTag("ChargeShot") || other.gameObject.CompareTag("EnemyShot"))
+    //    {
+    //        gameManager.damageTeammate(id, other.gameObject.GetComponent<LaserInformation>().damage, !other.gameObject.CompareTag("EnemyShot"));
             
-            hitSource.Play();
-            currentTimeOfDamageFlash = Time.time;
-        }
-    }
+    //        hitSource.Play();
+    //        currentTimeOfDamageFlash = Time.time;
+    //    }
+    //}
 }
