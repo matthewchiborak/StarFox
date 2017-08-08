@@ -50,6 +50,11 @@ public class TeammateARControlScript : MonoBehaviour {
         }
 	}
 
+    public TeammateARControlMode getCurrentMode()
+    {
+        return currentMode;
+    }
+
     public void switchModes(TeammateARControlMode newMode)
     {
         switch (newMode)
@@ -81,6 +86,7 @@ public class TeammateARControlScript : MonoBehaviour {
                 break;
         }
 
+        timeTransitionBegan = Time.time;
         currentMode = newMode;
         inModeTransition = true;
     }

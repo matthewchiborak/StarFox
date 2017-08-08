@@ -4,7 +4,8 @@ using UnityEngine;
 
 public enum EnemyARControlMode
 {
-    circlingAroundPoint
+    circlingAroundPoint,
+    tailOtherObject
 }
 
 public class EnemyARControlScript : MonoBehaviour {
@@ -29,6 +30,10 @@ public class EnemyARControlScript : MonoBehaviour {
     private bool movingAwayFromCenter;
     private bool reachedRadius;
 
+    private Transform objectToTail;
+    public float distanceAwayFromPlayerToTail;
+    private bool closeEnoughToLatchOnToTail;
+
     // Update is called once per frame
     void Update()
     {
@@ -37,11 +42,23 @@ public class EnemyARControlScript : MonoBehaviour {
             case EnemyARControlMode.circlingAroundPoint:
                 circlingAroundPoint();
                 break;
+            case EnemyARControlMode.tailOtherObject:
+                tailOtherObject();
+                break;
         }
+    }
+
+    public void setObjectToTail(Transform objectToTail)
+    {
+        this.objectToTail = objectToTail;
     }
 
     public void switchModes(EnemyARControlMode newMode)
     {
+        currentMode = newMode;
+        timeTransitionBegan = Time.time;
+        inModeTransition = true;
+
         switch (newMode)
         {
             case EnemyARControlMode.circlingAroundPoint:
@@ -63,10 +80,13 @@ public class EnemyARControlScript : MonoBehaviour {
                     endRot = Quaternion.Euler(0, 180 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0);
                 }
                 break;
-        }
 
-        currentMode = newMode;
-        inModeTransition = true;
+            case EnemyARControlMode.tailOtherObject:
+                transitionTime = 1;
+                startPos = transform.position;
+                startRot = transform.rotation;
+                break;
+        }
     }
 
     private void circlingAroundPoint()
@@ -123,5 +143,68 @@ public class EnemyARControlScript : MonoBehaviour {
 
         //Set the correct velocity
         GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed * Time.deltaTime;
+    }
+
+    private void tailOtherObject()
+    {
+        if(objectToTail == null)
+        {
+            switchModes(EnemyARControlMode.circlingAroundPoint);
+        }
+        if(objectToTail.GetComponent<TeammateARControlScript>())
+        {
+            if (objectToTail.GetComponent<TeammateARControlScript>().getCurrentMode() == TeammateARControlMode.retired)
+            {
+                switchModes(EnemyARControlMode.circlingAroundPoint);
+            }
+        }
+
+        if (!modeInited)
+        {
+            modeInited = true;
+        }
+
+        if (inModeTransition)
+        {
+            //float distance = (objectToTail.position - transform.position).magnitude;
+            //float angle = Mathf.Asin((objectToTail.position.y - transform.position.y) / ((objectToTail.position - transform.position).magnitude));
+            //if(!closeEnoughToLatchOnToTail)
+            {
+                int yDirection = 1;
+                if (objectToTail.position.y > transform.position.y)
+                {
+                    yDirection = -1;
+                }
+                transform.rotation = Quaternion.Lerp(startRot, Quaternion.Euler(yDirection * Mathf.Asin((objectToTail.position.y - transform.position.y - objectToTail.transform.forward.y * distanceAwayFromPlayerToTail) / ((objectToTail.position - transform.position).magnitude)) * (180f / 3.1415f), (Mathf.Atan2((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail), (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) * (180f / 3.1415f)), 0), (Time.time - timeTransitionBegan) / transitionTime);
+                GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed * Time.deltaTime;
+
+                if (Mathf.Sqrt((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) * (objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) + (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail) * (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) < 1)//distanceAwayFromPlayerToTail)
+                {
+                    GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
+                    inModeTransition = false;
+                    //startPos = transform.position;
+                    //startRot = transform.rotation;
+                    //timeTransitionBegan = Time.time;
+                    //closeEnoughToLatchOnToTail = true;
+                }
+            }
+            //else
+            //{
+            //    transform.position = Vector3.Lerp(startPos, new Vector3(objectToTail.position.x - (distanceAwayFromPlayerToTail * transform.forward.normalized.x), objectToTail.position.y - (distanceAwayFromPlayerToTail * transform.forward.normalized.y), objectToTail.position.z - (distanceAwayFromPlayerToTail * transform.forward.normalized.z)), (Time.time - timeTransitionBegan) / transitionTime);
+            //    transform.rotation = Quaternion.Lerp(startRot, Quaternion.Euler(0, (Mathf.Atan2((objectToTail.position.x - transform.position.x), (objectToTail.position.z - transform.position.z)) * (180f / 3.1415f)), 0), (Time.time - timeTransitionBegan) / transitionTime);
+
+            //    if ((Time.time - timeTransitionBegan > transitionTime))
+            //    {
+            //        Debug.Log("Fini");
+            //        inModeTransition = false;
+            //    }
+            //}
+        }
+
+        if (!inModeTransition)
+        {
+            transform.rotation = Quaternion.Euler(0, (Mathf.Atan2((objectToTail.position.x - transform.position.x), (objectToTail.position.z - transform.position.z)) * (180f / 3.1415f)), 0);
+            transform.position = new Vector3(objectToTail.position.x - (distanceAwayFromPlayerToTail * transform.forward.normalized.x), objectToTail.position.y - (distanceAwayFromPlayerToTail * transform.forward.normalized.y), objectToTail.position.z - (distanceAwayFromPlayerToTail * transform.forward.normalized.z));
+        }
     }
 }

@@ -812,9 +812,9 @@ public class GameManagerScript : MonoBehaviour {
                     _UIcontroller.setUIStatus(false);
 
                     //Remove the teammates
-                    teammates[0].SetActive(false);
-                    teammates[1].SetActive(false);
-                    teammates[2].SetActive(false);
+                    //teammates[0].SetActive(false);
+                    //teammates[1].SetActive(false);
+                    //teammates[2].SetActive(false);
                 }
 
                 //Activate the mission complete text
