@@ -268,6 +268,14 @@ public class GameManagerScript : MonoBehaviour {
                     FalcoRetire = true;
                     _UIcontroller.loadDialog(retireTeammatesDialog[0]);
                     _UIcontroller.enableRetireText();
+
+                    if(teammates[0].GetComponent<TeammateARControlScript>())
+                    {
+                        if(teammates[0].GetComponent<TeammateARControlScript>().enabled)
+                        {
+                            teammates[0].GetComponent<TeammateARControlScript>().switchModes(TeammateARControlMode.retired);
+                        }
+                    }
                 }
             }
         }
@@ -292,6 +300,14 @@ public class GameManagerScript : MonoBehaviour {
                     KrisRetire = true;
                     _UIcontroller.loadDialog(retireTeammatesDialog[1]);
                     _UIcontroller.enableRetireText();
+
+                    if (teammates[1].GetComponent<TeammateARControlScript>())
+                    {
+                        if (teammates[1].GetComponent<TeammateARControlScript>().enabled)
+                        {
+                            teammates[1].GetComponent<TeammateARControlScript>().switchModes(TeammateARControlMode.retired);
+                        }
+                    }
                 }
             }
         }
@@ -316,6 +332,14 @@ public class GameManagerScript : MonoBehaviour {
                     SlipRetire = true;
                     _UIcontroller.loadDialog(retireTeammatesDialog[2]);
                     _UIcontroller.enableRetireText();
+
+                    if (teammates[2].GetComponent<TeammateARControlScript>())
+                    {
+                        if (teammates[2].GetComponent<TeammateARControlScript>().enabled)
+                        {
+                            teammates[2].GetComponent<TeammateARControlScript>().switchModes(TeammateARControlMode.retired);
+                        }
+                    }
                 }
             }
         }
