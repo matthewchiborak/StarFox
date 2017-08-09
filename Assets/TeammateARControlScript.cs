@@ -9,7 +9,9 @@ public enum TeammateARControlMode
 }
 
 public class TeammateARControlScript : MonoBehaviour {
-    
+
+    public UIController _UIController;
+
     public TeammateARControlMode currentMode;
     private bool modeInited;
     private bool inModeTransition;
@@ -30,10 +32,15 @@ public class TeammateARControlScript : MonoBehaviour {
     private bool movingAwayFromCenter;
     private bool reachedRadius;
 
+    private bool beingTailed;
+    private GameObject enemyTailing;
+    public TextAsset enemyOnTailDialog;
+    public TextAsset thankYouDialog;
+
 	// Use this for initialization
 	void Start ()
     {
-
+        enemyTailing = null;
 	}
 	
 	// Update is called once per frame
@@ -48,7 +55,30 @@ public class TeammateARControlScript : MonoBehaviour {
                 retired();
                 break;
         }
+
+        //Check if enemy still on tail
+        if(beingTailed)
+        {
+            if(enemyTailing == null)
+            {
+                beingTailed = false;
+                _UIController.loadDialog(thankYouDialog);
+            }
+        }
 	}
+
+    public bool tryToTail(GameObject tailer)
+    {
+        if(!beingTailed)
+        {
+            beingTailed = true;
+            enemyTailing = tailer;
+            _UIController.loadDialog(enemyOnTailDialog);
+            return true;
+        }
+
+        return false;
+    }
 
     public TeammateARControlMode getCurrentMode()
     {
@@ -142,9 +172,9 @@ public class TeammateARControlScript : MonoBehaviour {
                 transform.rotation = Quaternion.Euler(0, -90 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0);
             }
         }
-        
+
         //Set the correct velocity
-        GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed * Time.deltaTime;
+        GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;// * Time.deltaTime;
     }
 
     private void retired()
@@ -152,7 +182,7 @@ public class TeammateARControlScript : MonoBehaviour {
         if (!modeInited)
         {
             transform.rotation = Quaternion.Euler(0, (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0);
-            GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed * Time.deltaTime;
+            GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;// * Time.deltaTime;
             modeInited = true;
         }
 
@@ -165,6 +195,6 @@ public class TeammateARControlScript : MonoBehaviour {
             }
         }
 
-        GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed * Time.deltaTime;
+        GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;// * Time.deltaTime;
     }
 }

@@ -996,6 +996,11 @@ public class GameManagerScript : MonoBehaviour {
             }
         }
     }
+    
+    public bool checkIfBossIsDestroyed()
+    {
+        return bossDestroyed;
+    }
 
     private void checkIfNeedToRemove()
     {
