@@ -6,6 +6,7 @@ public enum EnemyARControlMode
 {
     circlingAroundPoint,
     tailOtherObject,
+    doNothingForTimeThenReturnToTailing,
     retire
 }
 
@@ -53,9 +54,28 @@ public class EnemyARControlScript : MonoBehaviour {
     private float timeToReachPlayer3;
     private float distanceToLeadShot;
 
+    //Changing height variables
+    private float heightChangeAngle;
+    private float heightChangeAngleIncrement;
+    private bool changingHeight;
+    private int yDirection;
+    private float heightChangeAngleMax;
+    //
+    private bool heightIsChangingWhileTailing;
+    private Quaternion tailHeightChangeRotStart;
+    private float tailHeightChangeRotBegin;
+
+    public float doNothingDelay;
+    private bool delayAlreadyElapsed;
+
     void Start()
     {
+        previousMode = currentMode;
         timeOfLastShot = Time.time;
+        heightChangeAngle = 0;
+        heightChangeAngleIncrement = 100f;
+        heightChangeAngleMax = 45;
+        delayAlreadyElapsed = false;
     }
 
     // Update is called once per frame
@@ -69,6 +89,9 @@ public class EnemyARControlScript : MonoBehaviour {
                 break;
             case EnemyARControlMode.tailOtherObject:
                 tailOtherObject();
+                break;
+            case EnemyARControlMode.doNothingForTimeThenReturnToTailing:
+                doNothingForTimeThenReturnToTailing();
                 break;
             case EnemyARControlMode.retire:
                 retired();
@@ -179,7 +202,6 @@ public class EnemyARControlScript : MonoBehaviour {
     {
         if (!modeInited)
         {
-            //transform.position = new Vector3(0, pointToCircleAround.y, circleRadius);
             transform.position = new Vector3(circleRadius * Mathf.Sin(startingAngleOnCircle) + pointToCircleAround.x, pointToCircleAround.y, circleRadius * Mathf.Cos(startingAngleOnCircle) + pointToCircleAround.z);
 
             modeInited = true;
@@ -224,6 +246,44 @@ public class EnemyARControlScript : MonoBehaviour {
             else
             {
                 transform.rotation = Quaternion.Euler(0, -90 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0);
+            }
+        }
+
+        if (!changingHeight)
+        {
+            //Change if height change is needed
+            if (pointToCircleAround.y > transform.position.y)
+            {
+                yDirection = -1;
+                changingHeight = true;
+            }
+            else if (pointToCircleAround.y < transform.position.y)
+            {
+                yDirection = 1;
+                changingHeight = true;
+            }
+        }
+        else
+        {
+            //Advance the heightChange
+            transform.Rotate(heightChangeAngle, 0, 0);
+            heightChangeAngle += yDirection * heightChangeAngleIncrement * Time.deltaTime;
+            if (Mathf.Abs(heightChangeAngle) > 45)
+            {
+                heightChangeAngle = yDirection * heightChangeAngleMax;
+            }
+
+            if (yDirection < 0 && pointToCircleAround.y < transform.position.y)
+            {
+                changingHeight = false;
+                transform.position = new Vector3(transform.position.x, pointToCircleAround.y, transform.position.z);
+                heightChangeAngle = 0;
+            }
+            else if (yDirection > 0 && pointToCircleAround.y > transform.position.y)
+            {
+                changingHeight = false;
+                transform.position = new Vector3(transform.position.x, pointToCircleAround.y, transform.position.z);
+                heightChangeAngle = 0;
             }
         }
 
@@ -285,46 +345,68 @@ public class EnemyARControlScript : MonoBehaviour {
 
         if (inModeTransition)
         {
-            //float distance = (objectToTail.position - transform.position).magnitude;
-            //float angle = Mathf.Asin((objectToTail.position.y - transform.position.y) / ((objectToTail.position - transform.position).magnitude));
-            //if(!closeEnoughToLatchOnToTail)
+            
+            int yDirection = 1;
+            if (objectToTail.position.y > transform.position.y)
             {
-                int yDirection = 1;
-                if (objectToTail.position.y > transform.position.y)
-                {
-                    yDirection = -1;
-                }
-                transform.rotation = Quaternion.Lerp(startRot, Quaternion.Euler(yDirection * Mathf.Asin((objectToTail.position.y - transform.position.y - objectToTail.transform.forward.y * distanceAwayFromPlayerToTail) / ((objectToTail.position - transform.position).magnitude)) * (180f / 3.1415f), (Mathf.Atan2((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail), (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) * (180f / 3.1415f)), 0), (Time.time - timeTransitionBegan) / transitionTime);
-                GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;// * Time.deltaTime;
-
-                if (Mathf.Sqrt((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) * (objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) + (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail) * (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) < 1)//distanceAwayFromPlayerToTail)
-                {
-                    GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
-                    inModeTransition = false;
-                    //startPos = transform.position;
-                    //startRot = transform.rotation;
-                    //timeTransitionBegan = Time.time;
-                    //closeEnoughToLatchOnToTail = true;
-                }
+                yDirection = -1;
             }
-            //else
-            //{
-            //    transform.position = Vector3.Lerp(startPos, new Vector3(objectToTail.position.x - (distanceAwayFromPlayerToTail * transform.forward.normalized.x), objectToTail.position.y - (distanceAwayFromPlayerToTail * transform.forward.normalized.y), objectToTail.position.z - (distanceAwayFromPlayerToTail * transform.forward.normalized.z)), (Time.time - timeTransitionBegan) / transitionTime);
-            //    transform.rotation = Quaternion.Lerp(startRot, Quaternion.Euler(0, (Mathf.Atan2((objectToTail.position.x - transform.position.x), (objectToTail.position.z - transform.position.z)) * (180f / 3.1415f)), 0), (Time.time - timeTransitionBegan) / transitionTime);
+            float tempAngle = yDirection * Mathf.Asin((objectToTail.position.y - transform.position.y - objectToTail.transform.forward.y * distanceAwayFromPlayerToTail) / ((objectToTail.position - transform.position).magnitude)) * (180f / 3.1415f);
+            if((objectToTail.position.y > transform.position.y && tempAngle > 0) || (objectToTail.position.y < transform.position.y && tempAngle < 0))
+            {
+                tempAngle *= -1;
+            }
 
-            //    if ((Time.time - timeTransitionBegan > transitionTime))
-            //    {
-            //        Debug.Log("Fini");
-            //        inModeTransition = false;
-            //    }
+            transform.rotation = Quaternion.Lerp(startRot, Quaternion.Euler(tempAngle, (Mathf.Atan2((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail), (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) * (180f / 3.1415f)), 0), (Time.time - timeTransitionBegan) / transitionTime);
+            GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;// * Time.deltaTime;
+
+            if (Mathf.Sqrt((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) * (objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) + (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail) * (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) < 1)//distanceAwayFromPlayerToTail)
+            {
+                GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
+                inModeTransition = false;
+            }
+
+            //Check if change height
+            if (objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())// && !delayAlreadyElapsed)
+            {
+                switchModes(EnemyARControlMode.doNothingForTimeThenReturnToTailing);
+                //delayAlreadyElapsed = true;
+            }
+            //if(!objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())
+            //{
+            //    delayAlreadyElapsed = false;
             //}
+            
+            
         }
 
         if (!inModeTransition)
         {
-            transform.rotation = Quaternion.Euler(0, (Mathf.Atan2((objectToTail.position.x - transform.position.x), (objectToTail.position.z - transform.position.z)) * (180f / 3.1415f)), 0);
-            transform.position = new Vector3(objectToTail.position.x - (distanceAwayFromPlayerToTail * transform.forward.normalized.x), objectToTail.position.y - (distanceAwayFromPlayerToTail * transform.forward.normalized.y), objectToTail.position.z - (distanceAwayFromPlayerToTail * transform.forward.normalized.z));
-            
+            if(!objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())// || delayAlreadyElapsed)
+            {
+                transform.rotation = Quaternion.Euler(0, (Mathf.Atan2((objectToTail.position.x - transform.position.x), (objectToTail.position.z - transform.position.z)) * (180f / 3.1415f)), 0);
+                transform.position = new Vector3(objectToTail.position.x - (distanceAwayFromPlayerToTail * transform.forward.normalized.x), objectToTail.position.y - (distanceAwayFromPlayerToTail * transform.forward.normalized.y), objectToTail.position.z - (distanceAwayFromPlayerToTail * transform.forward.normalized.z));
+
+                if(objectToTail.position.y != transform.position.y)
+                {
+                    heightIsChangingWhileTailing = true;
+                    tailHeightChangeRotStart = transform.rotation;
+                    tailHeightChangeRotBegin = Time.time;
+                }
+
+                //Reset the delay
+                //if (objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())
+                //{
+                //    delayAlreadyElapsed = false;
+                //}
+            }
+            else
+            {
+                switchModes(EnemyARControlMode.doNothingForTimeThenReturnToTailing);
+                //delayAlreadyElapsed = true;
+                
+
+            }
         }
     }
 
@@ -347,5 +429,38 @@ public class EnemyARControlScript : MonoBehaviour {
         }
 
         GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;
+    }
+
+    private void returnToTailingPrevious()
+    {
+        currentMode = EnemyARControlMode.tailOtherObject;
+        timeTransitionBegan = Time.time;
+        inModeTransition = true;
+
+        transitionTime = 1;
+        startPos = transform.position;
+        startRot = transform.rotation;
+    }
+    private void doNothingForTimeThenReturnToTailing()
+    {
+        if(!modeInited)
+        {
+            GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;
+            modeInited = true;
+        }
+
+        if (inModeTransition)
+        {
+            GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;
+            inModeTransition = false;
+        }
+
+        if(!inModeTransition)
+        {
+            if((Time.time - timeTransitionBegan) > doNothingDelay)
+            {
+                returnToTailingPrevious();
+            }
+        }
     }
 }

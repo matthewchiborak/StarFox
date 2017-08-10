@@ -37,11 +37,24 @@ public class TeammateARControlScript : MonoBehaviour {
     public TextAsset enemyOnTailDialog;
     public TextAsset thankYouDialog;
 
-	// Use this for initialization
-	void Start ()
+    //Changing height variables
+    //private float timeHeightChangeStarted;
+    //private float timeToChangeHeight;
+    private float heightChangeAngle;
+    private float heightChangeAngleIncrement;
+    private bool changingHeight;
+    private int yDirection;
+    private float heightChangeAngleMax;
+    
+
+    // Use this for initialization
+    void Start ()
     {
         enemyTailing = null;
-	}
+        heightChangeAngle = 0;
+        heightChangeAngleIncrement = 100f;
+        heightChangeAngleMax = 45;
+    }
 	
 	// Update is called once per frame
 	void Update ()
@@ -83,6 +96,21 @@ public class TeammateARControlScript : MonoBehaviour {
     public TeammateARControlMode getCurrentMode()
     {
         return currentMode;
+    }
+
+    public void changeCircleCenter(Vector3 centerPoint)
+    {
+        pointToCircleAround = centerPoint;
+
+        if(currentMode == TeammateARControlMode.circlingAroundPoint)
+        {
+            switchModes(TeammateARControlMode.circlingAroundPoint);
+        }
+    }
+
+    public bool checkIsChangingHeight()
+    {
+        return changingHeight;
     }
 
     public void switchModes(TeammateARControlMode newMode)
@@ -130,7 +158,7 @@ public class TeammateARControlScript : MonoBehaviour {
 
             modeInited = true;
         }
-
+        
         if (inModeTransition)
         {
             transform.rotation = Quaternion.Lerp(startRot, endRot, (Time.time - timeTransitionBegan) / transitionTime);
@@ -172,7 +200,46 @@ public class TeammateARControlScript : MonoBehaviour {
                 transform.rotation = Quaternion.Euler(0, -90 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0);
             }
         }
+        
+        
+        if(!changingHeight)
+        {
+            //Change if height change is needed
+            if (pointToCircleAround.y > transform.position.y)
+            {
+                yDirection = -1;
+                changingHeight = true;
+            }
+            else if (pointToCircleAround.y < transform.position.y)
+            {
+                yDirection = 1;
+                changingHeight = true;
+            }
+        }
+        else
+        {
+            //Advance the heightChange
+            transform.Rotate(heightChangeAngle, 0, 0);
+            heightChangeAngle += yDirection * heightChangeAngleIncrement * Time.deltaTime;
+            if(Mathf.Abs(heightChangeAngle) > 45)
+            {
+                heightChangeAngle = yDirection * heightChangeAngleMax;
+            }
 
+            if(yDirection < 0 && pointToCircleAround.y < transform.position.y)
+            {
+                changingHeight = false;
+                transform.position = new Vector3(transform.position.x, pointToCircleAround.y, transform.position.z);
+                heightChangeAngle = 0;
+            }
+            else if (yDirection > 0 && pointToCircleAround.y > transform.position.y)
+            {
+                changingHeight = false;
+                transform.position = new Vector3(transform.position.x, pointToCircleAround.y, transform.position.z);
+                heightChangeAngle = 0;
+            }
+        }
+        
         //Set the correct velocity
         GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;// * Time.deltaTime;
     }

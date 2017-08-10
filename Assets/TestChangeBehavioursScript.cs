@@ -19,6 +19,15 @@ public class TestChangeBehavioursScript : MonoBehaviour {
         {
             objectToTest.setObjectToTail(objectToTail.transform);
             objectToTest.switchModes(EnemyARControlMode.tailOtherObject);
-        }	
-	}
+        }
+
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            objectToTail.GetComponent<TeammateARControlScript>().changeCircleCenter(new Vector3(0, -20, 0));
+        }
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            objectToTail.GetComponent<TeammateARControlScript>().changeCircleCenter(new Vector3(0, 50, 0));
+        }
+    }
 }
