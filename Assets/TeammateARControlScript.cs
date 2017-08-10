@@ -93,6 +93,11 @@ public class TeammateARControlScript : MonoBehaviour {
         return false;
     }
 
+    public float getSpeed()
+    {
+        return forwardSpeed;
+    }
+
     public TeammateARControlMode getCurrentMode()
     {
         return currentMode;

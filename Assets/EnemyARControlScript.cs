@@ -181,14 +181,13 @@ public class EnemyARControlScript : MonoBehaviour {
                     endRot = Quaternion.Euler(0, 180 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0);
                 }
                 break;
-
+                
             case EnemyARControlMode.tailOtherObject:
                 if (objectToTail.GetComponentInParent<TeammateARControlScript>().tryToTail(gameObject))
                 {
                     transitionTime = 1;
                     startPos = transform.position;
                     startRot = transform.rotation;
-
                 }
                 else
                 {
@@ -345,7 +344,6 @@ public class EnemyARControlScript : MonoBehaviour {
 
         if (inModeTransition)
         {
-            
             int yDirection = 1;
             if (objectToTail.position.y > transform.position.y)
             {
@@ -362,51 +360,98 @@ public class EnemyARControlScript : MonoBehaviour {
 
             if (Mathf.Sqrt((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) * (objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) + (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail) * (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) < 1)//distanceAwayFromPlayerToTail)
             {
-                GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
+                //GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
                 inModeTransition = false;
             }
 
-            //Check if change height
-            if (objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())// && !delayAlreadyElapsed)
+            if (!objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())
+            {
+                delayAlreadyElapsed = false;
+            }
+            if (objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight() && !delayAlreadyElapsed)
             {
                 switchModes(EnemyARControlMode.doNothingForTimeThenReturnToTailing);
-                //delayAlreadyElapsed = true;
+                delayAlreadyElapsed = true;
             }
+
+            //Check if change height
+            //if (objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())// && !delayAlreadyElapsed)
+            //{
+            //    switchModes(EnemyARControlMode.doNothingForTimeThenReturnToTailing);
+            //    //delayAlreadyElapsed = true;
+            //}
             //if(!objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())
             //{
             //    delayAlreadyElapsed = false;
             //}
-            
-            
+
+
         }
 
         if (!inModeTransition)
         {
-            if(!objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())// || delayAlreadyElapsed)
+            int yDirection = 1;
+            if (objectToTail.position.y > transform.position.y)
             {
-                transform.rotation = Quaternion.Euler(0, (Mathf.Atan2((objectToTail.position.x - transform.position.x), (objectToTail.position.z - transform.position.z)) * (180f / 3.1415f)), 0);
-                transform.position = new Vector3(objectToTail.position.x - (distanceAwayFromPlayerToTail * transform.forward.normalized.x), objectToTail.position.y - (distanceAwayFromPlayerToTail * transform.forward.normalized.y), objectToTail.position.z - (distanceAwayFromPlayerToTail * transform.forward.normalized.z));
-
-                if(objectToTail.position.y != transform.position.y)
-                {
-                    heightIsChangingWhileTailing = true;
-                    tailHeightChangeRotStart = transform.rotation;
-                    tailHeightChangeRotBegin = Time.time;
-                }
-
-                //Reset the delay
-                //if (objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())
-                //{
-                //    delayAlreadyElapsed = false;
-                //}
+                yDirection = -1;
             }
-            else
+            float tempAngle = yDirection * Mathf.Asin((objectToTail.position.y - transform.position.y - objectToTail.transform.forward.y * distanceAwayFromPlayerToTail) / ((objectToTail.position - transform.position).magnitude)) * (180f / 3.1415f);
+            if ((objectToTail.position.y > transform.position.y && tempAngle > 0) || (objectToTail.position.y < transform.position.y && tempAngle < 0))
+            {
+                tempAngle *= -1;
+            }
+
+            transform.rotation = Quaternion.Lerp(startRot, Quaternion.Euler(tempAngle, (Mathf.Atan2((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail), (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) * (180f / 3.1415f)), 0), (Time.time - timeTransitionBegan) / transitionTime);
+            GetComponent<Rigidbody>().velocity = transform.forward * objectToTail.GetComponentInParent<TeammateARControlScript>().getSpeed();// * Time.deltaTime;
+
+            if (Mathf.Sqrt((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) * (objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) + (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail) * (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) < 1)//distanceAwayFromPlayerToTail)
+            {
+                //GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
+                inModeTransition = false;
+            }
+
+            //Reset the delay
+            if (!objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())
+            {
+                delayAlreadyElapsed = false;
+            }
+            if (objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight() && !delayAlreadyElapsed)
             {
                 switchModes(EnemyARControlMode.doNothingForTimeThenReturnToTailing);
-                //delayAlreadyElapsed = true;
-                
-
+                delayAlreadyElapsed = true;
             }
+            //if (objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())// && !delayAlreadyElapsed)
+            //{
+            //    GetComponent<Rigidbody>().velocity = transform.forward * (objectToTail.GetComponentInParent<TeammateARControlScript>().getSpeed() / 2);
+            //    //switchModes(EnemyARControlMode.doNothingForTimeThenReturnToTailing);
+            //    //delayAlreadyElapsed = true;
+            //}
+
+            //if(!objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())// || delayAlreadyElapsed)
+            //{
+            //    transform.rotation = Quaternion.Euler(0, (Mathf.Atan2((objectToTail.position.x - transform.position.x), (objectToTail.position.z - transform.position.z)) * (180f / 3.1415f)), 0);
+            //    transform.position = new Vector3(objectToTail.position.x - (distanceAwayFromPlayerToTail * transform.forward.normalized.x), objectToTail.position.y - (distanceAwayFromPlayerToTail * transform.forward.normalized.y), objectToTail.position.z - (distanceAwayFromPlayerToTail * transform.forward.normalized.z));
+
+            //    if(objectToTail.position.y != transform.position.y)
+            //    {
+            //        heightIsChangingWhileTailing = true;
+            //        tailHeightChangeRotStart = transform.rotation;
+            //        tailHeightChangeRotBegin = Time.time;
+            //    }
+
+            //    //Reset the delay
+            //    //if (objectToTail.GetComponentInParent<TeammateARControlScript>().checkIsChangingHeight())
+            //    //{
+            //    //    delayAlreadyElapsed = false;
+            //    //}
+            //}
+            //else
+            //{
+            //    switchModes(EnemyARControlMode.doNothingForTimeThenReturnToTailing);
+            //    //delayAlreadyElapsed = true;
+
+
+            //}
         }
     }
 
@@ -445,13 +490,13 @@ public class EnemyARControlScript : MonoBehaviour {
     {
         if(!modeInited)
         {
-            GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;
+            GetComponent<Rigidbody>().velocity = transform.forward * (forwardSpeed / 2);
             modeInited = true;
         }
 
         if (inModeTransition)
         {
-            GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;
+            GetComponent<Rigidbody>().velocity = transform.forward * (forwardSpeed / 2);
             inModeTransition = false;
         }
 
