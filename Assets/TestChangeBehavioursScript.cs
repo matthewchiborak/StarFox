@@ -6,6 +6,7 @@ public class TestChangeBehavioursScript : MonoBehaviour {
 
     public EnemyARControlScript objectToTest;
     public GameObject objectToTail;
+    public GameObject player;
 
 	// Use this for initialization
 	void Start () {
@@ -19,6 +20,17 @@ public class TestChangeBehavioursScript : MonoBehaviour {
         {
             objectToTest.setObjectToTail(objectToTail.transform);
             objectToTest.switchModes(EnemyARControlMode.tailOtherObject);
+        }
+
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            objectToTest.changeCircleCenter(new Vector3(0, 30, 0));
+        }
+
+        if(Input.GetKeyDown(KeyCode.B))
+        {
+            objectToTest.setObjectToTail(player.transform);
+            objectToTest.switchModes(EnemyARControlMode.tailPlayer);
         }
 
         if (Input.GetKeyDown(KeyCode.O))

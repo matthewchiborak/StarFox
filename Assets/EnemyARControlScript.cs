@@ -6,7 +6,9 @@ public enum EnemyARControlMode
 {
     circlingAroundPoint,
     tailOtherObject,
+    tailPlayer,
     doNothingForTimeThenReturnToTailing,
+    doNothingAfterPlayerLosesThenCircle,
     retire
 }
 
@@ -44,6 +46,7 @@ public class EnemyARControlScript : MonoBehaviour {
 
     private Transform objectToTail;
     public float distanceAwayFromPlayerToTail;
+    public float distanceTooCloseToPlayerToTail;
     private bool closeEnoughToLatchOnToTail;
 
     private float shotLead;
@@ -68,6 +71,19 @@ public class EnemyARControlScript : MonoBehaviour {
     public float doNothingDelay;
     private bool delayAlreadyElapsed;
 
+    //Tailing player
+    private float tilt;
+    private float zTiltTurnFactor;
+
+    private float minRotX;
+    private float minRotY;
+    private float maxRotX;
+    private float maxRotY;
+    private float maxRotZ;
+    private float minRotZ;
+
+    public float doNothingAfterPlayerTailDelay;
+
     void Start()
     {
         previousMode = currentMode;
@@ -76,6 +92,14 @@ public class EnemyARControlScript : MonoBehaviour {
         heightChangeAngleIncrement = 100f;
         heightChangeAngleMax = 45;
         delayAlreadyElapsed = false;
+
+        zTiltTurnFactor = 0.5f;
+        minRotX = -45;
+        minRotY = -45;
+        maxRotX = 45;
+        maxRotY = 45;
+        maxRotZ = 90;
+        minRotZ = -90;
     }
 
     // Update is called once per frame
@@ -90,8 +114,15 @@ public class EnemyARControlScript : MonoBehaviour {
             case EnemyARControlMode.tailOtherObject:
                 tailOtherObject();
                 break;
+            case EnemyARControlMode.tailPlayer:
+                tailPlayer();
+                takeShotAtPlayerIfCloseEnough();
+                break;
             case EnemyARControlMode.doNothingForTimeThenReturnToTailing:
                 doNothingForTimeThenReturnToTailing();
+                break;
+            case EnemyARControlMode.doNothingAfterPlayerLosesThenCircle:
+                doNothingAfterPlayerLosesThenCircle();
                 break;
             case EnemyARControlMode.retire:
                 retired();
@@ -181,7 +212,13 @@ public class EnemyARControlScript : MonoBehaviour {
                     endRot = Quaternion.Euler(0, 180 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0);
                 }
                 break;
-                
+
+            case EnemyARControlMode.tailPlayer:
+                transitionTime = 1;
+                startPos = transform.position;
+                startRot = transform.rotation;
+                break;
+
             case EnemyARControlMode.tailOtherObject:
                 if (objectToTail.GetComponentInParent<TeammateARControlScript>().tryToTail(gameObject))
                 {
@@ -291,6 +328,106 @@ public class EnemyARControlScript : MonoBehaviour {
     }
 
     private void tailOtherObject()
+    {
+        if (objectToTail == null)
+        {
+            switchModes(EnemyARControlMode.circlingAroundPoint);
+        }
+        if (objectToTail.GetComponent<TeammateARControlScript>())
+        {
+            if (objectToTail.GetComponent<TeammateARControlScript>().getCurrentMode() == TeammateARControlMode.retired)
+            {
+                switchModes(EnemyARControlMode.circlingAroundPoint);
+            }
+        }
+
+        if (!modeInited)
+        {
+            modeInited = true;
+        }
+
+        if ((Time.time - timeOfLastShot) > timeBetweenShots)
+        {
+            //Estimate the time to reach player
+            Vector3 normDirection = objectToTail.forward.normalized;
+            timeToReachPlayer = -1 * ((((shotSpeed * (objectToTail.position.z + distanceToLeadShot) - objectToTail.GetComponentInParent<TeammateARControlScript>().forwardSpeed * normDirection.z * transform.position.z) / (shotSpeed - objectToTail.GetComponentInParent<TeammateARControlScript>().forwardSpeed * normDirection.z)) - objectToTail.position.z + distanceToLeadShot) / objectToTail.GetComponentInParent<TeammateARControlScript>().forwardSpeed * normDirection.z);
+            timeToReachPlayer2 = -1 * ((((shotSpeed * (objectToTail.position.x + distanceToLeadShot) - objectToTail.GetComponentInParent<TeammateARControlScript>().forwardSpeed * normDirection.x * transform.position.x) / (shotSpeed - objectToTail.GetComponentInParent<TeammateARControlScript>().forwardSpeed * normDirection.x)) - objectToTail.position.x + distanceToLeadShot) / objectToTail.GetComponentInParent<TeammateARControlScript>().forwardSpeed * normDirection.x);
+            timeToReachPlayer3 = -1 * ((((shotSpeed * (objectToTail.position.y + distanceToLeadShot) - objectToTail.GetComponentInParent<TeammateARControlScript>().forwardSpeed * normDirection.y * transform.position.y) / (shotSpeed - objectToTail.GetComponentInParent<TeammateARControlScript>().forwardSpeed * normDirection.y)) - objectToTail.position.y + distanceToLeadShot) / objectToTail.GetComponentInParent<TeammateARControlScript>().forwardSpeed * normDirection.y);
+
+            timeToReachPlayer = (timeToReachPlayer + timeToReachPlayer2 + timeToReachPlayer3) / 2;// 3;
+
+            shotDirection = new Vector3(
+                (transform.position.x - objectToTail.position.x + (timeToReachPlayer * objectToTail.forward.x * objectToTail.GetComponentInParent<TeammateARControlScript>().forwardSpeed)),
+                (transform.position.y - objectToTail.position.y + (timeToReachPlayer * objectToTail.forward.y * objectToTail.GetComponentInParent<TeammateARControlScript>().forwardSpeed)),
+                (transform.position.z - objectToTail.position.z + (timeToReachPlayer * objectToTail.forward.z * objectToTail.GetComponentInParent<TeammateARControlScript>().forwardSpeed))
+            );
+
+            shotDirection = shotDirection.normalized;
+
+            shotDirection = new Vector3(
+                shotDirection.x * -shotSpeed,//(shotDirectionNotNorm.x / timeToReachPlayer),//-shotSpeed,
+                shotDirection.y * -shotSpeed, //(shotDirectionNotNorm.y / timeToReachPlayer),//-shotSpeed,
+                shotDirection.z * -shotSpeed //(shotDirectionNotNorm.z / timeToReachPlayer)//-shotSpeed
+                );
+
+            Quaternion newAngle = Quaternion.Euler(Mathf.Atan2(objectToTail.position.x - transform.position.x, objectToTail.position.z + shotLead - transform.position.z), Mathf.Atan2(objectToTail.position.y - transform.position.y, objectToTail.position.z + shotLead - transform.position.z), 0);
+            GameObject newShot = Instantiate(enemyShot, transform.position, newAngle);
+
+            Vector3 direction = new Vector3(objectToTail.position.x - transform.position.x, objectToTail.position.y - transform.position.y, objectToTail.position.z - transform.position.z).normalized;
+            newShot.GetComponent<Rigidbody>().velocity = direction * shotSpeed;
+
+            timeOfLastShot = Time.time;
+        }
+
+        if (inModeTransition)
+        {
+            Vector3 direction = new Vector3(objectToTail.transform.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail, objectToTail.transform.position.y - transform.position.y - objectToTail.transform.forward.y * distanceAwayFromPlayerToTail, objectToTail.transform.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail).normalized;
+
+            if (Mathf.Sqrt((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) * (objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) + (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail) * (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) < 1)//distanceAwayFromPlayerToTail)
+            {
+                inModeTransition = false;
+            }
+            else
+            {
+                GetComponent<Rigidbody>().velocity = direction * forwardSpeed;
+                if ((Time.time - timeTransitionBegan) > transitionTime)
+                    transform.LookAt(new Vector3(objectToTail.transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail, objectToTail.transform.position.y - objectToTail.transform.forward.y * distanceAwayFromPlayerToTail, objectToTail.transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail));
+            }
+
+            if ((Time.time - timeTransitionBegan) < transitionTime)
+            {
+                int yDirection = 1;
+                if (objectToTail.position.y > transform.position.y)
+                {
+                    yDirection = -1;
+                }
+                float tempAngle = yDirection * Mathf.Asin((objectToTail.position.y - transform.position.y - objectToTail.transform.forward.y * distanceAwayFromPlayerToTail) / ((objectToTail.position - transform.position).magnitude)) * (180f / 3.1415f);
+                if ((objectToTail.position.y > transform.position.y && tempAngle > 0) || (objectToTail.position.y < transform.position.y && tempAngle < 0))
+                {
+                    tempAngle *= -1;
+                }
+                transform.rotation = Quaternion.Lerp(startRot, Quaternion.Euler(tempAngle, (Mathf.Atan2((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail), (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) * (180f / 3.1415f)), 0), (Time.time - timeTransitionBegan) / transitionTime);
+            }
+        }
+
+        if (!inModeTransition)
+        {
+            Vector3 direction = new Vector3(objectToTail.transform.position.x - transform.position.x, objectToTail.transform.position.y - transform.position.y, objectToTail.transform.position.z - transform.position.z).normalized;
+
+            //if(distanceTooCloseToPlayerToTail)
+            if (Mathf.Sqrt((objectToTail.position.x - transform.position.x) * (objectToTail.position.x - transform.position.x) + (objectToTail.position.z - transform.position.z) * (objectToTail.position.z - transform.position.z)) < distanceTooCloseToPlayerToTail)//distanceAwayFromPlayerToTail)
+            {
+                GetComponent<Rigidbody>().velocity = direction * (objectToTail.GetComponent<TeammateARControlScript>().getSpeed() / 2);
+            }
+            else
+            {
+                GetComponent<Rigidbody>().velocity = direction * (objectToTail.GetComponent<TeammateARControlScript>().getSpeed());
+            }
+
+            transform.LookAt(new Vector3(objectToTail.transform.position.x, objectToTail.transform.position.y, objectToTail.transform.position.z));
+        }
+    }
+    private void OLDtailOtherObject()
     {
         if(objectToTail == null)
         {
@@ -455,6 +592,145 @@ public class EnemyARControlScript : MonoBehaviour {
         }
     }
 
+    private void tailPlayer()
+    {
+        if (!modeInited)
+        {
+            modeInited = true;
+        }
+
+        if (inModeTransition)
+        {
+            Vector3 direction = new Vector3(player.transform.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail, player.transform.position.y - transform.position.y - objectToTail.transform.forward.y * distanceAwayFromPlayerToTail, player.transform.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail).normalized;
+
+            if (Mathf.Sqrt((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) * (objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) + (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail) * (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) < 1)//distanceAwayFromPlayerToTail)
+            {
+                inModeTransition = false;
+            }
+            else
+            {
+                GetComponent<Rigidbody>().velocity = direction * forwardSpeed;
+                if((Time.time - timeTransitionBegan) > transitionTime)
+                    transform.LookAt(new Vector3(player.transform.position.x - player.transform.forward.x * distanceAwayFromPlayerToTail, player.transform.position.y - objectToTail.transform.forward.y * distanceAwayFromPlayerToTail, player.transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail));
+            }
+
+            if ((Time.time - timeTransitionBegan) < transitionTime)
+            {
+                int yDirection = 1;
+                if (objectToTail.position.y > transform.position.y)
+                {
+                    yDirection = -1;
+                }
+                float tempAngle = yDirection * Mathf.Asin((objectToTail.position.y - transform.position.y - objectToTail.transform.forward.y * distanceAwayFromPlayerToTail) / ((objectToTail.position - transform.position).magnitude)) * (180f / 3.1415f);
+                if ((objectToTail.position.y > transform.position.y && tempAngle > 0) || (objectToTail.position.y < transform.position.y && tempAngle < 0))
+                {
+                    tempAngle *= -1;
+                }
+                transform.rotation = Quaternion.Lerp(startRot, Quaternion.Euler(tempAngle, (Mathf.Atan2((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail), (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) * (180f / 3.1415f)), 0), (Time.time - timeTransitionBegan) / transitionTime);
+            }
+            
+            //////////////////
+            if (player.GetComponent<PlayerControllerScript>().getIsSomerSaulting() || player.GetComponent<PlayerControllerScript>().getIsUturning())
+            {
+                switchModes(EnemyARControlMode.doNothingAfterPlayerLosesThenCircle);
+            }
+        }
+
+        if (!inModeTransition)
+        {
+            Vector3 direction = new Vector3(player.transform.position.x - transform.position.x, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z).normalized;
+
+            //if(distanceTooCloseToPlayerToTail)
+            if (Mathf.Sqrt((objectToTail.position.x - transform.position.x) * (objectToTail.position.x - transform.position.x) + (objectToTail.position.z - transform.position.z) * (objectToTail.position.z - transform.position.z)) < distanceTooCloseToPlayerToTail)//distanceAwayFromPlayerToTail)
+            {
+                GetComponent<Rigidbody>().velocity = direction * (player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed() / 2);
+            }
+            else
+            {
+                GetComponent<Rigidbody>().velocity = direction * (player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed());
+            }
+
+            transform.LookAt(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
+
+            if (player.GetComponent<PlayerControllerScript>().getIsSomerSaulting() || player.GetComponent<PlayerControllerScript>().getIsUturning())
+            {
+                switchModes(EnemyARControlMode.doNothingAfterPlayerLosesThenCircle);
+            }
+        }
+    }
+    private void OLDtailPlayer()
+    {
+        if (!modeInited)
+        {
+            modeInited = true;
+        }
+
+        if(inModeTransition)
+        {
+            int yDirection = 1;
+            if (objectToTail.position.y > transform.position.y)
+            {
+                yDirection = -1;
+            }
+            float tempAngle = yDirection * Mathf.Asin((objectToTail.position.y - transform.position.y - objectToTail.transform.forward.y * distanceAwayFromPlayerToTail) / ((objectToTail.position - transform.position).magnitude)) * (180f / 3.1415f);
+            if ((objectToTail.position.y > transform.position.y && tempAngle > 0) || (objectToTail.position.y < transform.position.y && tempAngle < 0))
+            {
+                tempAngle *= -1;
+            }
+
+            //transform.rotation = Quaternion.Lerp(startRot, Quaternion.Euler(tempAngle, (Mathf.Atan2((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail), (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) * (180f / 3.1415f)), 0), (Time.time - timeTransitionBegan) / transitionTime);
+            //GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;// * Time.deltaTime;
+
+            if (Mathf.Sqrt((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) * (objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) + (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail) * (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) < 1)//distanceAwayFromPlayerToTail)
+            {
+                //transform.rotation = 
+                Vector3 direction = new Vector3(player.transform.position.x - transform.position.x, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z).normalized;
+                GetComponent<Rigidbody>().velocity = direction * player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed();
+            }
+            else
+            {
+                transform.rotation = Quaternion.Lerp(startRot, Quaternion.Euler(tempAngle, (Mathf.Atan2((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail), (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) * (180f / 3.1415f)), 0), (Time.time - timeTransitionBegan) / transitionTime);
+                GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;
+            }
+
+            //if (Mathf.Sqrt((objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) * (objectToTail.position.x - transform.position.x - objectToTail.transform.forward.x * distanceAwayFromPlayerToTail) + (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail) * (objectToTail.position.z - transform.position.z - objectToTail.transform.forward.z * distanceAwayFromPlayerToTail)) < 1)//distanceAwayFromPlayerToTail)
+            //{
+            //    inModeTransition = false;
+            //}
+
+
+            //////////////////
+            if (player.GetComponent<PlayerControllerScript>().getIsSomerSaulting() || player.GetComponent<PlayerControllerScript>().getIsUturning())
+            {
+                switchModes(EnemyARControlMode.doNothingAfterPlayerLosesThenCircle);
+            }
+        }
+
+        //if (!inModeTransition)
+        //{
+        //    Vector3 direction = new Vector3(player.transform.position.x - transform.position.x, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z).normalized;
+        //    //direction.z = 1;
+        //    GetComponent<Rigidbody>().velocity = direction * player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed();
+
+        //    tilt = maxRotX / player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed();
+
+        //    //Rotate to make it look natural
+        //    Vector3 rotation = new Vector3
+        //       (
+        //       Mathf.Clamp(GetComponent<Rigidbody>().velocity.y * -tilt, minRotX, maxRotX),
+        //       Mathf.Clamp(GetComponent<Rigidbody>().velocity.x * tilt, minRotX, maxRotX),
+        //       Mathf.Clamp(GetComponent<Rigidbody>().velocity.x * -tilt * zTiltTurnFactor, minRotZ, maxRotZ)
+        //   );
+        //    GetComponent<Rigidbody>().rotation = Quaternion.Euler(-rotation.x, rotation.y + 180, rotation.z);
+
+        //    //Check if player is taking evasive actions
+        //    if(player.GetComponent<PlayerControllerScript>().getIsSomerSaulting() || player.GetComponent<PlayerControllerScript>().getIsUturning())
+        //    {
+        //        switchModes(EnemyARControlMode.doNothingAfterPlayerLosesThenCircle);
+        //    }
+        //}
+    }
+
     private void retired()
     {
         if (!modeInited)
@@ -474,6 +750,33 @@ public class EnemyARControlScript : MonoBehaviour {
         }
 
         GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;
+    }
+
+    public void changeCircleCenter(Vector3 centerPoint)
+    {
+        pointToCircleAround = centerPoint;
+
+        if (currentMode == EnemyARControlMode.circlingAroundPoint)
+        {
+            switchModes(EnemyARControlMode.circlingAroundPoint);
+        }
+    }
+
+    private void doNothingAfterPlayerLosesThenCircle()
+    {
+        if(!inModeTransition)
+        {
+            GetComponent<Rigidbody>().velocity = transform.forward * (forwardSpeed * 5);
+            inModeTransition = false;
+        }
+
+        if (inModeTransition)
+        {
+            if ((Time.time - timeTransitionBegan) > doNothingAfterPlayerTailDelay)
+            {
+                switchModes(EnemyARControlMode.circlingAroundPoint);
+            }
+        }
     }
 
     private void returnToTailingPrevious()

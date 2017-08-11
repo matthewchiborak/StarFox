@@ -1485,6 +1485,8 @@ public class PlayerControllerScript : MonoBehaviour {
         return currentForwardVelocity;
     }
 
+    
+
     public void setAtBoss(bool isAtBoss)
     {
         if(isAtBoss)
