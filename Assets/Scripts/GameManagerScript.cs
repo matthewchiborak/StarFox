@@ -89,7 +89,7 @@ public class GameManagerScript : MonoBehaviour {
 
     //Boss
     public bool hasBoss;
-    public float zCordToTriggerBoss;
+    //public float zCordToTriggerBoss;
     //public bool keepPlayerAndBossMoving;
     private bool isAtBoss;
     public GameObject boss;
@@ -103,7 +103,7 @@ public class GameManagerScript : MonoBehaviour {
     private bool startedTransitionTOAR;
 
     //Triggering boss in all range mode
-    public float timeNeededToPassForBossAppearAR;
+    private float timeNeededToPassForBossAppearAR;
     private float timeARStarted;
 
     public TextAsset switchingToARDialog;
@@ -147,6 +147,8 @@ public class GameManagerScript : MonoBehaviour {
     private bool FOnPath;
     private bool KOnPath;
     private bool SOnPath;
+
+    private bool transitionToAREventsTriggered;
 
     // Use this for initialization
     void Start ()
@@ -228,6 +230,108 @@ public class GameManagerScript : MonoBehaviour {
         }
 
         return 0;
+    }
+    
+    public void setTimeNeededToPassForBossAppearAR(float t)
+    {
+        timeNeededToPassForBossAppearAR = t;
+    }
+    public float getTimeARStarted()
+    {
+        return timeARStarted;
+    }
+
+    //Return false if transition is not complete, true if it is done.
+    public bool triggerBoss()
+    {
+        //Corridor
+        if(!player.GetComponent<PlayerControllerScript>().isInAllRange())
+        {
+            if (hasBoss && !isAtBoss)// && player.transform.position.z > zCordToTriggerBoss)
+            {
+                if (bossChangesToAR)
+                {
+                    switchToAllRange();
+
+                    _bgmusicControl.stopMusic();
+                    startedTransitionTOAR = true;
+                    _cameraControl.transitionToAR(timeNeededToPassForBossAppearAR);
+
+                    //Move teammates behind player and switch to AR behaviour
+                    //Move the teammates into position
+                    if (currentHealthFalco > 0)
+                    {
+                        teammates[0].SetActive(false);
+                        teammates[0].GetComponent<TeammateControlScript>().enabled = false;
+                        teammates[0].transform.position = new Vector3(player.transform.position.x - 30, player.transform.position.y, player.transform.position.z - 50);
+                        teammates[0].GetComponent<TeammateARControlScript>().enabled = true;
+                        teammates[0].GetComponent<TeammateARControlScript>().setTransitionSpeed(player.GetComponent<Rigidbody>().velocity.z);
+                        teammates[0].SetActive(true);
+                    }
+                    else
+                    {
+                        teammates[0].SetActive(false);
+                    }
+                    if (currentHealthKris > 0)
+                    {
+                        teammates[1].SetActive(false);
+                        teammates[1].GetComponent<TeammateControlScript>().enabled = false;
+                        teammates[1].transform.position = new Vector3(player.transform.position.x + 30, player.transform.position.y, player.transform.position.z - 50);
+                        teammates[1].GetComponent<TeammateARControlScript>().enabled = true;
+                        teammates[1].GetComponent<TeammateARControlScript>().setTransitionSpeed(player.GetComponent<Rigidbody>().velocity.z);
+                        teammates[1].SetActive(true);
+                    }
+                    else
+                    {
+                        teammates[1].SetActive(false);
+                    }
+                    if (currentHealthSlip > 0)
+                    {
+                        teammates[2].SetActive(false);
+                        teammates[2].GetComponent<TeammateControlScript>().enabled = false;
+                        teammates[2].transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - 70);
+                        teammates[2].GetComponent<TeammateARControlScript>().enabled = true;
+                        teammates[2].GetComponent<TeammateARControlScript>().setTransitionSpeed(player.GetComponent<Rigidbody>().velocity.z);
+                        teammates[2].SetActive(true);
+                    }
+                    else
+                    {
+                        teammates[2].SetActive(false);
+                    }
+
+                    return false;
+                }
+
+                isAtBoss = true;
+                player.GetComponent<PlayerControllerScript>().setAtBoss(true);
+                boss.SetActive(true);
+                boss.GetComponent<BossControlScript>().resetHealth();
+                _bgmusicControl.playBossMusic();
+
+                //Start moving the geometry
+                if (hasLevelGeo)
+                {
+                    bossPortion1.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, -player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed());
+                    bossPortion2.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, -player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed());
+                }
+            }
+
+            return true;
+        }
+        else
+        {
+            //All range
+            if (hasBoss && !isAtBoss)// && (Time.time - timeARStarted) > timeNeededToPassForBossAppearAR)
+            {
+                finishedTransitionTOAR = true;
+                isAtBoss = true;
+                boss.SetActive(true);
+                boss.GetComponent<BossControlScript>().resetHealth();
+                _bgmusicControl.playBossMusic();
+            }
+
+            return true;
+        }
     }
 
     public void allowHealthBarUpdates()
@@ -523,40 +627,40 @@ public class GameManagerScript : MonoBehaviour {
             //checkIfNeedActivate();
             checkIfNeedActiveEnemyWithPath();
 
-            if(hasBoss && !isAtBoss && player.transform.position.z > zCordToTriggerBoss)
-            {
-                if(bossChangesToAR)
-                {
-                    switchToAllRange();
+            //if(hasBoss && !isAtBoss && player.transform.position.z > zCordToTriggerBoss)
+            //{
+            //    if(bossChangesToAR)
+            //    {
+            //        switchToAllRange();
 
-                    //isAtBoss = true;
-                    //boss.SetActive(true);
-                    //boss.GetComponent<BossControlScript>().resetHealth();
-                    //_bgmusicControl.playBossMusic();
+            //        //isAtBoss = true;
+            //        //boss.SetActive(true);
+            //        //boss.GetComponent<BossControlScript>().resetHealth();
+            //        //_bgmusicControl.playBossMusic();
 
-                    _bgmusicControl.stopMusic();
-                    startedTransitionTOAR = true;
-                    _cameraControl.transitionToAR(timeNeededToPassForBossAppearAR);
-                    return;
-                }
+            //        _bgmusicControl.stopMusic();
+            //        startedTransitionTOAR = true;
+            //        _cameraControl.transitionToAR(timeNeededToPassForBossAppearAR);
+            //        return;
+            //    }
 
-                isAtBoss = true;
-                player.GetComponent<PlayerControllerScript>().setAtBoss(true);
-                //_boss = Instantiate(boss, bossSpawnLocation, Quaternion.identity);
-                boss.SetActive(true);
-                boss.GetComponent<BossControlScript>().resetHealth();
-                _bgmusicControl.playBossMusic();
-                //Activate health bar
-                //_UIcontroller.activateHealthBar();
+            //    isAtBoss = true;
+            //    player.GetComponent<PlayerControllerScript>().setAtBoss(true);
+            //    //_boss = Instantiate(boss, bossSpawnLocation, Quaternion.identity);
+            //    boss.SetActive(true);
+            //    boss.GetComponent<BossControlScript>().resetHealth();
+            //    _bgmusicControl.playBossMusic();
+            //    //Activate health bar
+            //    //_UIcontroller.activateHealthBar();
 
-                //Start moving the geometry
-                if(hasLevelGeo)
-                {
-                    bossPortion1.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, -player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed());
-                    bossPortion2.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, -player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed());
-                    //behindBossPortion.SetActive(true);
-                }
-            }
+            //    //Start moving the geometry
+            //    if(hasLevelGeo)
+            //    {
+            //        bossPortion1.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, -player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed());
+            //        bossPortion2.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, -player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed());
+            //        //behindBossPortion.SetActive(true);
+            //    }
+            //}
 
             //Update the health UI
             if(isAtBoss)
@@ -733,7 +837,27 @@ public class GameManagerScript : MonoBehaviour {
                 player.transform.position.z > minLevelBounds.z && player.transform.position.z < maxLevelBounds.z))
             {
                 if(!bossDestroyed && finishedTransitionTOAR)
-                player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(true);
+                {
+                    player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(true);
+
+                    if(!transitionToAREventsTriggered)
+                    {
+                        transitionToAREventsTriggered = true;
+                        //Change behaviour of teammates
+                        if (currentHealthFalco > 0)
+                        {
+                            teammates[0].GetComponent<TeammateARControlScript>().switchModes(TeammateARControlMode.circlingAroundPoint);
+                        }
+                        if (currentHealthKris > 0)
+                        {
+                            teammates[1].GetComponent<TeammateARControlScript>().switchModes(TeammateARControlMode.circlingAroundPoint);
+                        }
+                        if (currentHealthSlip > 0)
+                        {
+                            teammates[2].GetComponent<TeammateARControlScript>().switchModes(TeammateARControlMode.circlingAroundPoint);
+                        }
+                    }
+                }
             }
             else if(!player.GetComponent<PlayerControllerScript>().getIsUturning() && !player.GetComponent<PlayerControllerScript>().getPlayerControlEnabled() &&
                 ((player.transform.position.x < minLevelBounds.x && player.GetComponent<Rigidbody>().velocity.x < 0) ||
@@ -771,15 +895,15 @@ public class GameManagerScript : MonoBehaviour {
                 _UIcontroller.loadDialog(switchingToARDialog);
             }
 
-            //Trigger boss TODO
-            if (hasBoss && !isAtBoss && (Time.time - timeARStarted) > timeNeededToPassForBossAppearAR)
-            {
-                finishedTransitionTOAR = true;
-                isAtBoss = true;
-                boss.SetActive(true);
-                boss.GetComponent<BossControlScript>().resetHealth();
-                _bgmusicControl.playBossMusic();
-            }
+            ////Trigger boss TODO
+            //if (hasBoss && !isAtBoss && (Time.time - timeARStarted) > timeNeededToPassForBossAppearAR)
+            //{
+            //    finishedTransitionTOAR = true;
+            //    isAtBoss = true;
+            //    boss.SetActive(true);
+            //    boss.GetComponent<BossControlScript>().resetHealth();
+            //    _bgmusicControl.playBossMusic();
+            //}
 
             //Update the health UI
             if (isAtBoss)

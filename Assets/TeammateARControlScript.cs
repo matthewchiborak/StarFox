@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum TeammateARControlMode
 {
+    doNothing,
     circlingAroundPoint,
     retired
 }
@@ -45,7 +46,8 @@ public class TeammateARControlScript : MonoBehaviour {
     private bool changingHeight;
     private int yDirection;
     private float heightChangeAngleMax;
-    
+
+    private float transitionSpeed;
 
     // Use this for initialization
     void Start ()
@@ -61,6 +63,9 @@ public class TeammateARControlScript : MonoBehaviour {
     {
 	    switch(currentMode)
         {
+            case TeammateARControlMode.doNothing:
+                doNothing();
+                break;
             case TeammateARControlMode.circlingAroundPoint:
                 circlingAroundPoint();
                 break;
@@ -268,5 +273,27 @@ public class TeammateARControlScript : MonoBehaviour {
         }
 
         GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;// * Time.deltaTime;
+    }
+
+    private void doNothing()
+    {
+        if(!modeInited)
+        {
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+            GetComponent<Rigidbody>().velocity = transform.forward * transitionSpeed;
+            modeInited = true;
+        }
+
+        if (inModeTransition)
+        {
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+            inModeTransition = false;
+            GetComponent<Rigidbody>().velocity = transform.forward * transitionSpeed;//forwardSpeed;
+        }
+    }
+
+    public void setTransitionSpeed(float speed)
+    {
+        transitionSpeed = speed;
     }
 }

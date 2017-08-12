@@ -30,6 +30,8 @@ public class MissionCompleteCameraControl : MonoBehaviour {
 
     private bool playerInAllRange;
 
+    
+
     void Start()
     {
         cameraTransform = GetComponent<Transform>();
@@ -99,7 +101,6 @@ public class MissionCompleteCameraControl : MonoBehaviour {
             if (isRotating)
             {
                 //Slowly rotate around the player
-                //cameraTransform.position = new Vector3(transformToFollow.position.x + Mathf.Cos(currentAngle * (3.1415f / 180f)) * zOffset, transformToFollow.position.y, transformToFollow.position.z + Mathf.Sin(currentAngle * (3.1415f / 180f)) * zOffset);
                 cameraTransform.position = new Vector3(transformToFollow.position.x + Mathf.Sin(currentAngle * (3.1415f / 180f)) * zOffset, transformToFollow.position.y, transformToFollow.position.z + Mathf.Cos(currentAngle * (3.1415f / 180f)) * zOffset);
 
                 cameraTransform.LookAt(transformToFollow);
