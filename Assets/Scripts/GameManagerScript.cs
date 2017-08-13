@@ -626,42 +626,7 @@ public class GameManagerScript : MonoBehaviour {
             checkIfNeedToRemove();
             //checkIfNeedActivate();
             checkIfNeedActiveEnemyWithPath();
-
-            //if(hasBoss && !isAtBoss && player.transform.position.z > zCordToTriggerBoss)
-            //{
-            //    if(bossChangesToAR)
-            //    {
-            //        switchToAllRange();
-
-            //        //isAtBoss = true;
-            //        //boss.SetActive(true);
-            //        //boss.GetComponent<BossControlScript>().resetHealth();
-            //        //_bgmusicControl.playBossMusic();
-
-            //        _bgmusicControl.stopMusic();
-            //        startedTransitionTOAR = true;
-            //        _cameraControl.transitionToAR(timeNeededToPassForBossAppearAR);
-            //        return;
-            //    }
-
-            //    isAtBoss = true;
-            //    player.GetComponent<PlayerControllerScript>().setAtBoss(true);
-            //    //_boss = Instantiate(boss, bossSpawnLocation, Quaternion.identity);
-            //    boss.SetActive(true);
-            //    boss.GetComponent<BossControlScript>().resetHealth();
-            //    _bgmusicControl.playBossMusic();
-            //    //Activate health bar
-            //    //_UIcontroller.activateHealthBar();
-
-            //    //Start moving the geometry
-            //    if(hasLevelGeo)
-            //    {
-            //        bossPortion1.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, -player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed());
-            //        bossPortion2.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, -player.GetComponent<PlayerControllerScript>().getDefaultForwardSpeed());
-            //        //behindBossPortion.SetActive(true);
-            //    }
-            //}
-
+            
             //Update the health UI
             if(isAtBoss)
             {

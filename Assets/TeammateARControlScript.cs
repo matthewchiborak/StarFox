@@ -48,6 +48,10 @@ public class TeammateARControlScript : MonoBehaviour {
     private float heightChangeAngleMax;
 
     private float transitionSpeed;
+    
+    private float timeReachedCorrectHeight;
+    private bool levelingOut;
+    private Quaternion startRotLevelOut;
 
     // Use this for initialization
     void Start ()
@@ -160,6 +164,136 @@ public class TeammateARControlScript : MonoBehaviour {
     }
 
     private void circlingAroundPoint()
+    {
+        if (!modeInited)
+        {
+            //transform.position = new Vector3(0, pointToCircleAround.y, circleRadius);
+            transform.position = new Vector3(circleRadius * Mathf.Sin(startingAngleOnCircle) + pointToCircleAround.x, pointToCircleAround.y, circleRadius * Mathf.Cos(startingAngleOnCircle) + pointToCircleAround.z);
+
+            modeInited = true;
+        }
+
+
+        if (inModeTransition)
+        {
+            transform.rotation = Quaternion.Lerp(startRot, endRot, (Time.time - timeTransitionBegan) / transitionTime);
+            if ((!reachedRadius && movingAwayFromCenter && Mathf.Sqrt((transform.position.x - pointToCircleAround.x) * (transform.position.x - pointToCircleAround.x) + (transform.position.z - pointToCircleAround.z) * (transform.position.z - pointToCircleAround.z)) > circleRadius)
+                || (!reachedRadius && !movingAwayFromCenter && Mathf.Sqrt((transform.position.x - pointToCircleAround.x) * (transform.position.x - pointToCircleAround.x) + (transform.position.z - pointToCircleAround.z) * (transform.position.z - pointToCircleAround.z)) < circleRadius))
+            {
+                reachedRadius = true;
+                timeTransitionBegan = Time.time;
+                startRot = transform.rotation;
+            }
+
+            if (reachedRadius)
+            {
+                if (clockWise)
+                {
+                    endRot = Quaternion.Euler(0, 90 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0);
+                }
+                else
+                {
+                    endRot = Quaternion.Euler(0, -90 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0);
+                }
+
+                if ((Time.time - timeTransitionBegan) > transitionTime)
+                {
+                    inModeTransition = false;
+                }
+            }
+        }
+        
+        if (!inModeTransition)
+        {
+            //Rotate so that ship is on the radius of the circle
+            if (clockWise)
+            {
+                transform.rotation = Quaternion.Euler(0, 90 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0);
+            }
+            else
+            {
+                transform.rotation = Quaternion.Euler(0, -90 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0);
+            }
+        }
+
+
+        if (!changingHeight && !levelingOut)
+        {
+            //Change if height change is needed
+            if (pointToCircleAround.y > transform.position.y)
+            {
+                yDirection = -1;
+                changingHeight = true;
+            }
+            else if (pointToCircleAround.y < transform.position.y)
+            {
+                yDirection = 1;
+                changingHeight = true;
+            }
+
+            //Set the correct velocity
+            GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;// * Time.deltaTime;
+        }
+        else if(!levelingOut)
+        {
+            //Advance the heightChange
+            transform.Rotate(heightChangeAngle, 0, 0);
+            heightChangeAngle += yDirection * heightChangeAngleIncrement * Time.deltaTime;
+            if (Mathf.Abs(heightChangeAngle) > 45)
+            {
+                heightChangeAngle = yDirection * heightChangeAngleMax;
+            }
+
+            if (yDirection < 0 && pointToCircleAround.y < transform.position.y)
+            {
+                changingHeight = false;
+                transform.position = new Vector3(transform.position.x, pointToCircleAround.y, transform.position.z);
+                heightChangeAngle = 0;
+                levelingOut = true;
+                startRotLevelOut = transform.rotation;
+                timeReachedCorrectHeight = Time.time;
+            }
+            else if (yDirection > 0 && pointToCircleAround.y > transform.position.y)
+            {
+                changingHeight = false;
+                transform.position = new Vector3(transform.position.x, pointToCircleAround.y, transform.position.z);
+                heightChangeAngle = 0;
+                levelingOut = true;
+                startRotLevelOut = transform.rotation;
+                timeReachedCorrectHeight = Time.time;
+            }
+
+            //Set the correct velocity
+            GetComponent<Rigidbody>().velocity = transform.forward * forwardSpeed;// * Time.deltaTime;
+        }
+        else
+        {
+            transform.position = new Vector3(transform.position.x, pointToCircleAround.y, transform.position.z);
+
+            if (clockWise)
+            {
+                transform.rotation = Quaternion.Lerp(startRotLevelOut, Quaternion.Euler(0, 90 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0), (Time.time - timeReachedCorrectHeight) / transitionTime);
+                //Quaternion.Euler(0, 90 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0);
+            }
+            else
+            {
+                transform.rotation = Quaternion.Lerp(startRotLevelOut, Quaternion.Euler(0, -90 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0), (Time.time - timeReachedCorrectHeight) / transitionTime);
+                //transform.rotation = Quaternion.Euler(0, -90 + (Mathf.Atan2((transform.position.x - pointToCircleAround.x), (transform.position.z - pointToCircleAround.z)) * (180f / 3.1415f)), 0);
+            }
+
+            if((Time.time - timeReachedCorrectHeight) > transitionTime)
+            {
+                levelingOut = false;
+            }
+
+            //Set the correct velocity
+            GetComponent<Rigidbody>().velocity = new Vector3(transform.forward.x, 0, transform.forward.z) * forwardSpeed;// * Time.deltaTime;
+        }
+
+        
+    }
+
+    private void OLDcirclingAroundPoint()
     {
         if (!modeInited)
         {
