@@ -29,6 +29,11 @@ public class BossControlScript : MonoBehaviour {
         isVulerable = status;
     }
 
+    public bool getIsVulnerable()
+    {
+        return isVulerable;
+    }
+
     public void resetHealth()
     {
         currentHealth = maxHealth;

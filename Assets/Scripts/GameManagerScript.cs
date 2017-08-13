@@ -626,20 +626,20 @@ public class GameManagerScript : MonoBehaviour {
             checkIfNeedToRemove();
             //checkIfNeedActivate();
             checkIfNeedActiveEnemyWithPath();
-            
+
             //Update the health UI
-            if(isAtBoss)
+            if (isAtBoss)
             {
                 //Set health on the UI
-                if(updateBossHealthBar)
+                if (updateBossHealthBar)
                 {
                     _UIcontroller.updateBossHealth(boss.GetComponent<BossControlScript>().getCurrentHealthPercentage());
                 }
 
                 //Move the geo to give the appearance of movement
-                if(hasLevelGeo)
+                if (hasLevelGeo)
                 {
-                    if(bossPortion1.transform.position.z < resetFromCordinate)
+                    if (bossPortion1.transform.position.z < resetFromCordinate)
                     {
                         bossPortion1.transform.position = new Vector3(bossPortion1.transform.position.x, bossPortion1.transform.position.y, resetToCordinate);
                         behindBossPortion.SetActive(true);
@@ -650,142 +650,144 @@ public class GameManagerScript : MonoBehaviour {
                         behindBossPortion.SetActive(true);
                     }
                 }
+            }
 
                 //Check if the boss is done
-                if(!bossDestroyed && boss.GetComponent<BossControlScript>().getCurrentHealthPercentage() <= 0)
-                {
-                    //_UIController.increaseHits(hits);
-                    _UIcontroller.increaseHits(boss.GetComponent<BossControlScript>().hits);
-                    //boss.SetActive(false);
-                    bossDestroyed = true;
-                    timeBossDestroyed = Time.time;
-                    _bgmusicControl.stopMusic();
-                    //Debug.Log("Boss Destroyed");
-                    player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(false);
+                //if(!bossDestroyed && boss.GetComponent<BossControlScript>().getCurrentHealthPercentage() <= 0)
+                //{
+                //    //_UIController.increaseHits(hits);
+                //    _UIcontroller.increaseHits(boss.GetComponent<BossControlScript>().hits);
+                //    //boss.SetActive(false);
+                //    bossDestroyed = true;
+                //    timeBossDestroyed = Time.time;
+                //    _bgmusicControl.stopMusic();
+                //    //Debug.Log("Boss Destroyed");
+                //    player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(false);
 
-                    //Move the camera so the player is in the same place of the victory camera position
-                    _cameraControl.missionCompleteMode(timeAfterBossDestroyedToDisappear);
+                //    //Move the camera so the player is in the same place of the victory camera position
+                //    _cameraControl.missionCompleteMode(timeAfterBossDestroyedToDisappear);
+                //}
+            
+            //Victory condition
+            if(!victoryPlaying && bossDestroyed && Time.time - timeBossDestroyed > timeAfterBossDestroyedToDisappear)
+            {
+                _bgmusicControl.playVictoryTrack();
+                victoryPlaying = true;
+                timeOfVictoryActivated = Time.time;
+                //_cameraControl.missionCompleteMode();
+                player.GetComponent<PlayerControllerScript>().disableCursor();
+                _UIcontroller.setUIStatus(false);
+
+                //Move the teammates
+                if(currentHealthFalco > 0)
+                {
+                    teammates[0].SetActive(true);
+                    teammates[0].transform.position = new Vector3(player.transform.position.x - 30, player.transform.position.y, player.transform.position.z - 50);
                 }
-                
-                if(!victoryPlaying && bossDestroyed && Time.time - timeBossDestroyed > timeAfterBossDestroyedToDisappear)
+                else
                 {
-                    _bgmusicControl.playVictoryTrack();
-                    victoryPlaying = true;
-                    timeOfVictoryActivated = Time.time;
-                    //_cameraControl.missionCompleteMode();
-                    player.GetComponent<PlayerControllerScript>().disableCursor();
-                    _UIcontroller.setUIStatus(false);
-
-                    //Move the teammates
-                    if(currentHealthFalco > 0)
-                    {
-                        teammates[0].SetActive(true);
-                        teammates[0].transform.position = new Vector3(player.transform.position.x - 30, player.transform.position.y, player.transform.position.z - 50);
-                    }
-                    else
-                    {
-                        teammates[0].SetActive(false);
-                    }
-                    if (currentHealthKris > 0)
-                    {
-                        teammates[1].SetActive(true);
-                        teammates[1].transform.position = new Vector3(player.transform.position.x + 30, player.transform.position.y, player.transform.position.z - 50);
-                    }
-                    else
-                    {
-                        teammates[1].SetActive(false);
-                    }
-                    if (currentHealthSlip > 0)
-                    {
-                        teammates[2].SetActive(true);
-                        teammates[2].transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - 70);
-                    }
-                    else
-                    {
-                        teammates[2].SetActive(false);
-                    }
+                    teammates[0].SetActive(false);
                 }
-
-                //Activate the mission complete text
-                if (victoryPlaying && !displayingMissionComplete && Time.time - timeOfVictoryActivated > timeBeforeDisplayingMissionComplete)
+                if (currentHealthKris > 0)
                 {
-                    displayingMissionComplete = true;
-                    _UIcontroller.activateNextMissionComplete();
-                    timeSinceActivateMissionComplete = Time.time;
-
-                    timeDialogMissionCompleteStart = Time.time;
+                    teammates[1].SetActive(true);
+                    teammates[1].transform.position = new Vector3(player.transform.position.x + 30, player.transform.position.y, player.transform.position.z - 50);
                 }
-                if(displayingMissionComplete && Time.time - timeSinceActivateMissionComplete > timeBetweenMissionComplete)
+                else
                 {
-                    _UIcontroller.activateNextMissionComplete();
-                    timeSinceActivateMissionComplete = Time.time;
+                    teammates[1].SetActive(false);
                 }
-                if(!playingMissionOverDialog && displayingMissionComplete && Time.time - timeOfVictoryActivated > (totalTimeDisplayingMissionComplete + timeBetweenMissionComplete))
+                if (currentHealthSlip > 0)
                 {
-                    _UIcontroller.turnOffMissionComplete();
-                    playingMissionOverDialog = true;
-                    //timeDialogMissionCompleteStart = Time.time;
+                    teammates[2].SetActive(true);
+                    teammates[2].transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - 70);
                 }
-
-                //End of mission Dialog
-                if(playingMissionOverDialog && currentMissionCompleteDialog < 4 && Time.time - timeDialogMissionCompleteStart > timeBeforePlayMissionCompleteNextDialog)
+                else
                 {
-                    // _UIcontroller
-                    switch(currentMissionCompleteDialog)
-                    {
-                        case 0:
-                            _UIcontroller.loadDialog(missionCompleteText[0]);
-                            break;
-                        case 1:
-                            if(currentHealthFalco > 0)
-                            {
-                                _UIcontroller.loadDialog(missionCompleteText[1]);
-                            }
-                            else
-                            {
-                                _UIcontroller.loadDialog(repairsCompleteText[0]);
-                            }
-                            break;
-                        case 2:
-                            if (currentHealthKris > 0)
-                            {
-                                _UIcontroller.loadDialog(missionCompleteText[2]);
-                            }
-                            else
-                            {
-                                _UIcontroller.loadDialog(repairsCompleteText[1]);
-                            }
-                            break;
-                        case 3:
-                            if (currentHealthSlip > 0)
-                            {
-                                _UIcontroller.loadDialog(missionCompleteText[3]);
-                            }
-                            else
-                            {
-                                _UIcontroller.loadDialog(repairsCompleteText[2]);
-                            }
-                            break;
-                    }
-
-                    timeDialogMissionCompleteStart = Time.time;
-                    currentMissionCompleteDialog++;
-                }
-
-                if (victoryPlaying && !levelWinFadeOutActivated && Time.time - timeOfVictoryActivated > timeForLevelOrderFadeOutToStart)
-                {
-                    levelWinFadeOutActivated = true;
-                    _UIcontroller.activateFadeIn();
-                }
-
-                if(levelWinFadeOutActivated)
-                {
-                    if(!_UIcontroller.checkIfFadeInFinished())
-                    {
-                        SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
-                    }
+                    teammates[2].SetActive(false);
                 }
             }
+
+            //Activate the mission complete text
+            if (victoryPlaying && !displayingMissionComplete && Time.time - timeOfVictoryActivated > timeBeforeDisplayingMissionComplete)
+            {
+                displayingMissionComplete = true;
+                _UIcontroller.activateNextMissionComplete();
+                timeSinceActivateMissionComplete = Time.time;
+
+                timeDialogMissionCompleteStart = Time.time;
+            }
+            if(displayingMissionComplete && Time.time - timeSinceActivateMissionComplete > timeBetweenMissionComplete)
+            {
+                _UIcontroller.activateNextMissionComplete();
+                timeSinceActivateMissionComplete = Time.time;
+            }
+            if(!playingMissionOverDialog && displayingMissionComplete && Time.time - timeOfVictoryActivated > (totalTimeDisplayingMissionComplete + timeBetweenMissionComplete))
+            {
+                _UIcontroller.turnOffMissionComplete();
+                playingMissionOverDialog = true;
+                //timeDialogMissionCompleteStart = Time.time;
+            }
+
+            //End of mission Dialog
+            if(playingMissionOverDialog && currentMissionCompleteDialog < 4 && Time.time - timeDialogMissionCompleteStart > timeBeforePlayMissionCompleteNextDialog)
+            {
+                // _UIcontroller
+                switch(currentMissionCompleteDialog)
+                {
+                    case 0:
+                        _UIcontroller.loadDialog(missionCompleteText[0]);
+                        break;
+                    case 1:
+                        if(currentHealthFalco > 0)
+                        {
+                            _UIcontroller.loadDialog(missionCompleteText[1]);
+                        }
+                        else
+                        {
+                            _UIcontroller.loadDialog(repairsCompleteText[0]);
+                        }
+                        break;
+                    case 2:
+                        if (currentHealthKris > 0)
+                        {
+                            _UIcontroller.loadDialog(missionCompleteText[2]);
+                        }
+                        else
+                        {
+                            _UIcontroller.loadDialog(repairsCompleteText[1]);
+                        }
+                        break;
+                    case 3:
+                        if (currentHealthSlip > 0)
+                        {
+                            _UIcontroller.loadDialog(missionCompleteText[3]);
+                        }
+                        else
+                        {
+                            _UIcontroller.loadDialog(repairsCompleteText[2]);
+                        }
+                        break;
+                }
+
+                timeDialogMissionCompleteStart = Time.time;
+                currentMissionCompleteDialog++;
+            }
+
+            if (victoryPlaying && !levelWinFadeOutActivated && Time.time - timeOfVictoryActivated > timeForLevelOrderFadeOutToStart)
+            {
+                levelWinFadeOutActivated = true;
+                _UIcontroller.activateFadeIn();
+            }
+
+            if(levelWinFadeOutActivated)
+            {
+                if(!_UIcontroller.checkIfFadeInFinished())
+                {
+                    SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+                }
+            }
+            
         }
         else
         {
@@ -842,33 +844,13 @@ public class GameManagerScript : MonoBehaviour {
                 player.transform.position = new Vector3(player.transform.position.x, maxLevelBounds.y, player.transform.position.z);
             }
             /////End of keep player in game area
-
-            ////Transition to allrange
-            //if(bossChangesToAR && !finishedTransitionTOAR && (Time.time - timeARStarted) < timeNeededToPassForBossAppearAR)
-            //{
-            //    player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(false);
-            //}
-            //else
-            //{
-            //    finishedTransitionTOAR = true;
-            //}
-
+            
             if(startedTransitionTOAR)
             {
                 startedTransitionTOAR = false;
                 player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(false);
                 _UIcontroller.loadDialog(switchingToARDialog);
             }
-
-            ////Trigger boss TODO
-            //if (hasBoss && !isAtBoss && (Time.time - timeARStarted) > timeNeededToPassForBossAppearAR)
-            //{
-            //    finishedTransitionTOAR = true;
-            //    isAtBoss = true;
-            //    boss.SetActive(true);
-            //    boss.GetComponent<BossControlScript>().resetHealth();
-            //    _bgmusicControl.playBossMusic();
-            //}
 
             //Update the health UI
             if (isAtBoss)
@@ -878,111 +860,93 @@ public class GameManagerScript : MonoBehaviour {
                 {
                     _UIcontroller.updateBossHealth(boss.GetComponent<BossControlScript>().getCurrentHealthPercentage());
                 }
-                
-                //Check if the boss is done
-                if (!bossDestroyed && boss.GetComponent<BossControlScript>().getCurrentHealthPercentage() <= 0)
-                {
-                    _UIcontroller.increaseHits(boss.GetComponent<BossControlScript>().hits);
-                    bossDestroyed = true;
-                    timeBossDestroyed = Time.time;
-                    _bgmusicControl.stopMusic();
-                    player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(false);
+            }
 
-                    //Move the camera so the player is in the same place of the victory camera position
-                    _cameraControl.missionCompleteMode(timeAfterBossDestroyedToDisappear);
+            if (!victoryPlaying && bossDestroyed && Time.time - timeBossDestroyed > timeAfterBossDestroyedToDisappear)
+            {
+                _bgmusicControl.playVictoryTrack();
+                victoryPlaying = true;
+                timeOfVictoryActivated = Time.time;
+                player.GetComponent<PlayerControllerScript>().disableCursor();
+                _UIcontroller.setUIStatus(false);
+            }
+
+            //Activate the mission complete text
+            if (victoryPlaying && !displayingMissionComplete && Time.time - timeOfVictoryActivated > timeBeforeDisplayingMissionComplete)
+            {
+                displayingMissionComplete = true;
+                _UIcontroller.activateNextMissionComplete();
+                timeSinceActivateMissionComplete = Time.time;
+
+                timeDialogMissionCompleteStart = Time.time;
+            }
+            if (displayingMissionComplete && Time.time - timeSinceActivateMissionComplete > timeBetweenMissionComplete)
+            {
+                _UIcontroller.activateNextMissionComplete();
+                timeSinceActivateMissionComplete = Time.time;
+            }
+            if (!playingMissionOverDialog && displayingMissionComplete && Time.time - timeOfVictoryActivated > (totalTimeDisplayingMissionComplete + timeBetweenMissionComplete))
+            {
+                _UIcontroller.turnOffMissionComplete();
+                playingMissionOverDialog = true;
+            }
+
+            //End of mission Dialog
+            if (playingMissionOverDialog && currentMissionCompleteDialog < 4 && Time.time - timeDialogMissionCompleteStart > timeBeforePlayMissionCompleteNextDialog)
+            {
+                // _UIcontroller
+                switch (currentMissionCompleteDialog)
+                {
+                    case 0:
+                        _UIcontroller.loadDialog(missionCompleteText[0]);
+                        break;
+                    case 1:
+                        if (currentHealthFalco > 0)
+                        {
+                            _UIcontroller.loadDialog(missionCompleteText[1]);
+                        }
+                        else
+                        {
+                            _UIcontroller.loadDialog(repairsCompleteText[0]);
+                        }
+                        break;
+                    case 2:
+                        if (currentHealthKris > 0)
+                        {
+                            _UIcontroller.loadDialog(missionCompleteText[2]);
+                        }
+                        else
+                        {
+                            _UIcontroller.loadDialog(repairsCompleteText[1]);
+                        }
+                        break;
+                    case 3:
+                        if (currentHealthSlip > 0)
+                        {
+                            _UIcontroller.loadDialog(missionCompleteText[3]);
+                        }
+                        else
+                        {
+                            _UIcontroller.loadDialog(repairsCompleteText[2]);
+                        }
+                        break;
                 }
 
-                if (!victoryPlaying && bossDestroyed && Time.time - timeBossDestroyed > timeAfterBossDestroyedToDisappear)
-                {
-                    _bgmusicControl.playVictoryTrack();
-                    victoryPlaying = true;
-                    timeOfVictoryActivated = Time.time;
-                    player.GetComponent<PlayerControllerScript>().disableCursor();
-                    _UIcontroller.setUIStatus(false);
+                timeDialogMissionCompleteStart = Time.time;
+                currentMissionCompleteDialog++;
+            }
 
-                    //Remove the teammates
-                    //teammates[0].SetActive(false);
-                    //teammates[1].SetActive(false);
-                    //teammates[2].SetActive(false);
-                }
+            if (victoryPlaying && !levelWinFadeOutActivated && Time.time - timeOfVictoryActivated > timeForLevelOrderFadeOutToStart)
+            {
+                levelWinFadeOutActivated = true;
+                _UIcontroller.activateFadeIn();
+            }
 
-                //Activate the mission complete text
-                if (victoryPlaying && !displayingMissionComplete && Time.time - timeOfVictoryActivated > timeBeforeDisplayingMissionComplete)
+            if (levelWinFadeOutActivated)
+            {
+                if (!_UIcontroller.checkIfFadeInFinished())
                 {
-                    displayingMissionComplete = true;
-                    _UIcontroller.activateNextMissionComplete();
-                    timeSinceActivateMissionComplete = Time.time;
-
-                    timeDialogMissionCompleteStart = Time.time;
-                }
-                if (displayingMissionComplete && Time.time - timeSinceActivateMissionComplete > timeBetweenMissionComplete)
-                {
-                    _UIcontroller.activateNextMissionComplete();
-                    timeSinceActivateMissionComplete = Time.time;
-                }
-                if (!playingMissionOverDialog && displayingMissionComplete && Time.time - timeOfVictoryActivated > (totalTimeDisplayingMissionComplete + timeBetweenMissionComplete))
-                {
-                    _UIcontroller.turnOffMissionComplete();
-                    playingMissionOverDialog = true;
-                }
-
-                //End of mission Dialog
-                if (playingMissionOverDialog && currentMissionCompleteDialog < 4 && Time.time - timeDialogMissionCompleteStart > timeBeforePlayMissionCompleteNextDialog)
-                {
-                    // _UIcontroller
-                    switch (currentMissionCompleteDialog)
-                    {
-                        case 0:
-                            _UIcontroller.loadDialog(missionCompleteText[0]);
-                            break;
-                        case 1:
-                            if (currentHealthFalco > 0)
-                            {
-                                _UIcontroller.loadDialog(missionCompleteText[1]);
-                            }
-                            else
-                            {
-                                _UIcontroller.loadDialog(repairsCompleteText[0]);
-                            }
-                            break;
-                        case 2:
-                            if (currentHealthKris > 0)
-                            {
-                                _UIcontroller.loadDialog(missionCompleteText[2]);
-                            }
-                            else
-                            {
-                                _UIcontroller.loadDialog(repairsCompleteText[1]);
-                            }
-                            break;
-                        case 3:
-                            if (currentHealthSlip > 0)
-                            {
-                                _UIcontroller.loadDialog(missionCompleteText[3]);
-                            }
-                            else
-                            {
-                                _UIcontroller.loadDialog(repairsCompleteText[2]);
-                            }
-                            break;
-                    }
-
-                    timeDialogMissionCompleteStart = Time.time;
-                    currentMissionCompleteDialog++;
-                }
-
-                if (victoryPlaying && !levelWinFadeOutActivated && Time.time - timeOfVictoryActivated > timeForLevelOrderFadeOutToStart)
-                {
-                    levelWinFadeOutActivated = true;
-                    _UIcontroller.activateFadeIn();
-                }
-
-                if (levelWinFadeOutActivated)
-                {
-                    if (!_UIcontroller.checkIfFadeInFinished())
-                    {
-                        SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
-                    }
+                    SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
                 }
             }
         }
@@ -1091,6 +1055,22 @@ public class GameManagerScript : MonoBehaviour {
         return bossDestroyed;
     }
 
+    public bool getIsAtBoss()
+    {
+        return isAtBoss;
+    }
+
+    public void endLevel()
+    {
+        bossDestroyed = true;
+        timeBossDestroyed = Time.time;
+        _bgmusicControl.stopMusic();
+        player.GetComponent<PlayerControllerScript>().setPlayerControlEnable(false);
+
+        //Move the camera so the player is in the same place of the victory camera position
+        _cameraControl.missionCompleteMode(timeAfterBossDestroyedToDisappear);
+    }
+
     private void checkIfNeedToRemove()
     {
         //If all the green lasers were swapped, disalbe it to prevent further changes
@@ -1136,127 +1116,7 @@ public class GameManagerScript : MonoBehaviour {
                 }
             }
         }
-
-
-
-        //for (int i = 0; i < bombPickups.Length; i++)
-        //{
-        //    if (bombPickups[i] != null)
-        //    {
-        //        if (bombPickups[i].transform.position.z < player.transform.position.z)
-        //        {
-        //            bombPickups[i].GetComponent<BecomeTransparent>().switchTransparent(true);
-        //        }
-        //        else
-        //        {
-        //            bombPickups[i].GetComponent<BecomeTransparent>().switchTransparent(false);
-        //        }
-
-        //        if (bombPickups[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
-        //        {
-        //            Destroy(bombPickups[i]);
-        //        }
-        //    }
-        //}
-
-        //for (int i = 0; i < silverRings.Length; i++)
-        //{
-        //    if (silverRings[i] != null)
-        //    {
-        //        if (silverRings[i].transform.position.z < player.transform.position.z)
-        //        {
-        //            silverRings[i].GetComponent<BecomeTransparent>().switchTransparent(true);
-        //        }
-        //        else
-        //        {
-        //            silverRings[i].GetComponent<BecomeTransparent>().switchTransparent(false);
-        //        }
-
-        //        if (silverRings[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
-        //        {
-        //            Destroy(silverRings[i]);
-        //        }
-        //    }
-        //}
-
-        //for (int i = 0; i < goldRings.Length; i++)
-        //{
-        //    if (goldRings[i] != null)
-        //    {
-        //        if (goldRings[i].transform.position.z < player.transform.position.z)
-        //        {
-        //            goldRings[i].GetComponent<BecomeTransparent>().switchTransparent(true);
-        //        }
-        //        else
-        //        {
-        //            goldRings[i].GetComponent<BecomeTransparent>().switchTransparent(false);
-        //        }
-
-        //        if (goldRings[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
-        //        {
-        //            Destroy(goldRings[i]);
-        //        }
-        //    }
-        //}
-
-        //for (int i = 0; i < laserPickups.Length; i++)
-        //{
-        //    if (laserPickups[i] != null)
-        //    {
-        //        //Switch to blue lasers if have twin laser already
-        //        if (greenLasersActive)
-        //        {
-        //            if (player.GetComponent<PlayerControllerScript>().getCurrentLaser() > 0)
-        //            {
-        //                Vector3 pos = laserPickups[i].transform.position;
-        //                Quaternion rot = laserPickups[i].transform.rotation;
-        //                Destroy(laserPickups[i]);
-        //                laserPickups[i] = Instantiate(blueLasers, pos, rot);
-        //            }
-        //        }
-
-        //        if (laserPickups[i].transform.position.z < player.transform.position.z)
-        //        {
-        //            laserPickups[i].GetComponent<BecomeTransparent>().switchTransparent(true);
-        //        }
-        //        else
-        //        {
-        //            laserPickups[i].GetComponent<BecomeTransparent>().switchTransparent(false);
-        //        }
-
-        //        if (laserPickups[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
-        //        {
-        //            Destroy(laserPickups[i]);
-        //        }
-        //    }
-        //}
-
-        //for (int i = 0; i < enemies.Length; i++)
-        //{
-        //    if (enemies[i] != null)
-        //    {
-        //        if (enemies[i].transform.position.z < player.transform.position.z)
-        //        {
-        //            // Destroy(enemies[i]);
-        //            // enemies[i].GetComponent<DamagableByPlayer>().rend.material.shader = Shader.Find("Transparent/Diffuse");
-        //            enemies[i].GetComponent<BecomeTransparent>().switchTransparent(true);
-        //        }
-
-        //        if (enemies[i].transform.position.z + distanceBehindPlayerToRemove < player.transform.position.z)
-        //        {
-        //            Destroy(enemies[i]);
-        //        }
-        //        //else
-        //        //{
-        //        //    enemies[i].GetComponent<BecomeTransparent>().switchTransparent(false);
-        //        //}
-        //    }
-        //}
+        
     }
-
-    //public float getTransitionTime()
-    //{
-    //    return timeNeededToPassForBossAppearAR;
-    //}
-
+    
 }
