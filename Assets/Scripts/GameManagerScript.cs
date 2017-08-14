@@ -51,6 +51,8 @@ public class GameManagerScript : MonoBehaviour {
     bool greenLasersActive;
     public GameObject blueLasers;
 
+    public GameObject checkPoint;
+
     private float distanceBehindPlayerToRemove;
 
     //Teammates
@@ -150,6 +152,9 @@ public class GameManagerScript : MonoBehaviour {
 
     private bool transitionToAREventsTriggered;
 
+    private GameObject stored;
+    private bool levelInitCompleted;
+
     // Use this for initialization
     void Start ()
     {
@@ -204,6 +209,36 @@ public class GameManagerScript : MonoBehaviour {
         {
             timeARStarted = Time.time;
         }
+        
+        
+    }
+
+    private void init()
+    {
+        //CHECK IF THE PLAYER REACHED A CHECKPOINT!!!!!
+        stored = GameObject.FindWithTag("StoredInfo");
+        if (stored != null)
+        {
+            if (stored.GetComponent<InfoToTakeInOutOfLevel>().getCheckPointReached())
+            {
+                Destroy(checkPoint);
+                player.transform.position = new Vector3(0, 0, stored.GetComponent<InfoToTakeInOutOfLevel>().getCheckPointZcord());
+                _UIcontroller.setHits(stored.GetComponent<InfoToTakeInOutOfLevel>().getStoredHits());
+                _UIcontroller.skipIntro();
+
+                //Dont repeat dialog (Note to self: Since teammates paths one can only be active at a time those replaying might not be a bad thing but if problems arise you now know why)
+                for (int i = 0; i < levelDialog.Length; i++)
+                {
+                    if (player.transform.position.z > zCordToTriggerDialog[i] && !zCordDialogPlayed[i])
+                    {
+                        zCordDialogPlayed[i] = true;
+                    }
+                }
+            }
+        }
+        ////////
+
+        levelInitCompleted = true;
 
         _UIcontroller.activateFadeOut();
     }
@@ -454,6 +489,12 @@ public class GameManagerScript : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
+        //Check on the checkpoint after starting a level
+        if(!levelInitCompleted)
+        {
+            init();
+        }
+
         //Check if player is dead
         if (!playerIsDead && player.GetComponent<PlayerControllerScript>().getCurrentHealth() <= 0)
         {

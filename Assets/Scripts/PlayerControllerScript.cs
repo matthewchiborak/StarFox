@@ -353,6 +353,11 @@ public class PlayerControllerScript : MonoBehaviour {
         tilt = maxRotX / currentSpeed;
     }
 
+    public bool getIsDead()
+    {
+        return isDead;
+    }
+
     //Handle Collsions
     void OnTriggerEnter(Collider other)
     {

@@ -237,10 +237,17 @@ public class UIController : MonoBehaviour {
                     }
                     break;
                 case 5:
+                    totalIntroduction.enabled = false;
                     introFinished = true;
                     break;
             }
         }
+    }
+
+    public void skipIntro()
+    {
+        totalIntroduction.enabled = false;
+        introFinished = true;
     }
 
     public void activateNextMissionComplete()
@@ -560,6 +567,14 @@ public class UIController : MonoBehaviour {
     public void increaseHits(int hitsToAdd)
     {
         hits += hitsToAdd;
+    }
+    public void setHits(int hitsToSet)
+    {
+        hits = hitsToSet;
+    }
+    public int getHits()
+    {
+        return hits;
     }
 
     //public void loadDialog(int dialogIndex)
