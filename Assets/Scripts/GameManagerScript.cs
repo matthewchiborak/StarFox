@@ -22,6 +22,7 @@ public class UnitInfo
 public class GameManagerScript : MonoBehaviour {
 
     public string sceneName;
+    public string menuName;
     public TextAsset levelInfo;
 
     public GameObject player;
@@ -825,7 +826,8 @@ public class GameManagerScript : MonoBehaviour {
             {
                 if(!_UIcontroller.checkIfFadeInFinished())
                 {
-                    SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+                    GameObject.FindWithTag("StoredInfo").GetComponent<InfoToTakeInOutOfLevel>().finishedLevel(_UIcontroller.getHits());
+                    SceneManager.LoadScene(menuName, LoadSceneMode.Single);
                 }
             }
             
@@ -987,7 +989,8 @@ public class GameManagerScript : MonoBehaviour {
             {
                 if (!_UIcontroller.checkIfFadeInFinished())
                 {
-                    SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+                    GameObject.FindWithTag("StoredInfo").GetComponent<InfoToTakeInOutOfLevel>().finishedLevel(_UIcontroller.getHits());
+                    SceneManager.LoadScene(menuName, LoadSceneMode.Single);
                 }
             }
         }

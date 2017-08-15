@@ -7,6 +7,8 @@ using UnityEngine;
 public class InfoToTakeInOutOfLevel : MonoBehaviour {
 
     private static InfoToTakeInOutOfLevel persistantInfo;
+    private bool cameFromLevel;
+    private int levelId;
 
     private bool checkPointReached;
     private float checkPointZCord;
@@ -23,6 +25,7 @@ public class InfoToTakeInOutOfLevel : MonoBehaviour {
     public void reset()
     {
         checkPointReached = false;
+        cameFromLevel = false;
         checkPointZCord = 0;
         storedHits = 0;
         storedBombs = 0;
@@ -54,10 +57,29 @@ public class InfoToTakeInOutOfLevel : MonoBehaviour {
         return storedHits;
     }
 
+    public bool getCameFromlevel()
+    {
+        return cameFromLevel;
+    }
+    public int getLevelId()
+    {
+        return levelId;
+    }
+    public void setLevelId(int id)
+    {
+        levelId = id;
+    }
+
     public void hitCheckPoint(float zCord, int hits)
     {
         checkPointReached = true;
         checkPointZCord = zCord;
         storedHits = hits;
+    }
+
+    public void finishedLevel(int hits)
+    {
+        storedHits = hits;
+        cameFromLevel = true;
     }
 }
