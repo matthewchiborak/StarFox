@@ -37,6 +37,11 @@ public class LevelSelectControl : MonoBehaviour {
 
     private GameObject stored;
 
+    public AudioSource menuMove;
+    public AudioSource menuSelect;
+    public AudioSource menuError;
+    public AudioSource menuCancel;
+
     // Use this for initialization
     void Start ()
     {
@@ -116,6 +121,9 @@ public class LevelSelectControl : MonoBehaviour {
                 currentPosition--;
                 cursor.rectTransform.localPosition = cursorPositions[currentPosition];
 
+                menuMove.time = 0.9f;
+                menuMove.Play();
+
                 //Check on page change
                 if(currentPosition % levelsPerPage == (levelsPerPage - 1))
                 {
@@ -132,15 +140,19 @@ public class LevelSelectControl : MonoBehaviour {
             {
                 currentPosition++;
                 cursor.rectTransform.localPosition = cursorPositions[currentPosition];
-            }
 
-            //Check on page change
-            if (currentPosition % levelsPerPage == (0))
-            {
-                startPos = wholeMenu.rectTransform.localPosition.y;
-                endPos = pageSize * (currentPosition / levelsPerPage);
-                timePageChangeBegan = Time.time;
-                changingPage = true;
+                menuMove.time = 0.9f;
+                menuMove.Play();
+
+
+                //Check on page change
+                if (currentPosition % levelsPerPage == (0))
+                {
+                    startPos = wholeMenu.rectTransform.localPosition.y;
+                    endPos = pageSize * (currentPosition / levelsPerPage);
+                    timePageChangeBegan = Time.time;
+                    changingPage = true;
+                }
             }
         }
 
@@ -149,10 +161,18 @@ public class LevelSelectControl : MonoBehaviour {
             //Set the level id to the info going into level
             if (currentPosition <= lastLevelUnlocked)
             {
+                menuSelect.time = 0.9f;
+                menuSelect.Play();
+
                 GameObject.FindWithTag("StoredInfo").GetComponent<InfoToTakeInOutOfLevel>().reset();
                 GameObject.FindWithTag("StoredInfo").GetComponent<InfoToTakeInOutOfLevel>().setLevelId(currentPosition);
 
                 SceneManager.LoadScene(sceneNames[currentPosition], LoadSceneMode.Single);
+            }
+            else
+            {
+                menuError.time = 0.9f;
+                menuError.Play();
             }
         }
     }
