@@ -5,6 +5,53 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+public class BriefingDialogInfo
+{
+    public int[] character;
+    public int[] charOnLeft;
+    public int[] charOnRight;
+    public string[] dialog;
+    public int currentPosition;
+    public int characterOnScreen;
+
+    public bool isDone()
+    {
+        if (currentPosition >= dialog.Length)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public int getCurrentCharacter()
+    {
+        return character[currentPosition];
+    }
+    public string getCurrentDialog()
+    {
+        return dialog[currentPosition];
+    }
+    public int getCurrentCharOnLeft()
+    {
+        return charOnLeft[currentPosition];
+    }
+    public int getCurrentCharOnRight()
+    {
+        return charOnRight[currentPosition];
+    }
+
+    public BriefingDialogInfo(int size)
+    {
+        character = new int[size];
+        charOnLeft = new int[size];
+        charOnRight = new int[size];
+        dialog = new string[size];
+        currentPosition = 0;
+        characterOnScreen = 0;
+    }
+}
+
 public class BriefingControllerScript : MonoBehaviour {
 
     private GameObject stored;
@@ -17,14 +64,15 @@ public class BriefingControllerScript : MonoBehaviour {
 
     public string[] allPlanetNames;
     public TextAsset[] briefingDialog;
-    public GameObject[] characterPortraits;
+    public GameObject[] charactersLeft;
+    public GameObject[] charactersRight;
 
     public float durationOfBriefingAppear;
     private float timeBriefingBegan;
 
     private int briefingPhase;
     
-    private DialogInfo _dialogInfo;
+    private BriefingDialogInfo _dialogInfo;
 
     private float timeDialogPopup;
     public float durationOfDialogOnScreen;
@@ -71,13 +119,30 @@ public class BriefingControllerScript : MonoBehaviour {
 
                 if (!_dialogInfo.isDone())
                 {
-                    for (int i = 0; i < characterPortraits.Length; i++)
+                    for (int i = 0; i < charactersLeft.Length; i++)
                     {
                         if (i == _dialogInfo.getCurrentCharacter())
                         {
                             _dialogInfo.characterOnScreen = i;
                             characterName.text = ((CharacterID)i).ToString();
-                           
+                        }
+
+                        //Change the character models
+                        if(i == _dialogInfo.getCurrentCharOnLeft())
+                        {
+                            charactersLeft[i].SetActive(true);
+                        }
+                        else
+                        {
+                            charactersLeft[i].SetActive(false);
+                        }
+                        if (i == _dialogInfo.getCurrentCharOnRight())
+                        {
+                            charactersRight[i].SetActive(true);
+                        }
+                        else
+                        {
+                            charactersRight[i].SetActive(false);
                         }
                     }
 
@@ -114,7 +179,7 @@ public class BriefingControllerScript : MonoBehaviour {
         string fs = textAsset.text;
         string[] fLines = fs.Split('\n');
 
-        _dialogInfo = new DialogInfo(fLines.Length);//[fLines.Length];
+        _dialogInfo = new BriefingDialogInfo(fLines.Length);//[fLines.Length];
 
         for (int i = 0; i < fLines.Length; i++)
         {
@@ -122,7 +187,9 @@ public class BriefingControllerScript : MonoBehaviour {
             string[] values = valueLine.Split(';');//, ";"); // your splitter here
 
             _dialogInfo.character[i] = (int)Enum.Parse(typeof(CharacterID), values[0]);
-            _dialogInfo.dialog[i] = values[1];
+            _dialogInfo.charOnLeft[i] = (int)Enum.Parse(typeof(CharacterID), values[1]);
+            _dialogInfo.charOnRight[i] = (int)Enum.Parse(typeof(CharacterID), values[2]);
+            _dialogInfo.dialog[i] = values[3];
         }
     }
 }
