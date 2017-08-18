@@ -1,10 +1,10 @@
 Falco;Falco;Slippy;Okay everyone! I've been put in charge of testing and that's exactly what we're going to do.
-Slippy;Falco;Slippy;!!! Who said that!?
-Falco;Falco;Slippy;What are you talking about? I did.
-Slippy;Falco;Slippy;Falco? That's you? How come I can't see you?
-Krystal;Krystal;Slippy;I see you're taking my advice and ignoring him...
-Fox;Krystal;Fox;What's this about not being able to see us?
-Peppy;Peppy;Fox;Yeah don't working ROB will have this all fixed in a moment.
-ROB;Peppy;ROB;Actually this problem can only be fixed with created animations from scratch. More time will be needed.
-Krystal;Krystal;ROB;Fantastic...
-Falco;Krystal;Falco;...Test successful.
+Slippy;N;N;!!! Who said that!?
+Falco;N;N;What are you talking about? I did.
+Slippy;N;N;Falco? That's you? How come I can't see you?
+Krystal;Krystal;N;I see you're taking my advice and ignoring him...
+Fox;N;Fox;What's this about not being able to see us?
+Peppy;Peppy;N;Yeah don't working ROB will have this all fixed in a moment.
+ROB;N;ROB;Actually this problem can only be fixed with created animations from scratch. More time will be needed.
+Krystal;Krystal;N;Fantastic...
+Falco;N;Falco;...Test successful.
