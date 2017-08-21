@@ -10,6 +10,10 @@ public class BriefingDialogInfo
     public int[] character;
     public int[] charOnLeft;
     public int[] charOnRight;
+
+    public string[] animationNameLeft;
+    public string[] animationNameRight;
+
     public string[] dialog;
     public int currentPosition;
     public int characterOnScreen;
@@ -41,12 +45,25 @@ public class BriefingDialogInfo
         return charOnRight[currentPosition];
     }
 
+    public string getCurrentAnimationNameLeft()
+    {
+        return animationNameLeft[currentPosition];
+    }
+    public string getCurrentAnimationNameRight()
+    {
+        return animationNameRight[currentPosition];
+    }
+
     public BriefingDialogInfo(int size)
     {
         character = new int[size];
         charOnLeft = new int[size];
         charOnRight = new int[size];
         dialog = new string[size];
+
+        animationNameLeft = new string[size];
+        animationNameRight = new string[size];
+
         currentPosition = 0;
         characterOnScreen = 0;
     }
@@ -66,6 +83,8 @@ public class BriefingControllerScript : MonoBehaviour {
     public TextAsset[] briefingDialog;
     public GameObject[] charactersLeft;
     public GameObject[] charactersRight;
+    public Animator[] animLeft;
+    public Animator[] animRight;
 
     public Image leftCover;
     public Image rightCover;
@@ -101,85 +120,6 @@ public class BriefingControllerScript : MonoBehaviour {
         planetName.text = allPlanetNames[GameObject.FindWithTag("StoredInfo").GetComponent<InfoToTakeInOutOfLevel>().getLevelId()];
     }
 
-    private void oldDialogSystem()
-    {
-        if (briefingPhase == 0)
-        {
-            //background.rectTransform.localScale = new Vector3((Time.time - timeBriefingBegan) / durationOfBriefingAppear, (Time.time - timeBriefingBegan) / durationOfBriefingAppear, 0);
-            //if((Time.time - timeBriefingBegan) > durationOfBriefingAppear)
-            //{
-            //    briefingPhase++;
-            //}
-            blackScreen.color = new Vector4(0, 0, 0, Mathf.Lerp(1, 0, (Time.time - timeBriefingBegan) / durationOfBriefingAppear));
-            if ((Time.time - timeBriefingBegan) > durationOfBriefingAppear)
-            {
-                //Load the dialog to be read
-                loadDialog(briefingDialog[GameObject.FindWithTag("StoredInfo").GetComponent<InfoToTakeInOutOfLevel>().getLevelId()]);
-
-                briefingPhase++;
-            }
-        }
-
-        if (briefingPhase == 1)
-        {
-            if (Time.time - timeDialogPopup > durationOfDialogOnScreen)
-            {
-                timeDialogPopup = Time.time;
-
-                if (!_dialogInfo.isDone())
-                {
-                    for (int i = 0; i < charactersLeft.Length; i++)
-                    {
-                        if (i == _dialogInfo.getCurrentCharacter())
-                        {
-                            _dialogInfo.characterOnScreen = i;
-                            characterName.text = ((CharacterID)i).ToString();
-                        }
-
-                        //Change the character models
-                        if (i == _dialogInfo.getCurrentCharOnLeft())
-                        {
-                            charactersLeft[i].SetActive(true);
-                        }
-                        else
-                        {
-                            charactersLeft[i].SetActive(false);
-                        }
-                        if (i == _dialogInfo.getCurrentCharOnRight())
-                        {
-                            charactersRight[i].SetActive(true);
-                        }
-                        else
-                        {
-                            charactersRight[i].SetActive(false);
-                        }
-                    }
-
-                    dialog.text = _dialogInfo.getCurrentDialog();
-
-                    _dialogInfo.currentPosition++;
-                }
-                else
-                {
-                    //All dialog exhaused
-                    timeBriefingBegan = Time.time;
-                    briefingPhase++;
-                    characterName.text = "";
-                    dialog.text = "";
-                }
-            }
-        }
-
-        if (briefingPhase == 2)
-        {
-            blackScreen.color = new Vector4(0, 0, 0, Mathf.Lerp(0, 1, (Time.time - timeBriefingBegan) / durationOfBriefingAppear));
-            if ((Time.time - timeBriefingBegan) > durationOfBriefingAppear)
-            {
-                //Load level
-                SceneManager.LoadScene(GameObject.FindWithTag("StoredInfo").GetComponent<InfoToTakeInOutOfLevel>().getSceneNameOfLevel(), LoadSceneMode.Single);
-            }
-        }
-    }
 	
 	// Update is called once per frame
 	void Update ()
@@ -215,8 +155,22 @@ public class BriefingControllerScript : MonoBehaviour {
                 }
                 else
                 {
+                    ////
+                    //Check if need to cancel animations
+                    _dialogInfo.currentPosition--;
+                    if (_dialogInfo.getCurrentAnimationNameLeft() != "N")
+                    {
+                        animLeft[_dialogInfo.getCurrentCharOnLeft()].SetBool(_dialogInfo.getCurrentAnimationNameLeft(), false);
+                    }
+                    if (_dialogInfo.getCurrentAnimationNameRight() != "N")
+                    {
+                        animRight[_dialogInfo.getCurrentCharOnRight()].SetBool(_dialogInfo.getCurrentAnimationNameRight(), false);
+                    }
+                    _dialogInfo.currentPosition++;
+                    ////
+
                     //Set all the neccessary variables
-                    if(_dialogInfo.getCurrentCharOnLeft() >= 0)
+                    if (_dialogInfo.getCurrentCharOnLeft() >= 0)
                     {
                         //Change is required
                         fadingOutCoverL = true;
@@ -275,6 +229,11 @@ public class BriefingControllerScript : MonoBehaviour {
                         if (i == _dialogInfo.getCurrentCharOnLeft())
                         {
                             charactersLeft[i].SetActive(true);
+                            //Set the idle animation to the correct duration so can start talking immediately
+                            if (animLeft[i] != null)
+                            {
+                                animLeft[i].Play("Armature|Idle", -1, 2.5f - durationOfCharacterFade);
+                            }
                         }
                         else
                         {
@@ -286,6 +245,11 @@ public class BriefingControllerScript : MonoBehaviour {
                         if (i == _dialogInfo.getCurrentCharOnRight())
                         {
                             charactersRight[i].SetActive(true);
+                            //Set the idle animation to the correct duration so can start talking immediately
+                            if (animRight[i] != null)
+                            {
+                                animRight[i].Play("Armature|Idle", -1, 2.5f - durationOfCharacterFade);
+                            }
                         }
                         else
                         {
@@ -326,7 +290,7 @@ public class BriefingControllerScript : MonoBehaviour {
             }
         }
 
-        //Change dialog and name
+        //Change dialog and name and play the correct animation
         if (briefingPhase == 5)
         {
             for (int i = 0; i < charactersLeft.Length; i++)
@@ -335,6 +299,28 @@ public class BriefingControllerScript : MonoBehaviour {
                 {
                     _dialogInfo.characterOnScreen = i;
                     characterName.text = ((CharacterID)i).ToString();
+                }
+
+                //Change the animation is neccessary
+                if(i == _dialogInfo.getCurrentCharOnLeft())
+                {
+                    if(_dialogInfo.getCurrentAnimationNameLeft() != "N")
+                    {
+                        animLeft[i].SetBool(_dialogInfo.getCurrentAnimationNameLeft(), true);
+                        //animLeft[i].SetBool(_dialogInfo.getCurrentAnimationNameLeft(), false);
+                        //animLeft[i].SetTrigger(_dialogInfo.getCurrentAnimationNameLeft());
+                        //animLeft[i].ResetTrigger(_dialogInfo.getCurrentAnimationNameLeft());
+                    }
+                }
+                if (i == _dialogInfo.getCurrentCharOnRight())
+                {
+                    if (_dialogInfo.getCurrentAnimationNameRight() != "N")
+                    {
+                        animRight[i].SetTrigger(_dialogInfo.getCurrentAnimationNameRight());
+                        //animRight[i].ResetTrigger(_dialogInfo.getCurrentAnimationNameRight());
+                        //animRight[i].SetBool(_dialogInfo.getCurrentAnimationNameRight(), true);
+                        //animRight[i].SetBool(_dialogInfo.getCurrentAnimationNameRight(), false);
+                    }
                 }
             }
 
@@ -393,7 +379,11 @@ public class BriefingControllerScript : MonoBehaviour {
                 _dialogInfo.charOnRight[i] = (int)Enum.Parse(typeof(CharacterID), values[2]);
             }
 
-            _dialogInfo.dialog[i] = values[3];
+            //Animation to play name
+            _dialogInfo.animationNameLeft[i] = values[3];
+            _dialogInfo.animationNameRight[i] = values[4];
+
+            _dialogInfo.dialog[i] = values[5];
         }
     }
 }

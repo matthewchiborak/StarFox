@@ -1,0 +1,355 @@
+fileFormatVersion: 2
+guid: be05b643479b6884fbffb9481eb42ffa
+timeCreated: 1503349514
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: _ncl1_1
+    100002: Armature
+    100004: //RootNode
+    100006: Head
+    100008: Jaw
+    100010: Jaw_end
+    100012: LeftBack
+    100014: LeftElbow
+    100016: LeftIndex1
+    100018: LeftIndex2
+    100020: LeftIndex2_end
+    100022: LeftRest1
+    100024: LeftRest2
+    100026: LeftRest2_end
+    100028: LeftShoulder
+    100030: LeftThumb1
+    100032: LeftThumb2
+    100034: LeftThumb2_end
+    100036: LeftWrist
+    100038: LowerTorso
+    100040: Neck
+    100042: RightBack
+    100044: RightElbow
+    100046: RightIndex1
+    100048: RightIndex2
+    100050: RightIndex2_end
+    100052: RightRest1
+    100054: RightRest2
+    100056: RightRest2_end
+    100058: RightShoulder
+    100060: RightThumb1
+    100062: RightThumb2
+    100064: RightThumb2_end
+    100066: RightWrist
+    100068: Root
+    100070: UpperTorso
+    400000: _ncl1_1
+    400002: Armature
+    400004: //RootNode
+    400006: Head
+    400008: Jaw
+    400010: Jaw_end
+    400012: LeftBack
+    400014: LeftElbow
+    400016: LeftIndex1
+    400018: LeftIndex2
+    400020: LeftIndex2_end
+    400022: LeftRest1
+    400024: LeftRest2
+    400026: LeftRest2_end
+    400028: LeftShoulder
+    400030: LeftThumb1
+    400032: LeftThumb2
+    400034: LeftThumb2_end
+    400036: LeftWrist
+    400038: LowerTorso
+    400040: Neck
+    400042: RightBack
+    400044: RightElbow
+    400046: RightIndex1
+    400048: RightIndex2
+    400050: RightIndex2_end
+    400052: RightRest1
+    400054: RightRest2
+    400056: RightRest2_end
+    400058: RightShoulder
+    400060: RightThumb1
+    400062: RightThumb2
+    400064: RightThumb2_end
+    400066: RightWrist
+    400068: Root
+    400070: UpperTorso
+    4300000: _ncl1_1
+    7400000: Armature|Idle
+    7400002: Armature|Talk
+    7400004: Armature|Talk (1)
+    9500000: //RootNode
+    13700000: _ncl1_1
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Armature|Talk (1)
+      takeName: Armature|Talk
+      firstFrame: 0
+      lastFrame: 299
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: _ncl1_1
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Root
+        weight: 1
+      - path: Armature/Root/LowerTorso
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1/LeftIndex2
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1/LeftIndex2/LeftIndex2_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1/LeftRest2
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1/LeftRest2/LeftRest2_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1/LeftThumb2
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1/LeftThumb2/LeftThumb2_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/Neck
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/Neck/Head
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/Neck/Head/Jaw
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/Neck/Head/Jaw/Jaw_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1/RightIndex2
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1/RightIndex2/RightIndex2_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1/RightRest2
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1/RightRest2/RightRest2_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightThumb1
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightThumb1/RightThumb2
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightThumb1/RightThumb2/RightThumb2_end
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Armature|Talk
+      takeName: Armature|Talk
+      firstFrame: 0
+      lastFrame: 299
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: _ncl1_1
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Root
+        weight: 1
+      - path: Armature/Root/LowerTorso
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1/LeftIndex2
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1/LeftIndex2/LeftIndex2_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1/LeftRest2
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1/LeftRest2/LeftRest2_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1/LeftThumb2
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1/LeftThumb2/LeftThumb2_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/Neck
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/Neck/Head
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/Neck/Head/Jaw
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/Neck/Head/Jaw/Jaw_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1/RightIndex2
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1/RightIndex2/RightIndex2_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1/RightRest2
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1/RightRest2/RightRest2_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightThumb1
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightThumb1/RightThumb2
+        weight: 1
+      - path: Armature/Root/LowerTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightThumb1/RightThumb2/RightThumb2_end
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
