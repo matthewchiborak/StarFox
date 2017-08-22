@@ -1,0 +1,384 @@
+fileFormatVersion: 2
+guid: f23015948a4345742a0d288dd8425a54
+timeCreated: 1503434128
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Armature
+    100002: Head
+    100004: Jaw
+    100006: Jaw_end
+    100008: //RootNode
+    100010: LeftBack
+    100012: LeftElbow
+    100014: LeftIndex1
+    100016: LeftIndex2
+    100018: LeftIndex3
+    100020: LeftIndex3_end
+    100022: LeftRest1
+    100024: LeftRest2
+    100026: LeftRest3
+    100028: LeftRest3_end
+    100030: LeftShoulder
+    100032: LeftThumb1
+    100034: LeftThumb2
+    100036: LeftThumb2_end
+    100038: LeftWrist
+    100040: LowerTorso
+    100042: MidTorso
+    100044: Neck
+    100046: Object01
+    100048: RightBack
+    100050: RightElbow
+    100052: RightIndex1
+    100054: RightIndex2
+    100056: RightIndex3
+    100058: RightIndex3_end
+    100060: RightRest1
+    100062: RightRest2
+    100064: RightRest3
+    100066: RightRest3_end
+    100068: RightShoulder
+    100070: RightThumb1
+    100072: RightThumb2
+    100074: RightThumb2_end
+    100076: RightWrist
+    100078: Root
+    100080: UpperTorso
+    400000: Armature
+    400002: Head
+    400004: Jaw
+    400006: Jaw_end
+    400008: //RootNode
+    400010: LeftBack
+    400012: LeftElbow
+    400014: LeftIndex1
+    400016: LeftIndex2
+    400018: LeftIndex3
+    400020: LeftIndex3_end
+    400022: LeftRest1
+    400024: LeftRest2
+    400026: LeftRest3
+    400028: LeftRest3_end
+    400030: LeftShoulder
+    400032: LeftThumb1
+    400034: LeftThumb2
+    400036: LeftThumb2_end
+    400038: LeftWrist
+    400040: LowerTorso
+    400042: MidTorso
+    400044: Neck
+    400046: Object01
+    400048: RightBack
+    400050: RightElbow
+    400052: RightIndex1
+    400054: RightIndex2
+    400056: RightIndex3
+    400058: RightIndex3_end
+    400060: RightRest1
+    400062: RightRest2
+    400064: RightRest3
+    400066: RightRest3_end
+    400068: RightShoulder
+    400070: RightThumb1
+    400072: RightThumb2
+    400074: RightThumb2_end
+    400076: RightWrist
+    400078: Root
+    400080: UpperTorso
+    4300000: Object01
+    7400000: Armature|Idle
+    7400002: Armature|Talk
+    9500000: //RootNode
+    13700000: Object01
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Armature|Idle
+      takeName: Armature|Idle
+      firstFrame: 0
+      lastFrame: 180
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Root
+        weight: 1
+      - path: Armature/Root/LowerTorso
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1/LeftIndex2
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1/LeftIndex2/LeftIndex3
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1/LeftIndex2/LeftIndex3/LeftIndex3_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1/LeftRest2
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1/LeftRest2/LeftRest3
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1/LeftRest2/LeftRest3/LeftRest3_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1/LeftThumb2
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1/LeftThumb2/LeftThumb2_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/Neck
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/Neck/Head
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/Neck/Head/Jaw
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/Neck/Head/Jaw/Jaw_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1/RightIndex2
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1/RightIndex2/RightIndex3
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1/RightIndex2/RightIndex3/RightIndex3_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1/RightRest2
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1/RightRest2/RightRest3
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1/RightRest2/RightRest3/RightRest3_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightThumb1
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightThumb1/RightThumb2
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightThumb1/RightThumb2/RightThumb2_end
+        weight: 1
+      - path: Object01
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Armature|Talk
+      takeName: Armature|Talk
+      firstFrame: 0
+      lastFrame: 300
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Root
+        weight: 1
+      - path: Armature/Root/LowerTorso
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1/LeftIndex2
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1/LeftIndex2/LeftIndex3
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1/LeftIndex2/LeftIndex3/LeftIndex3_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1/LeftRest2
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1/LeftRest2/LeftRest3
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftRest1/LeftRest2/LeftRest3/LeftRest3_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1/LeftThumb2
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/LeftBack/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1/LeftThumb2/LeftThumb2_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/Neck
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/Neck/Head
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/Neck/Head/Jaw
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/Neck/Head/Jaw/Jaw_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1/RightIndex2
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1/RightIndex2/RightIndex3
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightIndex1/RightIndex2/RightIndex3/RightIndex3_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1/RightRest2
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1/RightRest2/RightRest3
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightRest1/RightRest2/RightRest3/RightRest3_end
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightThumb1
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightThumb1/RightThumb2
+        weight: 1
+      - path: Armature/Root/LowerTorso/MidTorso/UpperTorso/RightBack/RightShoulder/RightElbow/RightWrist/RightThumb1/RightThumb2/RightThumb2_end
+        weight: 1
+      - path: Object01
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

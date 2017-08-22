@@ -2,11 +2,12 @@ Falco;Falco;Slippy;N;N;Okay everyone! I've been put in charge of testing and tha
 Slippy;N;N;N;N;!!! Who said that!?
 Falco;N;N;N;N;What are you talking about? I did.
 Slippy;N;N;N;N;Falco? That's you? How come I can't see you?
-Krystal;Krystal;N;N;N;I see you're taking my advice and ignoring him...
+Krystal;Krystal;N;Talk;N;I see you're taking my advice and ignoring him...
 Fox;N;Fox;N;Talk;What's this about not being able to see us?
 Peppy;Peppy;N;N;N;Yeah don't working ROB will have this all fixed in a moment.
 ROB;N;ROB;N;N;Actually this problem can only be fixed with created animations from scratch. More time will be needed.
-Krystal;Krystal;N;N;N;Fantastic...
+Krystal;Krystal;N;Talk;N;Fantastic...
 Falco;N;Falco;N;N;...Test successful.
 Fox;Fox;N;Talk;N;Nope. Not yet. Needed to check the other side too.
 Falco;N;N;N;N;Oh. Okay. Well now test successful. (How does he know!!!).
+Krystal;N;Krystal;N;Talk;Someone help me. 
