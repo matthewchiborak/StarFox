@@ -1,7 +1,7 @@
 Falco;Falco;Slippy;Talk;N;Okay everyone! I've been put in charge of testing and that's exactly what we're going to do.
-Slippy;N;N;N;N;!!! Who said that!?
+Slippy;N;N;N;Talk;!!! Who said that!?
 Falco;N;N;Talk;N;What are you talking about? I did.
-Slippy;N;N;N;N;Falco? That's you? How come I can't see you?
+Slippy;N;N;N;Talk;Falco? That's you? How come I can't see you?
 Krystal;Krystal;N;Talk;N;I see you're taking my advice and ignoring him...
 Fox;N;Fox;N;Talk;What's this about not being able to see us?
 Peppy;Peppy;N;N;N;Yeah don't working ROB will have this all fixed in a moment.
