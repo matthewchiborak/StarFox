@@ -73,6 +73,9 @@ public class BriefingControllerScript : MonoBehaviour {
 
     private GameObject stored;
 
+    private int currentlyDisplayedLeft;
+    private int currentlyDisplayedRight;
+
     public Image background;
     public Image blackScreen;
     public Text planetName;
@@ -160,11 +163,11 @@ public class BriefingControllerScript : MonoBehaviour {
                     _dialogInfo.currentPosition--;
                     if (_dialogInfo.getCurrentAnimationNameLeft() != "N")
                     {
-                        animLeft[_dialogInfo.getCurrentCharOnLeft()].SetBool(_dialogInfo.getCurrentAnimationNameLeft(), false);
+                        animLeft[currentlyDisplayedLeft].SetBool(_dialogInfo.getCurrentAnimationNameLeft(), false);
                     }
                     if (_dialogInfo.getCurrentAnimationNameRight() != "N")
                     {
-                        animRight[_dialogInfo.getCurrentCharOnRight()].SetBool(_dialogInfo.getCurrentAnimationNameRight(), false);
+                        animRight[currentlyDisplayedRight].SetBool(_dialogInfo.getCurrentAnimationNameRight(), false);
                     }
                     _dialogInfo.currentPosition++;
                     ////
@@ -229,6 +232,7 @@ public class BriefingControllerScript : MonoBehaviour {
                         if (i == _dialogInfo.getCurrentCharOnLeft())
                         {
                             charactersLeft[i].SetActive(true);
+                            currentlyDisplayedLeft = i;
                             //Set the idle animation to the correct duration so can start talking immediately
                             if (animLeft[i] != null)
                             {
@@ -245,6 +249,7 @@ public class BriefingControllerScript : MonoBehaviour {
                         if (i == _dialogInfo.getCurrentCharOnRight())
                         {
                             charactersRight[i].SetActive(true);
+                            currentlyDisplayedRight = i;
                             //Set the idle animation to the correct duration so can start talking immediately
                             if (animRight[i] != null)
                             {
@@ -302,21 +307,26 @@ public class BriefingControllerScript : MonoBehaviour {
                 }
 
                 //Change the animation is neccessary
-                if(i == _dialogInfo.getCurrentCharOnLeft())
+                //if(i == _dialogInfo.getCurrentCharOnLeft())
+                if (i == currentlyDisplayedLeft)
                 {
                     if(_dialogInfo.getCurrentAnimationNameLeft() != "N")
                     {
                         animLeft[i].SetBool(_dialogInfo.getCurrentAnimationNameLeft(), true);
+                        //animLeft[i].Play("Armature|Idle", -1, 2.5f);
                         //animLeft[i].SetBool(_dialogInfo.getCurrentAnimationNameLeft(), false);
                         //animLeft[i].SetTrigger(_dialogInfo.getCurrentAnimationNameLeft());
                         //animLeft[i].ResetTrigger(_dialogInfo.getCurrentAnimationNameLeft());
                     }
                 }
-                if (i == _dialogInfo.getCurrentCharOnRight())
+                //if (i == _dialogInfo.getCurrentCharOnRight())
+                if (i == currentlyDisplayedRight)
                 {
                     if (_dialogInfo.getCurrentAnimationNameRight() != "N")
                     {
-                        animRight[i].SetTrigger(_dialogInfo.getCurrentAnimationNameRight());
+                        animRight[i].SetBool(_dialogInfo.getCurrentAnimationNameRight(), true);
+                        //animRight[i].Play("Armature|Idle", -1, 2.5f);
+                        //animRight[i].SetTrigger(_dialogInfo.getCurrentAnimationNameRight());
                         //animRight[i].ResetTrigger(_dialogInfo.getCurrentAnimationNameRight());
                         //animRight[i].SetBool(_dialogInfo.getCurrentAnimationNameRight(), true);
                         //animRight[i].SetBool(_dialogInfo.getCurrentAnimationNameRight(), false);
